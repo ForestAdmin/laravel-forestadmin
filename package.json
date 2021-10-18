@@ -1,0 +1,23 @@
+{
+  "name": "laravel-forestadmin",
+  "version": "0.0.1",
+  "description": "The official Laravel liana for Forest.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ForestAdmin/laravel-forestadmin.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ForestAdmin/laravel-forestadmin/issues"
+  },
+  "homepage": "https://github.com/ForestAdmin/laravel-forestadmin#readme",
+  "devDependencies": {
+    "@commitlint/cli": "11.0.0",
+    "@commitlint/config-conventional": "11.0.0",
+    "husky": "4.2.5"
+  }
+}
