@@ -18,11 +18,6 @@ use Illuminate\Support\Str;
 class ForestServiceProvider extends ServiceProvider
 {
     /**
-     * @var bool $defer
-     */
-    protected bool $defer = false;
-
-    /**
      * @var string $serveCommand
      */
     protected string $serveCommand = 'artisan serve';
@@ -34,37 +29,39 @@ class ForestServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // publish configuration file
+        // publish configuration files
         $this->publishes(
             [
-                $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'schema.php',
+                $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest.php',
             ],
             'config'
         );
 
-        $currentCommand = implode(' ', Request::server('argv'));
-        if (Str::startsWith($currentCommand, $this->serveCommand)) {
-            $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']);
+        if (null !== Request::server('argv')) {
+            $currentCommand = implode(' ', Request::server('argv'));
+            if (Str::startsWith($currentCommand, $this->serveCommand)) {
+                $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']);
+            }
         }
     }
 
     /**
-     * Register service provider.
+     * merge module config if it's not published or some entries are missing
+     *
      * @return void
      */
     public function register(): void
     {
-        // merge module config if it's not published or some entries are missing
-        $this->mergeConfigFrom($this->configFile(), 'schema');
+        $this->mergeConfigFrom($this->configFile(), 'forest');
     }
 
     /**
-     * Get module config file.
+     * Get path schema file.
      *
      * @return string
      */
     protected function configFile(): string
     {
-        return realpath(__DIR__ . '/../config/schema.php');
+        return realpath(__DIR__ . '/../config/forest.php');
     }
 }
