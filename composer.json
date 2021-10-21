@@ -1,0 +1,35 @@
+{
+  "name": "forestadmin/laravel-forestadmin",
+  "description": "Forest Admin provides an off-the-shelf administration panel based on a highly-extensible API plugged into your application.",
+  "type": "library",
+  "require": {
+    "php": "^7.4|^8.0",
+    "laravel/framework": "^8.0",
+    "doctrine/dbal": "^3.1"
+  },
+  "require-dev": {
+    "pestphp/pest": "^1.20",
+    "phpunit/phpunit": "^9.5",
+    "squizlabs/php_codesniffer": "^3.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "ForestAdmin\\LaravelForestAdmin\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ForestAdmin\\LaravelForestAdmin\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "ForestAdmin\\LaravelForestAdmin\\ForestServiceProvider"
+      ]
+    }
+  },
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
