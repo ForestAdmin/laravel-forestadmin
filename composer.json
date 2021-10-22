@@ -5,7 +5,8 @@
   "require": {
     "php": "^7.4|^8.0",
     "laravel/framework": "^8.0",
-    "doctrine/dbal": "^3.1"
+    "doctrine/dbal": "^3.1",
+    "asm89/stack-cors": "^2.0"
   },
   "require-dev": {
     "pestphp/pest": "^1.20",
