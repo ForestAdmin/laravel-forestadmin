@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin;
 
+use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Support\Facades\Request;
@@ -43,6 +44,10 @@ class ForestServiceProvider extends ServiceProvider
                 $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']);
             }
         }
+
+        // routing
+        $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
+        $this->app->router->pushMiddlewareToGroup('forestCors', ForestCors::class);
     }
 
     /**
