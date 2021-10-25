@@ -4,7 +4,11 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Middleware;
 
 use Asm89\Stack\CorsService;
 use Closure;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,24 +21,39 @@ use Symfony\Component\HttpFoundation\Response;
 class ForestCors
 {
     /**
-     * @var CorsService
+     * @var CorsService $cors
      */
-    protected CorsService $corsService;
+    protected CorsService $cors;
 
     /**
-     * Handle an incoming request.
-     *
-     * @param  Request $request
-     * @param  Closure $next
+     * @var Container $container
+     */
+    protected Container $container;
+
+    /**
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->cors = new CorsService($this->getCorsOptions());
+        $this->container = $container;
+    }
+
+    /**
+     * @param Request $request
+     * @param Closure $next
      * @return Response
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next): Response
     {
-        $this->corsService = new CorsService($this->getCorsOptions());
+        if (!$this->shouldRun($request)) {
+            return $next($request);
+        }
 
-        if ($this->corsService->isPreflightRequest($request)) {
-            $response = $this->corsService->handlePreflightRequest($request);
-            $this->corsService->varyHeader($response, 'Access-Control-Request-Method');
+        if ($this->cors->isPreflightRequest($request)) {
+            $response = $this->cors->handlePreflightRequest($request);
+
+            $this->cors->varyHeader($response, 'Access-Control-Request-Method');
 
             return $response;
         }
@@ -42,14 +61,37 @@ class ForestCors
         $response = $next($request);
 
         if ($request->getMethod() === 'OPTIONS') {
-            $this->corsService->varyHeader($response, 'Access-Control-Request-Method');
+            $this->cors->varyHeader($response, 'Access-Control-Request-Method');
         }
 
-        if (! $response->headers->has('Access-Control-Allow-Origin')) {
-            $response = $this->corsService->addActualRequestHeaders($response, $request);
+        return $this->addHeaders($request, $response);
+    }
+
+    /**
+     * Add the headers to the Response, if they don't exist yet.
+     *
+     * @param Request  $request
+     * @param Response $response
+     * @return Response
+     */
+    protected function addHeaders(Request $request, Response $response): Response
+    {
+        if (!$response->headers->has('Access-Control-Allow-Origin')) {
+            $response = $this->cors->addActualRequestHeaders($response, $request);
         }
 
         return $response;
+    }
+
+    /**
+     * Determine if the request match with the config
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    protected function shouldRun(Request $request): bool
+    {
+        return Str::startsWith($request->getRequestUri(), '/' . config('forest.route_prefix'));
     }
 
     /**
@@ -62,7 +104,7 @@ class ForestCors
         return [
             'allowedHeaders'         => ['*'],
             'allowedMethods'         => ['GET', 'POST', 'PUT', 'DELETE'],
-            'allowedOrigins'         => ['*.forestadmin.com'],
+            'allowedOrigins'         => ['*.forestadmin.com', 'localhost:(\d){4}'],
             'allowedOriginsPatterns' => ['#^.*\.forestadmin\.com\z#u'],
             'exposedHeaders'         => false,
             'maxAge'                 => 86400,

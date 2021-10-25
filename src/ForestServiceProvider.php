@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Console\Events\ArtisanStarting;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -25,10 +26,10 @@ class ForestServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap the application events.
-     *
+     * @param Kernel $kernel
      * @return void
      */
-    public function boot(): void
+    public function boot(Kernel $kernel): void
     {
         // publish configuration files
         $this->publishes(
@@ -47,7 +48,7 @@ class ForestServiceProvider extends ServiceProvider
 
         // routing
         $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
-        $this->app->router->pushMiddlewareToGroup('forestCors', ForestCors::class);
+        $kernel->pushMiddleware(ForestCors::class);
     }
 
     /**
