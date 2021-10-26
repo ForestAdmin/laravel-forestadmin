@@ -16,6 +16,22 @@ use Illuminate\Support\Facades\Http;
 class ForestApiRequester
 {
     /**
+     * @var array
+     */
+    private array $headers;
+
+    /**
+     * ForestApiRequester constructor
+     */
+    public function __construct()
+    {
+        $this->headers = [
+            'Content-Type'      => 'application/json',
+            'forest-secret-key' => config('forest.api.secret'),
+        ];
+    }
+
+    /**
      * @param string      $route
      * @param string|null $query
      * @param array       $headers
@@ -48,16 +64,16 @@ class ForestApiRequester
     /**
      * @param string $method
      * @param string $url
-     * @param array  $data
+     * @param array  $params
      * @param array  $headers
      *
      * @return Response
      */
-    private function call(string $method, string $url, array $data = [], array $headers = []): Response
+    private function call(string $method, string $url, array $params = [], array $headers = []): Response
     {
-        $response = Http::withHeaders($this->getHeaders($headers))
+        $response = Http::withHeaders($this->headers($headers))
             ->acceptJson()
-            ->$method($url, $data);
+            ->$method($url, $params);
 
         if (! $response->successful()) {
             throw new \RuntimeException("Cannot reach Forest API at $url, it seems to be down right now");
@@ -67,18 +83,25 @@ class ForestApiRequester
     }
 
     /**
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    /**
      * @param array $headers
      * @return array
      */
-    private function getHeaders(array $headers = []): array
+    private function headers(array $headers = []): array
     {
-        return array_merge(
-            [
-                'Content-Type'      => 'application/json',
-                'forest_secret_key' => config('forest.api.secret'),
-            ],
+        $this->headers = array_merge(
+            $this->headers,
             $headers
         );
+
+        return $this->headers;
     }
 
     /**
@@ -104,7 +127,7 @@ class ForestApiRequester
     private function validateUrl(string $url): bool
     {
         if ((bool) filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED) !== true) {
-            throw new InvalidUrlException("$url seems to be invalid url");
+            throw new InvalidUrlException("$url seems to be an invalid url");
         }
 
         return true;

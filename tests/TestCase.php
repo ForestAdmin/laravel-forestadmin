@@ -22,6 +22,25 @@ class TestCase extends OrchestraTestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        config('forest.api.secret', 'my-secret-key');
+    }
+
+    /**
+     * Call protected/private method of a class.
+     * @param object &$object
+     * @param string $methodName
+     * @param array  $parameters
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    public function invokeMethod(object &$object, string $methodName, array $parameters = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $parameters);
     }
 
     /**
