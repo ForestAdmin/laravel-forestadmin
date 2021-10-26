@@ -28,7 +28,7 @@ class TestCase extends OrchestraTestCase
 
     /**
      * Call protected/private method of a class.
-     * @param object &$object
+     * @param object $object
      * @param string $methodName
      * @param array  $parameters
      * @return mixed
