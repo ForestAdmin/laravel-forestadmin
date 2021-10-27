@@ -7,7 +7,8 @@ on:
   pull_request:
 
 jobs:
-  phpcs:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,3 +37,6 @@ jobs:
 
       - name: Detect coding standard violations
         run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
+
+      - name: PHPUnit tests
+        run: XDEBUG_MODE=coverage vendor/bin/phpunit
