@@ -13,6 +13,9 @@
         stopOnFailure="false"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
+    <logging>
+        <testdoxXml outputFile="/tmp/coverage.xml"/>
+    </logging>
     <coverage>
         <include>
             <directory suffix=".php">src/</directory>
