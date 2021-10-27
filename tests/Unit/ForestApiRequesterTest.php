@@ -3,8 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
+use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Utils\ForestApiRequester;
 use Illuminate\Support\Facades\Http;
 
 /**

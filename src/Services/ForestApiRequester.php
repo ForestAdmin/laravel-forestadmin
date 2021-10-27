@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Utils;
+namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
 use Illuminate\Http\Client\Response;
@@ -75,7 +75,7 @@ class ForestApiRequester
             ->acceptJson()
             ->$method($url, $params);
 
-        if (! $response->successful()) {
+        if (! $response->object()) {
             throw new \RuntimeException("Cannot reach Forest API at $url, it seems to be down right now");
         }
 
