@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "The official Laravel liana for Forest.",
   "scripts": {
+    "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,6 @@
   "devDependencies": {
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "11.0.0",
-    "husky": "4.2.5"
+    "husky": "7.0.0"
   }
 }
