@@ -5,6 +5,11 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -66,40 +71,44 @@ class ForestApiRequesterTest extends TestCase
     }
 
     /**
+     * @throws GuzzleException
      * @return void
      */
     public function testGetExceptionRequest(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ConnectionException::class);
         $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
 
-        Http::fake(
+        $mock = new MockHandler(
             [
-                config('forest.api.url') . '/foo' => Http::response(['foo' => 'bar'], 404),
+                new ConnectionException('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now')
             ]
-        )
-            ->accept('application/json')
-            ->withHeaders($this->headers);
+        );
+        $handlerStack = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handlerStack]);
+        $client->request('GET', config('forest.api.url') . '/foo');
 
         $this->forestApi->get('/foo', ['foo' => 'bar']);
     }
 
 
     /**
+     * @throws GuzzleException
      * @return void
      */
     public function testPostExceptionRequest(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ConnectionException::class);
         $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
 
-        Http::fake(
+        $mock = new MockHandler(
             [
-                config('forest.api.url') . '/foo' => Http::response(['foo' => 'bar'], 404),
+                new ConnectionException('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now')
             ]
-        )
-            ->accept('application/json')
-            ->withHeaders($this->headers);
+        );
+        $handlerStack = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handlerStack]);
+        $client->request('GET', config('forest.api.url') . '/foo');
 
         $this->forestApi->post('/foo', ['foo' => 'bar']);
     }

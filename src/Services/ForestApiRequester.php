@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -71,12 +72,12 @@ class ForestApiRequester
      */
     private function call(string $method, string $url, array $params = [], array $headers = []): Response
     {
-        $response = Http::withHeaders($this->headers($headers))
-            ->acceptJson()
-            ->$method($url, $params);
-
-        if (! $response->object()) {
-            throw new \RuntimeException("Cannot reach Forest API at $url, it seems to be down right now");
+        try {
+            $response = Http::withHeaders($this->headers($headers))
+                ->acceptJson()
+                ->$method($url, $params);
+        } catch (ConnectionException $e) {
+            throw new ConnectionException("Cannot reach Forest API at $url, it seems to be down right now");
         }
 
         return $response;
