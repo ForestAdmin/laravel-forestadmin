@@ -8,5 +8,5 @@ node_modules
 # composer
 vendor
 
-# phpunity
+# phpunit
 .phpunit.result.cache
