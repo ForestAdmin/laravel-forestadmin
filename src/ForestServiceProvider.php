@@ -31,7 +31,6 @@ class ForestServiceProvider extends ServiceProvider
      */
     public function boot(Kernel $kernel): void
     {
-        // publish configuration files
         $this->publishes(
             [
                 $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest.php',
@@ -46,13 +45,12 @@ class ForestServiceProvider extends ServiceProvider
             }
         }
 
-        // routing
         $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
         $kernel->pushMiddleware(ForestCors::class);
     }
 
     /**
-     * merge module config if it's not published or some entries are missing
+     * Merge module config if it's not published or some entries are missing.
      *
      * @return void
      */
