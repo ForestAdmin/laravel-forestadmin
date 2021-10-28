@@ -1,12 +1,15 @@
 <?php
 
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
-        'middleware' => 'forestCors',
-        'prefix'     => config('forest.route_prefix'),
-    ], function () {
-        //
+        'prefix'     => 'forest',
+    ],
+    function () {
+        Route::post('authentication', [AuthController::class, 'login'])->name('forest.auth.login');
+        Route::get('authentication/callback', [AuthController::class, 'callback'])->name('forest.auth.callback');
+        //Route::get('custom-route', fn() => view('welcome'));
     }
 );

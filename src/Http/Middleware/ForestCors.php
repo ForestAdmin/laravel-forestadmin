@@ -91,7 +91,7 @@ class ForestCors
      */
     protected function shouldRun(Request $request): bool
     {
-        return Str::startsWith($request->getRequestUri(), '/' . config('forest.route_prefix'));
+        return Str::startsWith($request->getRequestUri(), '/forest');
     }
 
     /**
