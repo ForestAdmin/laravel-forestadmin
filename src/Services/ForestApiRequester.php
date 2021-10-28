@@ -67,25 +67,6 @@ class ForestApiRequester
     }
 
     /**
-     * @param string $method
-     * @param string $url
-     * @param array  $params
-     * @return Response
-     * @throws GuzzleException
-     */
-    public function call(string $method, string $url, array $params = []): Response
-    {
-        try {
-            $client = $this->client;
-            $response = $client->request($method, $url, $params);
-        } catch (\Exception $e) {
-            $this->throwException("Cannot reach Forest API at $url, it seems to be down right now");
-        }
-
-        return $response;
-    }
-
-    /**
      * @param array $query
      * @param array $body
      * @param array $headers
@@ -118,10 +99,29 @@ class ForestApiRequester
     }
 
     /**
+     * @param string $method
+     * @param string $url
+     * @param array  $params
+     * @return Response
+     * @throws GuzzleException
+     */
+    private function call(string $method, string $url, array $params = []): Response
+    {
+        try {
+            $client = $this->client;
+            $response = $client->request($method, $url, $params);
+        } catch (\Exception $e) {
+            $this->throwException("Cannot reach Forest API at $url, it seems to be down right now");
+        }
+
+        return $response;
+    }
+
+    /**
      * @param array $headers
      * @return array
      */
-    public function headers(array $headers = []): array
+    private function headers(array $headers = []): array
     {
         $this->headers = array_merge(
             $this->headers,
