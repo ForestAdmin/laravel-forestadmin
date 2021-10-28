@@ -9,8 +9,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Psr7\Response;
+use RuntimeException;
 
 /**
  * Class ForestApiRequesterTest
@@ -32,40 +32,31 @@ class ForestApiRequesterTest extends TestCase
     }
 
     /**
+     * @throws GuzzleException
      * @return void
      */
     public function testGetRequest(): void
     {
-        Http::fake()
-            ->accept('application/json')
-            ->withHeaders($this->headers)
-            ->get(
-                config('forest.api.url') . '/foo',
-                ['foo' => 'bar'],
-            );
+        $this->mockResponse();
+        $response = $this->forestApi->get('/foo', [], $this->headers);
 
-        $response = $this->forestApi->get('/foo', ['foo' => 'bar'], $this->headers);
-
-        $this->assertTrue($response->ok());
+        $this->assertSame($response->getStatusCode(), 200);
+        $this->assertTrue($response->hasHeader('foo'));
         $this->assertArrayHasKey('forest-secret-key', $this->forestApi->getHeaders());
         $this->assertSame($this->forestApi->getHeaders()['forest-secret-key'], 'my-secret-key');
     }
 
     /**
+     * @throws GuzzleException
      * @return void
      */
     public function testPostRequest(): void
     {
-        Http::fake()
-            ->accept('application/json')
-            ->withHeaders($this->headers)
-            ->post(
-                config('forest.api.url') . '/foo',
-                ['key' => 'value'],
-            );
-        $response = $this->forestApi->post('/foo', ['key' => 'value'], $this->headers);
+        $this->mockResponse();
+        $response = $this->forestApi->post('/foo', [], ['key' => 'value'], $this->headers);
 
-        $this->assertTrue($response->ok());
+        $this->assertSame($response->getStatusCode(), 200);
+        $this->assertTrue($response->hasHeader('foo'));
         $this->assertArrayHasKey('forest-secret-key', $this->forestApi->getHeaders());
         $this->assertSame($this->forestApi->getHeaders()['forest-secret-key'], 'my-secret-key');
     }
@@ -76,21 +67,11 @@ class ForestApiRequesterTest extends TestCase
      */
     public function testGetExceptionRequest(): void
     {
-        $this->expectException(ConnectionException::class);
+        $this->mockResponseException();
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
-
-        $mock = new MockHandler(
-            [
-                new ConnectionException('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now')
-            ]
-        );
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-        $client->request('GET', config('forest.api.url') . '/foo');
-
-        $this->forestApi->get('/foo', ['foo' => 'bar']);
+        $this->forestApi->get('/foo');
     }
-
 
     /**
      * @throws GuzzleException
@@ -98,19 +79,10 @@ class ForestApiRequesterTest extends TestCase
      */
     public function testPostExceptionRequest(): void
     {
-        $this->expectException(ConnectionException::class);
+        $this->mockResponseException();
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
-
-        $mock = new MockHandler(
-            [
-                new ConnectionException('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now')
-            ]
-        );
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-        $client->request('GET', config('forest.api.url') . '/foo');
-
-        $this->forestApi->post('/foo', ['foo' => 'bar']);
+        $this->forestApi->post('/foo');
     }
 
     /**
@@ -133,5 +105,38 @@ class ForestApiRequesterTest extends TestCase
         $this->expectExceptionMessage(config('forest.api.url') . 'foo seems to be an invalid url');
 
         $this->invokeMethod($this->forestApi, 'makeUrl', array('foo'));
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @return void
+     */
+    public function testThrowException(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
+        $this->invokeMethod($this->forestApi, 'throwException', array('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now'));
+    }
+
+    /**
+     * @return void
+     */
+    public function mockResponse(): void
+    {
+        $mock = new MockHandler([new Response(200, ['foo' => 'bar'], 'ok'),]);
+        $handlerStack = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handlerStack]);
+        $this->forestApi->setClient($client);
+    }
+
+    /**
+     * @return void
+     */
+    public function mockResponseException(): void
+    {
+        $mock = new MockHandler([new RuntimeException('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now'),]);
+        $handlerStack = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handlerStack]);
+        $this->forestApi->setClient($client);
     }
 }
