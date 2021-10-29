@@ -7,3 +7,6 @@ node_modules
 
 # composer
 vendor
+
+# phpunit
+.phpunit.result.cache
