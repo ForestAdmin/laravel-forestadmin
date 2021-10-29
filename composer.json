@@ -7,7 +7,8 @@
     "laravel/framework": "^8.0",
     "doctrine/dbal": "^3.1",
     "asm89/stack-cors": "^2.0",
-    "guzzlehttp/guzzle": "^7.4"
+    "guzzlehttp/guzzle": "^7.4",
+    "league/oauth2-client": "^2.6"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
