@@ -6,7 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\ConnectException;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
@@ -75,9 +75,10 @@ class ForestApiRequester
     public function getParams(array $query = [], array $body = [], array $headers = []): array
     {
         return [
-            'headers'     => $headers,
-            'query'       => $query,
-            'form_params' => $body,
+            'headers' => $headers,
+            'query'   => $query,
+            'json'    => $body,
+            'verify'  => !config('app.debug'),
         ];
     }
 
@@ -138,10 +139,13 @@ class ForestApiRequester
      */
     private function makeUrl(string $route): string
     {
-        $url = config('forest.api.url') . $route;
-        $this->validateUrl($url);
+        if (!Str::of($route)->startsWith('https://')) {
+            $route = config('forest.api.url') . $route;
+        }
 
-        return $url;
+        $this->validateUrl($route);
+
+        return $route;
     }
 
     /**
