@@ -36,4 +36,6 @@ class ErrorMessages
     public const OIDC_CONFIGURATION_RETRIEVAL_FAILED = 'Failed to retrieve the provider\'s configuration.';
 
     public const TWO_FACTOR_AUTHENTICATION_REQUIRED = 'TwoFactorAuthenticationRequiredForbiddenError';
+
+    public const AUTHORIZATION = 'Error while authorizing the user on Forest Admin';
 }
