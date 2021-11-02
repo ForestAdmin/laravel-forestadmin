@@ -56,10 +56,10 @@ class AuthManager
     /**
      * @param string $redirectUrl
      * @param array  $params
-     * @throws GuzzleException
+     * @return string
      * @throws JsonException
      * @throws IdentityProviderException
-     * @return string
+     * @throws GuzzleException
      */
     public function verifyCodeAndGenerateToken(string $redirectUrl, array $params): string
     {
@@ -75,7 +75,7 @@ class AuthManager
         $accessToken = $forestProvider->getAccessToken(
             'authorization_code',
             [
-                'code' => $params['code'],
+                'code'          => $params['code'],
                 'response_type' => 'token'
             ]
         );
@@ -87,7 +87,7 @@ class AuthManager
 
     /**
      * @param string $state
-     * @return int|string
+     * @return int
      * @throws JsonException
      */
     private function getRenderingIdFromState(string $state): int
@@ -109,11 +109,11 @@ class AuthManager
      */
     private function stateIsValid(array $params): bool
     {
-        if (! array_key_exists('state', $params)) {
+        if (!array_key_exists('state', $params)) {
             throw new ForestApiException(ErrorMessages::INVALID_STATE_MISSING);
         }
 
-        if (! array_key_exists('renderingId', json_decode($params['state'], true, 512, JSON_THROW_ON_ERROR))) {
+        if (!array_key_exists('renderingId', json_decode($params['state'], true, 512, JSON_THROW_ON_ERROR))) {
             throw new ForestApiException(ErrorMessages::INVALID_STATE_RENDERING_ID);
         }
 
