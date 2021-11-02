@@ -20,7 +20,10 @@ use Mockery as m;
  */
 class ForestProviderTest extends TestCase
 {
-    protected $provider;
+    /**
+     * @var ForestProvider
+     */
+    protected ForestProvider $provider;
 
     /**
      * @return void
