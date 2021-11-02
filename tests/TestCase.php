@@ -24,6 +24,7 @@ class TestCase extends OrchestraTestCase
         parent::setUp();
 
         config('forest.api.secret', 'my-secret-key');
+        config('forest.api.auth-secret', 'auth-secret-key');
     }
 
     /**
@@ -41,6 +42,22 @@ class TestCase extends OrchestraTestCase
         $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
+    }
+
+    /**
+     * Call protected/private property of a class.
+     * @param object $object
+     * @param string $methodName
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    public function invokeProperty(object &$object, string $methodName)
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $property = $reflection->getProperty($methodName);
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
     }
 
     /**
