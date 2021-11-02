@@ -2,8 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Auth;
 
+use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestProvider;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
-use ForestAdmin\LaravelForestAdmin\Services\AuthenticationService;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
@@ -70,7 +70,7 @@ class OidcClientManager
             return $e->getMessage();
         }
 
-        return new AuthenticationService(
+        return new ForestProvider(
             Cache::get($cacheKey)['issuer'],
             [
                 'clientId'     => Cache::get($cacheKey)['client_id'],
