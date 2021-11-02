@@ -22,17 +22,12 @@ class OidcClientManager
 {
     use FormatGuzzle;
 
-    public const TTL = 10;// 60 * 60 * 24;
+    public const TTL = 60 * 60 * 24;
 
     /**
      * @var ForestApiRequester
      */
     private ForestApiRequester $forestApi;
-
-    /**
-     * @var AuthenticationService
-     */
-    private AuthenticationService $client;
 
     /**
      * @param ForestApiRequester $forestApi
@@ -87,10 +82,11 @@ class OidcClientManager
     /**
      * @return array
      * @throws GuzzleException
+     * @throws \JsonException
      */
     private function retrieve(): array
     {
-        $response = $this->forestApi->get('/oidc/.well-known/openid-configuration', ['foo' => 'bar']);
+        $response = $this->forestApi->get('/oidc/.well-known/openid-configuration');
 
         if (!$response->getReasonPhrase()) {
             throw new ForestApiException(ErrorMessages::OIDC_CONFIGURATION_RETRIEVAL_FAILED);
