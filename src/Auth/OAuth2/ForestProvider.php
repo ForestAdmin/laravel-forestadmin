@@ -3,11 +3,9 @@
 namespace ForestAdmin\LaravelForestAdmin\Auth\OAuth2;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\AuthorizationException;
-use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
@@ -63,15 +61,11 @@ class ForestProvider extends AbstractProvider
 
     /**
      * @param AccessToken $token
-     * @throws \Exception
      * @return string
+     * @throws \Exception
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
-        if (null === $this->renderingId) {
-            throw new \Exception('The renderingId parameter must be set before using the resourceOwner url');
-        }
-
         return $this->host . '/liana/v2/renderings/' . $this->renderingId . '/authorization';
     }
 
@@ -92,6 +86,7 @@ class ForestProvider extends AbstractProvider
     {
         return [
             'urlAuthorize',
+            'urlAccessToken',
             'host',
         ];
     }
@@ -107,8 +102,8 @@ class ForestProvider extends AbstractProvider
     /**
      * @param ResponseInterface $response
      * @param array|string      $data
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
@@ -151,41 +146,22 @@ class ForestProvider extends AbstractProvider
     {
         $url = $this->getResourceOwnerDetailsUrl($token);
 
-        $forestApi = new ForestApiRequester();
-        $response = $forestApi->get($url, [], ['forest-token' => $token->getToken()]);
+        $request = $this->getAuthenticatedRequest(
+            self::METHOD_GET,
+            $url,
+            $token,
+            [
+                'headers' => [
+                    'forest-token'      => $token->getToken(),
+                    'forest-secret-key' => config('forest.api.secret')
+                ],
+            ]
+        );
 
-        if (200 !== $response->getStatusCode()) {
-            return $this->throwAuthorizationException($response);
-        }
-
-        $body = $this->getBody($response);
-        $userData = $body['data']['attributes'];
-        $userData['id'] = $body['data']['id'];
+        $response = $this->getParsedResponse($request);
+        $userData = $response['data']['attributes'];
+        $userData['id'] = $response['data']['id'];
 
         return $userData;
-    }
-
-    /**
-     * @param Response $response
-     * @throws \Exception
-     * @return void
-     */
-    private function throwAuthorizationException(Response $response): void
-    {
-        if (404 === $response->getStatusCode()) {
-            throw new AuthorizationException(ErrorMessages::SECRET_NOT_FOUND);
-        }
-
-        if (422 === $response->getStatusCode()) {
-            throw new AuthorizationException(ErrorMessages::SECRET_AND_RENDERINGID_INCONSISTENT);
-        }
-
-        $body = $this->body($response);
-        $serverError = (array_key_exists('errors', $body) && count($body['errors']) > 0) ? $body['errors'][0] : null;
-        if (null !== $serverError && array_key_exists('name', $serverError) && $serverError['name'] === ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED) {
-            throw new AuthorizationException(ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED);
-        }
-
-        throw new \Exception(ErrorMessages::AUTHORIZATION);
     }
 }
