@@ -22,9 +22,18 @@ class TestCase extends OrchestraTestCase
     public function setUp(): void
     {
         parent::setUp();
+    }
 
-        config('forest.api.secret', 'my-secret-key');
-        config('forest.api.auth-secret', 'auth-secret-key');
+    /**
+     * @param Application $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app): void
+    {
+        parent::getEnvironmentSetUp($app);
+        $config = $app['config'];
+        $config->set('forest.api.secret', 'my-secret-key');
+        $config->set('forest.api.auth-secret', 'auth-secret-key');
     }
 
     /**
