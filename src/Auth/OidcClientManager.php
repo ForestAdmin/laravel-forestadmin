@@ -83,7 +83,7 @@ class OidcClientManager
      * @throws GuzzleException
      * @throws \JsonException
      */
-    public function retrieve(): array
+    private function retrieve(): array
     {
         try {
             $response = $this->forestApi->get('/oidc/.well-known/openid-configuration');
@@ -100,7 +100,7 @@ class OidcClientManager
      * @throws GuzzleException
      * @throws \JsonException
      */
-    public function register(array $data): array
+    private function register(array $data): array
     {
         $response = $this->forestApi->post(
             $data['registration_endpoint'],

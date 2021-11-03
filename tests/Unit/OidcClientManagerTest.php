@@ -96,16 +96,19 @@ class OidcClientManagerTest extends TestCase
         $mock = new MockHandler([new Response(200, [], json_encode(['client_id' => 1], JSON_THROW_ON_ERROR)),]);
         $handlerStack = HandlerStack::create($mock);
         $client = new Client(['handler' => $handlerStack]);
-
         $this->forestApi->setClient($client);
         $this->oidc = new OidcClientManager($this->forestApi);
-        $register = $this->oidc->register(
-            [
-                'token_endpoint_auth_method' => 'none',
-                'registration_endpoint'      => $this->mockedConfig()['registration_endpoint'],
-                'redirect_uris'              => ['mock_host/callback'],
-                'application_type'           => 'web'
-            ]
+        $data = [
+            'token_endpoint_auth_method' => 'none',
+            'registration_endpoint'      => $this->mockedConfig()['registration_endpoint'],
+            'redirect_uris'              => ['mock_host/callback'],
+            'application_type'           => 'web'
+        ];
+        $register = $this->invokeMethod(
+            $this->oidc,
+            'register',
+            array(&$data)
+
         );
         $this->assertIsArray($register);
         $this->assertEquals(1, $register['client_id']);
@@ -184,7 +187,7 @@ class OidcClientManagerTest extends TestCase
             "end_session_endpoint"                             => "https://mock_host/oidc/session/end",
             "grant_types_supported"                            => [
                 "authorization_code",
-                "urn=>ietf=>params=>oauth=>grant-type=>device_code"
+                "urn:ietf:params:oauth:grant-type:device_code"
             ],
             "id_token_signing_alg_values_supported"            => [
                 "HS256",
