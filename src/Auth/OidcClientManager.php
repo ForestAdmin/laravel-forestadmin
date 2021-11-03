@@ -39,9 +39,8 @@ class OidcClientManager
 
     /**
      * @param string $callbackUrl
-     * @return string|void|null
+     * @return ForestProvider|string
      * @throws GuzzleException
-     * @throws \JsonException
      */
     public function getClientForCallbackUrl(string $callbackUrl)
     {
@@ -66,8 +65,8 @@ class OidcClientManager
                     return $clientData;
                 }
             );
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        } catch (\Exception) {
+            throw new ForestApiException(ErrorMessages::REGISTRATION_FAILED);
         }
 
         return new ForestProvider(
@@ -84,11 +83,11 @@ class OidcClientManager
      * @throws GuzzleException
      * @throws \JsonException
      */
-    private function retrieve(): array
+    public function retrieve(): array
     {
-        $response = $this->forestApi->get('/oidc/.well-known/openid-configuration');
-
-        if (!$response->getReasonPhrase()) {
+        try {
+            $response = $this->forestApi->get('/oidc/.well-known/openid-configuration');
+        } catch (\RuntimeException) {
             throw new ForestApiException(ErrorMessages::OIDC_CONFIGURATION_RETRIEVAL_FAILED);
         }
 
@@ -97,11 +96,11 @@ class OidcClientManager
 
     /**
      * @param array $data
-     * @return mixed
+     * @return array
      * @throws GuzzleException
      * @throws \JsonException
      */
-    private function register(array $data)
+    public function register(array $data): array
     {
         $response = $this->forestApi->post(
             $data['registration_endpoint'],
