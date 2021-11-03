@@ -108,7 +108,6 @@ class OidcClientManagerTest extends TestCase
             $this->oidc,
             'register',
             array(&$data)
-
         );
         $this->assertIsArray($register);
         $this->assertEquals(1, $register['client_id']);
