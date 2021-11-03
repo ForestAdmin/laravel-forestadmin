@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
@@ -83,10 +84,10 @@ class ForestApiRequester
     }
 
     /**
-     * @param Client $client
+     * @param ClientInterface $client
      * @return void
      */
-    public function setClient(Client $client): void
+    public function setClient(ClientInterface $client): void
     {
         $this->client = $client;
     }
@@ -143,7 +144,9 @@ class ForestApiRequester
             $route = config('forest.api.url') . $route;
         }
 
-        $this->validateUrl($route);
+        if (!config('app.debug')) {
+            $this->validateUrl($route);
+        }
 
         return $route;
     }
