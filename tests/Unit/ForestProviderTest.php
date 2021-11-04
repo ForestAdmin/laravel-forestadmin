@@ -6,10 +6,10 @@ use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestProvider;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Exceptions\AuthorizationException;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockClientHttp;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
-use Mockery as m;
 
 /**
  * Class ForestProviderTest
@@ -20,6 +20,8 @@ use Mockery as m;
  */
 class ForestProviderTest extends TestCase
 {
+    use MockClientHttp;
+
     /**
      * @var ForestProvider
      */
@@ -65,17 +67,6 @@ class ForestProviderTest extends TestCase
         $uri = parse_url($url);
 
         $this->assertEquals('mock-host/oidc/token', $uri['path']);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetAuthorizationUrl(): void
-    {
-        $url = $this->provider->getAuthorizationUrl();
-        $uri = parse_url($url);
-
-        $this->assertEquals('mock-host/oidc/auth', $uri['path']);
     }
 
     /**
@@ -182,7 +173,7 @@ class ForestProviderTest extends TestCase
     {
         $this->mockClient(400);
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(ErrorMessages::AUTHORIZATION);
+        $this->expectExceptionMessage(ErrorMessages::AUTHORIZATION_FAILED);
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
@@ -219,26 +210,5 @@ class ForestProviderTest extends TestCase
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $resourceOwner = $this->provider->getResourceOwner($token);
         $this->assertInstanceOf(ForestResourceOwner::class, $resourceOwner);
-    }
-
-    /**
-     * @param int    $status
-     * @param string $body
-     * @param int    $responseCallLimit
-     * @param int    $clientCallLimit
-     * @return m\LegacyMockInterface|m\MockInterface|string
-     */
-    protected function mockClient(int $status = 200, string $body = '{"access_token":"mock_access_token"}', $responseCallLimit = 1, $clientCallLimit = 1)
-    {
-        $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $response->shouldReceive('getHeader')->times($responseCallLimit)->andReturn('application/json');
-        $response->shouldReceive('getBody')->andReturn($body);
-        $response->shouldReceive('getStatusCode')->andReturn($status);
-
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')->times($clientCallLimit)->andReturn($response);
-        $this->provider->setHttpClient($client);
-
-        return $client;
     }
 }

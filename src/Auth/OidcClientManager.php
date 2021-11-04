@@ -106,7 +106,6 @@ class OidcClientManager
             $data['registration_endpoint'],
             [],
             $data,
-            ['Authorization' => 'Bearer ' . config('forest.api.secret')]
         );
 
         return $this->getBody($response);

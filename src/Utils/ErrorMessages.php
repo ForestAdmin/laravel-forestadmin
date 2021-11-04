@@ -37,5 +37,5 @@ class ErrorMessages
 
     public const TWO_FACTOR_AUTHENTICATION_REQUIRED = 'TwoFactorAuthenticationRequiredForbiddenError';
 
-    public const AUTHORIZATION = 'Error while authorizing the user on Forest Admin';
+    public const AUTHORIZATION_FAILED= 'Error while authorizing the user on Forest Admin';
 }

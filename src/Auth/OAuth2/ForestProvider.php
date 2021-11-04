@@ -121,7 +121,7 @@ class ForestProvider extends AbstractProvider
                 throw new AuthorizationException(ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED);
             }
 
-            throw new \Exception(ErrorMessages::AUTHORIZATION);
+            throw new \Exception(ErrorMessages::AUTHORIZATION_FAILED);
         }
     }
 

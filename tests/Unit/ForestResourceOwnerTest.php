@@ -37,7 +37,12 @@ class ForestResourceOwnerTest extends TestCase
                 'teams'                             => [
                     0 => 'Operations'
                 ],
-                'tags'                              => [],
+                'tags'                              => [
+                    0 => [
+                        'key'   => 'demo',
+                        'value' => '1234',
+                    ],
+                ],
                 'two_factor_authentication_enabled' => false,
                 'two_factor_authentication_active'  => false,
             ],

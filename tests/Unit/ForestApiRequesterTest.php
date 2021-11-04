@@ -91,7 +91,7 @@ class ForestApiRequesterTest extends TestCase
      */
     public function testValidUrlRequest(): void
     {
-        $makeUrl = $this->invokeMethod($this->forestApi, 'validateUrl', array(config('forest.api.url') . '/foo'));
+        $makeUrl = $this->invokeMethod($this->forestApi, 'validateUrl', [config('forest.api.url') . '/foo']);
         $this->assertTrue($makeUrl);
     }
 
@@ -115,8 +115,8 @@ class ForestApiRequesterTest extends TestCase
     public function testThrowException(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
-        $this->invokeMethod($this->forestApi, 'throwException', ['Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now']);
+        $this->expectExceptionMessage('test error');
+        $this->invokeMethod($this->forestApi, 'throwException', ['test error']);
     }
 
     /**
