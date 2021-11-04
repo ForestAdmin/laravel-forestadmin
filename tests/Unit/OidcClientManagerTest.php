@@ -15,6 +15,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
+use Prophecy\Argument;
 
 /**
  * Class OidcClientManagerTest
@@ -36,8 +37,6 @@ class OidcClientManagerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->forestApi = new ForestApiRequester();
     }
 
     /**
@@ -57,15 +56,10 @@ class OidcClientManagerTest extends TestCase
      */
     public function testRetrieve(): void
     {
-        $mock = new MockHandler([new Response(200, [], json_encode($this->mockedConfig(), JSON_THROW_ON_ERROR)),]);
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-
-        $this->forestApi->setClient($client);
-        $this->oidc = new OidcClientManager($this->forestApi);
+        $this->oidc = new OidcClientManager($this->makeForestApiGet());
         $retrieve = $this->invokeMethod($this->oidc, 'retrieve');
         $this->assertIsArray($retrieve);
-        $this->assertEquals($retrieve, $this->mockedConfig());
+        $this->assertEquals($retrieve, self::mockedConfig());
     }
 
     /**
@@ -75,14 +69,10 @@ class OidcClientManagerTest extends TestCase
      */
     public function testRetrieveException(): void
     {
-        $mock = new MockHandler([new Response(404, [], json_encode($this->mockedConfig(), JSON_THROW_ON_ERROR)),]);
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-
-        $this->forestApi->setClient($client);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(ErrorMessages::OIDC_CONFIGURATION_RETRIEVAL_FAILED);
-        $this->oidc = new OidcClientManager($this->forestApi);
+        $this->oidc = new OidcClientManager($this->makeForestApiGetThrowException());
+
         $this->invokeMethod($this->oidc, 'retrieve');
     }
 
@@ -93,17 +83,13 @@ class OidcClientManagerTest extends TestCase
      */
     public function testRegister(): void
     {
-        $mock = new MockHandler([new Response(200, [], json_encode(['client_id' => 1], JSON_THROW_ON_ERROR)),]);
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-        $this->forestApi->setClient($client);
-        $this->oidc = new OidcClientManager($this->forestApi);
         $data = [
             'token_endpoint_auth_method' => 'none',
-            'registration_endpoint'      => $this->mockedConfig()['registration_endpoint'],
+            'registration_endpoint'      => self::mockedConfig()['registration_endpoint'],
             'redirect_uris'              => ['mock_host/callback'],
             'application_type'           => 'web'
         ];
+        $this->oidc = new OidcClientManager($this->makeForestApiPost($data));
         $register = $this->invokeMethod(
             $this->oidc,
             'register',
@@ -120,24 +106,14 @@ class OidcClientManagerTest extends TestCase
      */
     public function testGetClientForCallbackUrl(): void
     {
-        $mock = new MockHandler(
-            [
-                new Response(200, [], json_encode($this->mockedConfig(), JSON_THROW_ON_ERROR)),
-                new Response(200, [], json_encode(['client_id' => 1], JSON_THROW_ON_ERROR)),
-            ]
-        );
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-
-        $this->forestApi->setClient($client);
-        $this->oidc = new OidcClientManager($this->forestApi);
+        $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost(json_encode(['client_id' => 1], JSON_THROW_ON_ERROR)));
         $clientForCallbackUrl = $this->oidc->getClientForCallbackUrl('mock_host/foo');
 
         $this->assertInstanceOf(ForestProvider::class, $clientForCallbackUrl);
         $this->assertIsArray(Cache::get('mock_host/foo-' . config('forest.api.secret') . '-client-data'));
         $this->assertSame(
             Cache::get('mock_host/foo-' . config('forest.api.secret') . '-client-data'),
-            ['client_id' => 1, 'issuer' => $this->mockedConfig()['issuer']]
+            ['client_id' => 1, 'issuer' => self::mockedConfig()['issuer']]
         );
     }
 
@@ -148,17 +124,7 @@ class OidcClientManagerTest extends TestCase
      */
     public function testGetClientForCallbackUrlException(): void
     {
-        $mock = new MockHandler(
-            [
-                new Response(200, [], json_encode($this->mockedConfig(), JSON_THROW_ON_ERROR)),
-                new Response(200, [], ''),
-            ]
-        );
-        $handlerStack = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handlerStack]);
-
-        $this->forestApi->setClient($client);
-        $this->oidc = new OidcClientManager($this->forestApi);
+        $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost());
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::REGISTRATION_FAILED);
         $this->oidc->getClientForCallbackUrl('mock_host/foo');
@@ -166,8 +132,9 @@ class OidcClientManagerTest extends TestCase
 
     /**
      * @return string
+     * todo migrate to utils
      */
-    private function mockedConfig()
+    public static function mockedConfig()
     {
         return [
             "authorization_endpoint"                           => "https://mock_host/oidc/auth",
@@ -226,5 +193,79 @@ class OidcClientManagerTest extends TestCase
                 "normal"
             ]
         ];
+    }
+
+    /**
+     * @return object
+     * @throws \JsonException
+     */
+    public function makeForestApiGet()
+    {
+        $forestApiGet = $this->prophesize(ForestApiRequester::class);
+        $forestApiGet
+            ->get(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willReturn(
+                new Response(200, [], json_encode(self::mockedConfig(), JSON_THROW_ON_ERROR))
+            );
+
+        return $forestApiGet->reveal();
+    }
+
+    /**
+     * @return object
+     */
+    public function makeForestApiGetThrowException()
+    {
+        $forestApiGet = $this->prophesize(ForestApiRequester::class);
+        $forestApiGet
+            ->get(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willThrow(new \RuntimeException());
+
+        return $forestApiGet->reveal();
+    }
+
+    /**
+     * @param array $data
+     * @return object
+     * @throws \JsonException
+     */
+    public function makeForestApiPost(array $data)
+    {
+        $forestApiPost = $this->prophesize(ForestApiRequester::class);
+        $forestApiPost
+            ->post(Argument::type('string'), Argument::size(0), $data)
+            ->shouldBeCalled()
+            ->willReturn(
+                new Response(200, [], json_encode(['client_id' => 1], JSON_THROW_ON_ERROR))
+            );
+
+        return $forestApiPost->reveal();
+    }
+
+    /**
+     * @param string|null $body
+     * @return object
+     * @throws \JsonException
+     */
+    public function makeForestApiGetAndPost(?string $body = null)
+    {
+        $forestApi = $this->prophesize(ForestApiRequester::class);
+        $forestApi
+            ->get(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willReturn(
+                new Response(200, [], json_encode(self::mockedConfig(), JSON_THROW_ON_ERROR))
+            );
+
+        $forestApi
+            ->post(Argument::type('string'), Argument::size(0), Argument::size(4))
+            ->shouldBeCalled()
+            ->willReturn(
+                new Response(200, [], $body)
+            );
+
+        return $forestApi->reveal();
     }
 }
