@@ -65,7 +65,7 @@ class OidcClientManager
                     return $clientData;
                 }
             );
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             throw new ForestApiException(ErrorMessages::REGISTRATION_FAILED);
         }
 
@@ -87,7 +87,7 @@ class OidcClientManager
     {
         try {
             $response = $this->forestApi->get('/oidc/.well-known/openid-configuration');
-        } catch (\RuntimeException) {
+        } catch (\RuntimeException $e) {
             throw new ForestApiException(ErrorMessages::OIDC_CONFIGURATION_RETRIEVAL_FAILED);
         }
 
@@ -106,6 +106,7 @@ class OidcClientManager
             $data['registration_endpoint'],
             [],
             $data,
+            ['Authorization' => 'Bearer ' . config('forest.api.secret')]
         );
 
         return $this->getBody($response);
