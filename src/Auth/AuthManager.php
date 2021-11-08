@@ -68,8 +68,10 @@ class AuthManager
         $forestProvider = $this->oidc->getClientForCallbackUrl($redirectUrl);
         $forestProvider->setRenderingId($this->getRenderingIdFromState($params['state']));
         if (config('app.debug')) {
+            // @codeCoverageIgnoreStart
             $guzzleClient = new Client([RequestOptions::VERIFY => false]);
             $forestProvider->setHttpClient($guzzleClient);
+            // @codeCoverageIgnoreEnd
         }
 
         $accessToken = $forestProvider->getAccessToken(
