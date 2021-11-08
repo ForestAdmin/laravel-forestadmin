@@ -8,14 +8,12 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Class OidcClientManagerTest
@@ -26,6 +24,8 @@ use Prophecy\Argument;
  */
 class OidcClientManagerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var ForestApiRequester
      */
@@ -235,7 +235,7 @@ class OidcClientManagerTest extends TestCase
     {
         $forestApiPost = $this->prophesize(ForestApiRequester::class);
         $forestApiPost
-            ->post(Argument::type('string'), Argument::size(0), $data)
+            ->post(Argument::type('string'), Argument::size(0), $data, Argument::size(1))
             ->shouldBeCalled()
             ->willReturn(
                 new Response(200, [], json_encode(['client_id' => 1], JSON_THROW_ON_ERROR))
@@ -260,7 +260,7 @@ class OidcClientManagerTest extends TestCase
             );
 
         $forestApi
-            ->post(Argument::type('string'), Argument::size(0), Argument::size(4))
+            ->post(Argument::type('string'), Argument::size(0), Argument::size(4), Argument::size(1))
             ->shouldBeCalled()
             ->willReturn(
                 new Response(200, [], $body)
