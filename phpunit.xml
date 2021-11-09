@@ -13,14 +13,14 @@
         stopOnFailure="false"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
-    <logging>
-        <testdoxXml outputFile="/tmp/coverage.xml"/>
-    </logging>
     <coverage>
         <include>
             <directory suffix=".php">src/</directory>
         </include>
     </coverage>
+    <report>
+        <clover outputFile="./clover.xml"/>
+    </report>
     <testsuites>
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
