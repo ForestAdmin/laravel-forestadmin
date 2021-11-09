@@ -39,13 +39,11 @@ jobs:
         run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
 
       - name: PHPUnit tests
-        run: XDEBUG_MODE=coverage vendor/bin/phpunit
+        run: vendor/bin/phpunit
 
       - name: Send coverage
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageCommand: vendor/bin/phpunit
           coverageLocations: /tmp/coverage.xml:clover
-          debug: true
