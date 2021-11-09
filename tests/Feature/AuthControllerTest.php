@@ -41,17 +41,18 @@ class AuthControllerTest extends TestCase
         $params = ['renderingId' => 1];
         $request = Request::create('/forest/authentication', 'POST', $params);
         app()->instance('request', $request);
+        $return = 'http://localhost/oidc/auth?state=%7B%22renderingId%22%3A28%7D&scope=openid%20profile%20email&response_type=code&approval_prompt=auto&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fforest%2Fauthentication%2Fcallback&client_id=TEST';
 
         $auth = $this->prophesize(AuthManager::class);
         $auth
             ->start(route('forest.auth.callback'), 1)
             ->shouldBeCalled()
-            ->willReturn(
-                ['authorizationUrl' => 'http://localhost/oidc/auth?state=%7B%22renderingId%22%3A28%7D&scope=openid%20profile%20email&response_type=code&approval_prompt=auto&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fforest%2Fauthentication%2Fcallback&client_id=TEST']
-            );
+            ->willReturn($return);
 
         $this->authController = new AuthController($auth->reveal());
-        $this->authController->login();
+        $login = $this->authController->login();
+
+        $this->assertEquals($return, json_decode($login->getContent(),true)['authorizationUrl']);
     }
 
     /**
