@@ -19,7 +19,7 @@
         </include>
     </coverage>
     <report>
-        <clover outputFile="./clover.xml"/>
+        <clover outputFile="/tmp/clover.xml"/>
     </report>
     <testsuites>
         <testsuite name="Unit">
