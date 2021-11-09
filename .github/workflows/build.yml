@@ -47,5 +47,5 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageCommand: vendor/bin/phpunit
-          coverageLocations: ${{github.workspace}}/tmp/coverage.xml:clover
+          coverageLocations: /tmp/coverage.xml:clover
           debug: true
