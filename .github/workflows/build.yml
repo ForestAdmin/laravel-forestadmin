@@ -43,9 +43,9 @@ jobs:
 
       - name: Send coverage
         uses: paambaati/codeclimate-action@v3.0.0
-          env:
-            CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          with:
-            coverageCommand: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover coverage.xml
-            coverageLocations: |
-              ${{github.workspace}}/coverage.xml
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover coverage.xml
+          coverageLocations: |
+            ${{github.workspace}}/coverage.xml
