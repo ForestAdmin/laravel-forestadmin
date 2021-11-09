@@ -52,7 +52,7 @@ class AuthControllerTest extends TestCase
         $this->authController = new AuthController($auth->reveal());
         $login = $this->authController->login();
 
-        $this->assertEquals($return, json_decode($login->getContent(),true)['authorizationUrl']);
+        $this->assertEquals($return, json_decode($login->getContent(), true)['authorizationUrl']);
     }
 
     /**
