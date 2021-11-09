@@ -39,7 +39,7 @@ jobs:
         run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
 
       - name: PHPUnit tests
-        run: vendor/bin/phpunit
+        run: XDEBUG_MODE=coverage vendor/bin/phpunit
 
       - name: Send coverage
         uses: paambaati/codeclimate-action@v3.0.0
