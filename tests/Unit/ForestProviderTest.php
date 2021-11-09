@@ -90,8 +90,10 @@ class ForestProviderTest extends TestCase
     public function testGetResourceOwnerDetailsUrlException(): void
     {
         $token = new AccessToken(['access_token' => 'mock_access_token']);
+
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Typed property ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestProvider::$renderingId must not be accessed before initialization');
+
         $this->provider->getResourceOwnerDetailsUrl($token);
     }
 
@@ -126,6 +128,7 @@ class ForestProviderTest extends TestCase
     {
         $this->mockClient();
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
         $this->assertEquals('mock_access_token', $token->getToken());
     }
 
@@ -136,8 +139,10 @@ class ForestProviderTest extends TestCase
     public function testGetAccessTokenExceptionNotFound(): void
     {
         $this->mockClient(404);
+
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage(ErrorMessages::SECRET_NOT_FOUND);
+
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
@@ -148,8 +153,10 @@ class ForestProviderTest extends TestCase
     public function testGetAccessTokenExceptionSecretAndRenderingIdInconsistent(): void
     {
         $this->mockClient(422);
+
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage(ErrorMessages::SECRET_AND_RENDERINGID_INCONSISTENT);
+
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
@@ -160,8 +167,10 @@ class ForestProviderTest extends TestCase
     public function testGetAccessTokenExceptionTwoFactorAuthenticationRequired(): void
     {
         $this->mockClient(400, '{"errors":[{"name":"' . ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED . '"}]}');
+
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage(ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED);
+
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
@@ -172,8 +181,10 @@ class ForestProviderTest extends TestCase
     public function testGetAccessTokenException(): void
     {
         $this->mockClient(400);
+
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(ErrorMessages::AUTHORIZATION_FAILED);
+
         $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
@@ -209,6 +220,7 @@ class ForestProviderTest extends TestCase
         $this->provider->setRenderingId(1234);
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $resourceOwner = $this->provider->getResourceOwner($token);
+
         $this->assertInstanceOf(ForestResourceOwner::class, $resourceOwner);
     }
 }

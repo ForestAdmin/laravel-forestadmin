@@ -68,8 +68,10 @@ class ForestApiRequesterTest extends TestCase
     public function testGetExceptionRequest(): void
     {
         $this->mockResponseException();
+
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Cannot reach Forest API at ' . config('forest.api.url') . '/foo, it seems to be down right now');
+
         $this->forestApi->get('/foo');
     }
 
@@ -116,6 +118,7 @@ class ForestApiRequesterTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('test error');
+
         $this->invokeMethod($this->forestApi, 'throwException', ['test error']);
     }
 

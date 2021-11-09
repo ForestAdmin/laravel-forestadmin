@@ -88,6 +88,7 @@ class ForestResourceOwnerTest extends TestCase
     public function testMakeJwt(): void
     {
         $result = JWT::decode($this->forestResourceOwner->makeJwt(), config('forest.api.auth-secret'), array('HS256'));
+
         $this->assertEquals(1, $result->id);
     }
 }

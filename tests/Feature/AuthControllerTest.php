@@ -11,12 +11,9 @@ use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Route;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Mockery as m;
 
 /**
  * Class AuthControllerTest
@@ -33,14 +30,6 @@ class AuthControllerTest extends TestCase
      * @var AuthController
      */
     private AuthController $authController;
-
-    /**
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
 
     /**
      * @throws GuzzleException
@@ -102,8 +91,8 @@ class AuthControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $callback);
         $content = json_decode($callback->getContent(), true);
 
-        $this->assertArrayHasKey('token', $content);
-        $this->assertArrayHasKey('tokenData', $content);
+        $this->assertEquals($jwt, $content['token']);
+        $this->assertEquals($user, $content['tokenData']);
     }
 
     /**
@@ -134,7 +123,7 @@ class AuthControllerTest extends TestCase
         $this->expectExceptionMessage(ErrorMessages::MISSING_RENDERING_ID);
 
         $this->authController = app(AuthController::class);
-        $this->assertIsInt($this->invokeMethod($this->authController, 'getAndCheckRenderingId'));
+        $this->invokeMethod($this->authController, 'getAndCheckRenderingId');
     }
 
 
@@ -152,6 +141,6 @@ class AuthControllerTest extends TestCase
         $this->expectExceptionMessage(ErrorMessages::INVALID_RENDERING_ID);
 
         $this->authController = app(AuthController::class);
-        $this->assertIsInt($this->invokeMethod($this->authController, 'getAndCheckRenderingId'));
+        $this->invokeMethod($this->authController, 'getAndCheckRenderingId');
     }
 }

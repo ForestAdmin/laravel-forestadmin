@@ -32,14 +32,6 @@ class OidcClientManagerTest extends TestCase
     private ForestApiRequester $forestApi;
 
     /**
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    /**
      * @param Application $app
      * @return void
      */

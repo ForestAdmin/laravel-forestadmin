@@ -27,14 +27,6 @@ class AuthManagerTest extends TestCase
     use ProphecyTrait;
 
     /**
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    /**
      * @throws BindingResolutionException
      * @return void
      */
@@ -71,7 +63,6 @@ class AuthManagerTest extends TestCase
         $data = ['code' => 'test', 'state' => '{"renderingId":1}'];
         $token = $this->auth->verifyCodeAndGenerateToken('mock_host/foo', $data);
 
-        $this->assertIsString($token);
         $this->assertSame($return, $token);
     }
 
@@ -87,7 +78,6 @@ class AuthManagerTest extends TestCase
         $data = ['state' => '{"renderingId":1}'];
         $renderingId = $this->invokeMethod($this->auth, 'getRenderingIdFromState', $data);
 
-        $this->assertIsInt($renderingId);
         $this->assertSame($renderingId, 1);
     }
 
@@ -101,8 +91,10 @@ class AuthManagerTest extends TestCase
         /** @var AuthManager auth */
         $this->auth = app()->make(AuthManager::class);
         $data = ['state' => '{"renderingId":10.1}'];
+
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::INVALID_STATE_FORMAT);
+
         $this->invokeMethod($this->auth, 'getRenderingIdFromState', $data);
     }
 
@@ -117,6 +109,7 @@ class AuthManagerTest extends TestCase
         $this->auth = app()->make(AuthManager::class);
         $data = ['code' => 'test', 'state' => '{"renderingId":1}'];
         $state = $this->invokeMethod($this->auth, 'stateIsValid', array(&$data));
+
         $this->assertTrue($state);
     }
 
@@ -129,9 +122,12 @@ class AuthManagerTest extends TestCase
     {
         /** @var AuthManager auth */
         $this->auth = app()->make(AuthManager::class);
+        $data = ['code' => 'test'];
+
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::INVALID_STATE_MISSING);
-        $data = ['code' => 'test'];
+
+
         $this->invokeMethod($this->auth, 'stateIsValid', array(&$data));
     }
 
@@ -144,9 +140,11 @@ class AuthManagerTest extends TestCase
     {
         /** @var AuthManager auth */
         $this->auth = app()->make(AuthManager::class);
+        $data = ['code' => 'test', 'state' => '{}'];
+
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::INVALID_STATE_RENDERING_ID);
-        $data = ['code' => 'test', 'state' => '{}'];
+
         $this->invokeMethod($this->auth, 'stateIsValid', array(&$data));
     }
 
