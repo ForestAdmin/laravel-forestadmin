@@ -42,10 +42,8 @@ jobs:
         run: XDEBUG_MODE=coverage vendor/bin/phpunit
 
       - name: Send coverage
-        uses: paambaati/codeclimate-action@v3.0.0
+        uses: paambaati/codeclimate-action@v2.7.1
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageCommand: vendor/bin/phpunit
-          coverageLocations: /tmp/coverage.xml:clover
-          debug: true
+          coverageLocations: /tmp/clover.xml:clover
