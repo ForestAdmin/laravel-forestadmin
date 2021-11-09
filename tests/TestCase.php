@@ -16,14 +16,16 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 class TestCase extends OrchestraTestCase
 {
     /**
-     * Setup the test environment.
+     * @param Application $app
      * @return void
      */
-    public function setUp(): void
+    protected function getEnvironmentSetUp($app): void
     {
-        parent::setUp();
-
-        config('forest.api.secret', 'my-secret-key');
+        parent::getEnvironmentSetUp($app);
+        $config = $app['config'];
+        $config->set('app.debug', true);
+        $config->set('forest.api.secret', 'my-secret-key');
+        $config->set('forest.api.auth-secret', 'auth-secret-key');
     }
 
     /**
@@ -41,6 +43,22 @@ class TestCase extends OrchestraTestCase
         $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
+    }
+
+    /**
+     * Call protected/private property of a class.
+     * @param object $object
+     * @param string $methodName
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    public function invokeProperty(object &$object, string $methodName)
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $property = $reflection->getProperty($methodName);
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
     }
 
     /**

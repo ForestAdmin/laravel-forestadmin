@@ -41,7 +41,7 @@ class ForestServiceProvider extends ServiceProvider
         if (null !== Request::server('argv')) {
             $currentCommand = implode(' ', Request::server('argv'));
             if (Str::startsWith($currentCommand, $this->serveCommand)) {
-                $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']);
+                $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']); // @codeCoverageIgnore
             }
         }
 
