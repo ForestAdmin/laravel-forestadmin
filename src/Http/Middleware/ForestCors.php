@@ -86,7 +86,7 @@ class ForestCors
     /**
      * Determine if the request match with the config
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return bool
      */
     protected function shouldRun(Request $request): bool
