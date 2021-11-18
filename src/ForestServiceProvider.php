@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin;
 
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
+use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Http\Kernel;
@@ -31,19 +32,14 @@ class ForestServiceProvider extends ServiceProvider
      */
     public function boot(Kernel $kernel): void
     {
+        $this->app->register(EventProvider::class);
+
         $this->publishes(
             [
                 $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest.php',
             ],
             'config'
         );
-
-        if (null !== Request::server('argv')) {
-            $currentCommand = implode(' ', Request::server('argv'));
-            if (Str::startsWith($currentCommand, $this->serveCommand)) {
-                $this->app['events']->listen(ArtisanStarting::class, [Schema::class, 'handle']); // @codeCoverageIgnore
-            }
-        }
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
         $kernel->pushMiddleware(ForestCors::class);
