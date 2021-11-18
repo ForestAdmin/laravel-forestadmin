@@ -11,3 +11,4 @@ vendor
 # phpunit
 .phpunit.result.cache
 coverage
+coverage.xml

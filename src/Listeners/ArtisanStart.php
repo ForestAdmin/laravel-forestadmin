@@ -12,6 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
+ * @codeCoverageIgnore
  */
 class ArtisanStart
 {
@@ -23,7 +24,7 @@ class ArtisanStart
     public function handle(CommandStarting $event): void
     {
         if ($event->command === 'serve') {
-            (new Schema())->handle();
+            app()->make(Schema::class)->handle();
         }
     }
 }
