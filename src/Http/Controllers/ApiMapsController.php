@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Auth\OidcConfiguration;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Htptp;
 
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Htptp;
 class ApiMapsController extends Controller
 {
     /**
-     * @return JsonResponse
+     * @return Response
      */
     public function index()
     {
