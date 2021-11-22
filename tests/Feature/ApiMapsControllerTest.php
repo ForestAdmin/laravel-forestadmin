@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ApiMapsController;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;

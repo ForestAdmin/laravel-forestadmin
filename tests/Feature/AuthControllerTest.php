@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use Firebase\JWT\JWT;
 use ForestAdmin\LaravelForestAdmin\Auth\AuthManager;
