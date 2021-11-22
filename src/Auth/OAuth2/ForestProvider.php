@@ -107,15 +107,11 @@ class ForestProvider extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        if (200 !== $response->getStatusCode()) {
-            if (404 === $response->getStatusCode()) {
-                throw new AuthorizationException(ErrorMessages::SECRET_NOT_FOUND);
-            }
-
-            if (422 === $response->getStatusCode()) {
-                throw new AuthorizationException(ErrorMessages::SECRET_AND_RENDERINGID_INCONSISTENT);
-            }
-
+        if (404 === $response->getStatusCode()) {
+            throw new AuthorizationException(ErrorMessages::SECRET_NOT_FOUND);
+        } else if (422 === $response->getStatusCode()) {
+            throw new AuthorizationException(ErrorMessages::SECRET_AND_RENDERINGID_INCONSISTENT);
+        } else if (200 !== $response->getStatusCode()) {
             $serverError = (array_key_exists('errors', $data) && count($data['errors']) > 0) ? $data['errors'][0] : null;
             if (null !== $serverError && array_key_exists('name', $serverError) && $serverError['name'] === ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED) {
                 throw new AuthorizationException(ErrorMessages::TWO_FACTOR_AUTHENTICATION_REQUIRED);
