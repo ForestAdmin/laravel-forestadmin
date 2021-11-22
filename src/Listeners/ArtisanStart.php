@@ -24,7 +24,7 @@ class ArtisanStart
     public function handle(CommandStarting $event): void
     {
         if ($event->command === 'serve') {
-            app()->make(Schema::class)->handle();
+            app()->make(Schema::class)->sendApiMap();
         }
     }
 }

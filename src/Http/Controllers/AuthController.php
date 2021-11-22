@@ -10,7 +10,6 @@ use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Htptp;
 use JsonException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
