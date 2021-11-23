@@ -114,13 +114,13 @@ class ForestModel
     public function serialize(): array
     {
         return [
-            'name'                   => $this->name,
-            'old_name'               => $this->oldName,
-            'icon'                   => $this->icon,
-            'is_read_only'           => $this->isReadOnly,
-            'is_virtual'             => $this->isVirtual,
-            'only_for_relationships' => $this->onlyForRelationships,
-            'pagination_type'        => $this->paginationType,
+            'name'                   => $this->getName(),
+            'old_name'               => $this->getOldName(),
+            'icon'                   => $this->getIcon(),
+            'is_read_only'           => $this->isReadOnly(),
+            'is_virtual'             => $this->isVirtual(),
+            'only_for_relationships' => $this->isOnlyForRelationships(),
+            'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
         ];
     }
@@ -138,18 +138,225 @@ class ForestModel
             if (array_key_exists('enums', $field)) {
                 $values['type'] = 'Enum';
             }
-            $fields->put($field['field'], array_merge($field, $values));
+            $fields->put($field['field'], array_merge($values, $field));
         }
 
         return $fields->values()->toArray();
     }
 
+    /**
+     * @param array $fields
+     * @return ForestModel
+     */
+    public function setFields(array $fields): ForestModel
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return ForestModel
+     */
+    public function setName(string $name): ForestModel
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOldName(): string
+    {
+        return $this->oldName;
+    }
+
+    /**
+     * @param string $oldName
+     * @return ForestModel
+     */
+    public function setOldName(string $oldName): ForestModel
+    {
+        $this->oldName = $oldName;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string|null $icon
+     * @return ForestModel
+     */
+    public function setIcon(?string $icon): ForestModel
+    {
+        $this->icon = $icon;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->isReadOnly;
+    }
+
+    /**
+     * @param bool $isReadOnly
+     * @return ForestModel
+     */
+    public function setIsReadOnly(bool $isReadOnly): ForestModel
+    {
+        $this->isReadOnly = $isReadOnly;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSearchable(): bool
+    {
+        return $this->isSearchable;
+    }
+
+    /**
+     * @param bool $isSearchable
+     * @return ForestModel
+     */
+    public function setIsSearchable(bool $isSearchable): ForestModel
+    {
+        $this->isSearchable = $isSearchable;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVirtual(): bool
+    {
+        return $this->isVirtual;
+    }
+
+    /**
+     * @param bool $isVirtual
+     * @return ForestModel
+     */
+    public function setIsVirtual(bool $isVirtual): ForestModel
+    {
+        $this->isVirtual = $isVirtual;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnlyForRelationships(): bool
+    {
+        return $this->onlyForRelationships;
+    }
+
+    /**
+     * @param bool $onlyForRelationships
+     * @return ForestModel
+     */
+    public function setOnlyForRelationships(bool $onlyForRelationships): ForestModel
+    {
+        $this->onlyForRelationships = $onlyForRelationships;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaginationType(): string
+    {
+        return $this->paginationType;
+    }
+
+    /**
+     * @param string $paginationType
+     * @return ForestModel
+     */
+    public function setPaginationType(string $paginationType): ForestModel
+    {
+        $this->paginationType = $paginationType;
+        return $this;
+    }
+
+    /**
+     * @return LaravelModel
+     */
+    public function getModel(): LaravelModel
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param LaravelModel $model
+     * @return ForestModel
+     */
+    public function setModel(LaravelModel $model): ForestModel
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDatabase()
+    {
+        return $this->database;
+    }
+
+    /**
+     * @param string|null $database
+     * @return ForestModel
+     */
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string $table
+     * @return ForestModel
+     */
+    public function setTable($table)
+    {
+        $this->table = $table;
+        return $this;
+    }
 
     /**
      * @return Collection
      * @throws Exception
      */
-    private function fetchFieldsFromTable(): Collection
+    protected function fetchFieldsFromTable(): Collection
     {
         $fields = new Collection();
         $connexion = $this->model->getConnection()->getDoctrineSchemaManager();
@@ -169,13 +376,12 @@ class ForestModel
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
     }
 
-
     /**
      * @param Collection $fields
      * @param array      $relations
      * @return Collection
      */
-    private function mergeFieldsWithRelations(Collection $fields, array $relations): Collection
+    protected function mergeFieldsWithRelations(Collection $fields, array $relations): Collection
     {
         foreach ($relations as $name => $type) {
             $relation = $this->model->$name();
@@ -243,7 +449,7 @@ class ForestModel
      * @param string|null $name
      * @return array
      */
-    private function fieldDefaultValues(?string $name = null): array
+    protected function fieldDefaultValues(?string $name = null): array
     {
         return [
             'field'         => $name,
