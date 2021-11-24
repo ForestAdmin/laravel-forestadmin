@@ -307,16 +307,6 @@ class ForestModel
     }
 
     /**
-     * @param LaravelModel $model
-     * @return ForestModel
-     */
-    public function setModel(LaravelModel $model): ForestModel
-    {
-        $this->model = $model;
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getDatabase()
@@ -417,9 +407,9 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => $relation->getRelated()->getTable(),
+                            'field'      => $name,
                             'reference'  => $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName(),
-                            'inverse_of' => $type instanceof HasOneOrMany ? $relation->getForeignKeyName() : null,
+                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getForeignKeyName(),
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
@@ -429,7 +419,7 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'     => $relation->getParent()->getTable(),
+                            'field'     => $name,
                             'reference' => $relation->getRelated()->getTable() . '.' . $relation->getLocalKeyName(),
                         ]
                     );
