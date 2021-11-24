@@ -4,6 +4,8 @@ namespace ForestAdmin\LaravelForestAdmin\Tests;
 
 use ForestAdmin\LaravelForestAdmin\ForestServiceProvider;
 use Illuminate\Foundation\Application;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 /**
@@ -15,19 +17,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
  */
 class TestCase extends OrchestraTestCase
 {
-    /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $config = $app['config'];
-        $config->set('app.debug', true);
-        $config->set('forest.api.secret', 'my-secret-key');
-        $config->set('forest.api.auth-secret', 'auth-secret-key');
-    }
-
     /**
      * Call protected/private method of a class.
      * @param object $object
@@ -62,6 +51,39 @@ class TestCase extends OrchestraTestCase
     }
 
     /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $db = new DB();
+        $db->addConnection(
+            [
+                'driver'   => 'sqlite',
+                'database' => ':memory:',
+            ]
+        );
+
+        $db->setAsGlobal();
+        $db->bootEloquent();
+        $this->migrate();
+    }
+
+    /**
+     * @param Application $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app): void
+    {
+        parent::getEnvironmentSetUp($app);
+        $config = $app['config'];
+        $config->set('app.debug', true);
+        $config->set('forest.api.secret', 'my-secret-key');
+        $config->set('forest.api.auth-secret', 'auth-secret-key');
+    }
+
+    /**
      * Get package providers.
      *
      * @param Application $app
@@ -73,5 +95,177 @@ class TestCase extends OrchestraTestCase
         return [
             ForestServiceProvider::class,
         ];
+    }
+
+    /**
+     * Make some dummy tables
+     * @return void
+     */
+    protected function migrate(): void
+    {
+        DB::schema()->create(
+            'users',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->unique();
+                $table->timestamp('email_verified_at')->nullable();
+                $table->string('password');
+                $table->rememberToken();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'products',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->decimal('price');
+                $table->foreignId('user_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'categories',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->foreignId('product_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'books',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->text('comment');
+                $table->enum('difficulty', ['easy', 'hard']);
+                $table->float('amount', 8, 2);
+                $table->boolean('active')->default(true);
+                $table->jsonb('options');
+                $table->string('other')->default('N/A');
+                $table->foreignId('category_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'ranges',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'book_range',
+            function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('book_id')->constrained();
+                $table->foreignId('range_id')->constrained();
+            }
+        );
+
+        DB::schema()->create(
+            'comments',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('body');
+                $table->foreignId('book_id')->constrained();
+                $table->foreignId('user_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'environments',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->foreignId('book_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'deployments',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->foreignId('environment_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'authors',
+            function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->table(
+            'users',
+            function (Blueprint $table) {
+                $table->foreignId('book_id')->nullable()->constrained();
+            }
+        );
+
+        DB::schema()->create(
+            'editors',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->foreignId('book_id')->constrained();
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'tags',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->morphs('taggable');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'images',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('url');
+                $table->morphs('imageable');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'buys',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'buyables',
+            function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('buy_id')->constrained();
+                $table->integer('buyable_id');
+                $table->string('buyable_type');
+            }
+        );
     }
 }
