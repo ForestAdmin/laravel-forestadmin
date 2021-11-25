@@ -69,7 +69,7 @@ class Schema
         $response = $this->forestApi->post(
             '/forest/apimaps',
             [],
-            $this->serializeSchema()
+            $this->serialize()
         );
 
         $output = new ConsoleOutput();
@@ -120,7 +120,7 @@ class Schema
      * @throws Exception
      * @return array
      */
-    private function serializeSchema(): array
+    private function serialize(): array
     {
         $schema = $this->generate();
         $data = [];
@@ -153,7 +153,7 @@ class Schema
      * Fetch all files in the model directory
      * @return Collection
      */
-    protected function fetchFiles(): Collection
+    private function fetchFiles(): Collection
     {
         $files = new Collection();
 
