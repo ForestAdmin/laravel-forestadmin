@@ -363,6 +363,8 @@ class ForestModel
             }
         }
 
+        $fields = $fields->reject(fn ($item) => $item['type'] === 'unknown');
+
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
     }
 

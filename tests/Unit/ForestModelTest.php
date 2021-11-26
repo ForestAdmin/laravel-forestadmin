@@ -38,9 +38,9 @@ class ForestModelTest extends TestCase
     use ProphecyTrait;
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSerialize(): void
     {
@@ -84,9 +84,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testGetFields(): void
     {
@@ -164,9 +164,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testFetchFieldsFromTable(): void
     {
@@ -176,11 +176,11 @@ class ForestModelTest extends TestCase
         $forestModel->shouldReceive('getRelations')
             ->withAnyArgs()
             ->andReturn([]);
-        $defaultValues = $this->invokeMethod($forestModel, 'fieldDefaultValues');
 
         $fields = $forestModel->fetchFieldsFromTable();
 
         $this->assertInstanceOf(Collection::class, $fields);
+        $this->assertNull($fields->firstWhere('field', 'field_exclude'));
         $this->assertIsArray($fields['id']);
         $this->assertEquals($fields['id']['field'], 'id');
         $this->assertEquals($fields['id']['type'], 'Number');
@@ -188,9 +188,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testGetRelations(): void
     {
@@ -200,7 +200,7 @@ class ForestModelTest extends TestCase
 
         $relations = $forestModel->getRelations($forestModel->getModel());
         foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            $publicMethods[$method->getName()] = (string) $method->getReturnType();
+            $publicMethods[$method->getName()] = (string)$method->getReturnType();
         }
 
         $this->assertIsArray($relations);
@@ -365,9 +365,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetName(): void
     {
@@ -380,9 +380,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetOldName(): void
     {
@@ -395,9 +395,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetIcon(): void
     {
@@ -410,9 +410,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetIsReadOnly(): void
     {
@@ -425,9 +425,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetIsSearchable(): void
     {
@@ -440,9 +440,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetIsVirtual(): void
     {
@@ -455,9 +455,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetOnlyForRelationships(): void
     {
@@ -470,9 +470,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetPaginationType(): void
     {
@@ -485,9 +485,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetTable(): void
     {
@@ -500,9 +500,9 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
+     * @throws SchemaException
+     * @throws Exception
      */
     public function testSetDatabase(): void
     {
@@ -525,8 +525,9 @@ class ForestModelTest extends TestCase
         $schemaManager->listTableColumns(Argument::any(), Argument::any())
             ->willReturn(
                 [
-                    'id'  => new Column('id', Type::getType('bigint')),
-                    'foo' => new Column('foo', Type::getType('string')),
+                    'id'            => new Column('id', Type::getType('bigint')),
+                    'foo'           => new Column('foo', Type::getType('string')),
+                    'field_exclude' => new Column('field_exclude', Type::getType('array')),
                 ]
             );
 
