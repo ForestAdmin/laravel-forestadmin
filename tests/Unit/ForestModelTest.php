@@ -138,28 +138,28 @@ class ForestModelTest extends TestCase
                 ['field' => 'bar', 'enums' => ['easy', 'hard']],
             ]
         );
-        $f = $forestModel->getFields();
-        $fieldFoo = array_search('foo', array_column($f, 'field'), true);
-        $fieldBar = array_search('bar', array_column($f, 'field'), true);
-        $fieldLabel = array_search('label', array_column($f, 'field'), true);
+        $fields = $forestModel->getFields();
+        $fieldFoo = array_search('foo', array_column($fields, 'field'), true);
+        $fieldBar = array_search('bar', array_column($fields, 'field'), true);
+        $fieldLabel = array_search('label', array_column($fields, 'field'), true);
 
-        $this->assertIsArray($f);
+        $this->assertIsArray($fields);
         $this->assertNotNull($fieldFoo);
         $this->assertNotNull($fieldBar);
         $this->assertNotNull($fieldLabel);
-        $this->assertEquals($f[$fieldBar]['type'], 'Enum');
-        $this->assertEquals($f[$fieldBar]['enums'], ['easy', 'hard']);
-        $this->assertArrayHasKey('default_value', $f[$fieldLabel]);
-        $this->assertArrayHasKey('enums', $f[$fieldLabel]);
-        $this->assertArrayHasKey('integration', $f[$fieldLabel]);
-        $this->assertArrayHasKey('is_filterable', $f[$fieldLabel]);
-        $this->assertArrayHasKey('is_read_only', $f[$fieldLabel]);
-        $this->assertArrayHasKey('is_required', $f[$fieldLabel]);
-        $this->assertArrayHasKey('is_sortable', $f[$fieldLabel]);
-        $this->assertArrayHasKey('is_virtual', $f[$fieldLabel]);
-        $this->assertArrayHasKey('reference', $f[$fieldLabel]);
-        $this->assertArrayHasKey('widget', $f[$fieldLabel]);
-        $this->assertArrayHasKey('validations', $f[$fieldLabel]);
+        $this->assertEquals($fields[$fieldBar]['type'], 'Enum');
+        $this->assertEquals($fields[$fieldBar]['enums'], ['easy', 'hard']);
+        $this->assertArrayHasKey('default_value', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('enums', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('integration', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('is_filterable', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('is_read_only', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('is_required', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('is_sortable', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('is_virtual', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('reference', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('widget', $fields[$fieldLabel]);
+        $this->assertArrayHasKey('validations', $fields[$fieldLabel]);
     }
 
     /**

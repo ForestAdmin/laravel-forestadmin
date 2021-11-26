@@ -14,6 +14,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -54,7 +55,7 @@ class Schema
     public function __construct(Config $config, ForestApiRequester $forestApi)
     {
         $this->config = $config;
-        $this->directory = base_path($config->get('forest.models_directory'));
+        $this->directory = App::basePath($config->get('forest.models_directory'));
         $this->forestApi = $forestApi;
     }
 
@@ -105,12 +106,7 @@ class Schema
             }
         }
         $schema->put('collections', $collections);
-
-        try {
-            File::put($this->config->get('forest.json_file_path'), json_encode($schema, JSON_PRETTY_PRINT));
-        } catch (\RuntimeException $e) {
-            throw new SchemaException("The schema cannot be saved in your application");
-        }
+        File::put($this->config->get('forest.json_file_path'), json_encode($schema, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
 
         return $schema->toArray();
     }

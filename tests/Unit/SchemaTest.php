@@ -8,10 +8,12 @@ use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Mockery as m;
 
 /**
- * Class SchemaTest
+ * Class ArtisanTest
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
@@ -67,6 +69,22 @@ class SchemaTest extends TestCase
     }
 
     /**
+     * @throws \ReflectionException
+     * @return void
+     */
+    public function testGenerate(): void
+    {
+        App::shouldReceive('basePath')
+            ->andReturn(__DIR__ . '/../Feature/Models');
+        $schema = new Schema($this->getConfig(), $this->getForestApi());
+        $generate = $this->invokeMethod($schema, 'generate');
+
+        $this->assertIsArray($generate);
+        $this->assertArrayHasKey('meta', $generate);
+        $this->assertArrayHasKey('collections', $generate);
+    }
+
+    /**
      * @return object
      */
     private function getForestApi()
@@ -86,6 +104,9 @@ class SchemaTest extends TestCase
         $config
             ->get('forest.models_directory')
             ->willReturn(__DIR__ . '/../Feature/Models');
+        $config
+            ->get('forest.json_file_path')
+            ->willReturn('.forestadmin-schema.json');
 
         return $config->reveal();
     }
