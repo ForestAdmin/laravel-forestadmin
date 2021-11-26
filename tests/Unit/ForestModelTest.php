@@ -200,7 +200,7 @@ class ForestModelTest extends TestCase
 
         $relations = $forestModel->getRelations($forestModel->getModel());
         foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            $publicMethods[$method->getName()] = (string)$method->getReturnType();
+            $publicMethods[$method->getName()] = (string) $method->getReturnType();
         }
 
         $this->assertIsArray($relations);
