@@ -9,8 +9,8 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Mockery as m;
 
 /**
  * Class ArtisanTest
@@ -77,6 +77,7 @@ class SchemaTest extends TestCase
         App::shouldReceive('basePath')
             ->andReturn(__DIR__ . '/../Feature/Models');
         $schema = new Schema($this->getConfig(), $this->getForestApi());
+        File::shouldReceive('put')->andReturn(true);
         $generate = $this->invokeMethod($schema, 'generate');
 
         $this->assertIsArray($generate);

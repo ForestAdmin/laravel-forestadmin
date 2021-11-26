@@ -139,27 +139,28 @@ class ForestModelTest extends TestCase
             ]
         );
         $fields = $forestModel->getFields();
-        $fieldFoo = array_search('foo', array_column($fields, 'field'), true);
-        $fieldBar = array_search('bar', array_column($fields, 'field'), true);
-        $fieldLabel = array_search('label', array_column($fields, 'field'), true);
+        $foo = array_search('foo', array_column($fields, 'field'), true);
+        $bar = array_search('bar', array_column($fields, 'field'), true);
+        $label = array_search('label', array_column($fields, 'field'), true);
+        $defaultValues = $this->invokeMethod($forestModel, 'fieldDefaultValues');
 
         $this->assertIsArray($fields);
-        $this->assertNotNull($fieldFoo);
-        $this->assertNotNull($fieldBar);
-        $this->assertNotNull($fieldLabel);
-        $this->assertEquals($fields[$fieldBar]['type'], 'Enum');
-        $this->assertEquals($fields[$fieldBar]['enums'], ['easy', 'hard']);
-        $this->assertArrayHasKey('default_value', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('enums', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('integration', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('is_filterable', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('is_read_only', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('is_required', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('is_sortable', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('is_virtual', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('reference', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('widget', $fields[$fieldLabel]);
-        $this->assertArrayHasKey('validations', $fields[$fieldLabel]);
+        $this->assertNotNull($foo);
+        $this->assertNotNull($bar);
+        $this->assertNotNull($label);
+        $this->assertEquals($fields[$bar]['type'], 'Enum');
+        $this->assertEquals($fields[$bar]['enums'], ['easy', 'hard']);
+        $this->assertEquals($fields[$label]['default_value'], $defaultValues['default_value']);
+        $this->assertEquals($fields[$label]['enums'], $defaultValues['enums']);
+        $this->assertEquals($fields[$label]['integration'], $defaultValues['integration']);
+        $this->assertEquals($fields[$label]['is_filterable'], $defaultValues['is_filterable']);
+        $this->assertEquals($fields[$label]['is_read_only'], $defaultValues['is_read_only']);
+        $this->assertEquals($fields[$label]['is_required'], $defaultValues['is_required']);
+        $this->assertEquals($fields[$label]['is_sortable'], $defaultValues['is_sortable']);
+        $this->assertEquals($fields[$label]['is_virtual'], $defaultValues['is_virtual']);
+        $this->assertEquals($fields[$label]['reference'], $defaultValues['reference']);
+        $this->assertEquals($fields[$label]['widget'], $defaultValues['widget']);
+        $this->assertEquals($fields[$label]['validations'], $defaultValues['validations']);
     }
 
     /**
@@ -175,15 +176,15 @@ class ForestModelTest extends TestCase
         $forestModel->shouldReceive('getRelations')
             ->withAnyArgs()
             ->andReturn([]);
+        $defaultValues = $this->invokeMethod($forestModel, 'fieldDefaultValues');
 
         $fields = $forestModel->fetchFieldsFromTable();
 
         $this->assertInstanceOf(Collection::class, $fields);
         $this->assertIsArray($fields['id']);
-        $this->assertArrayHasKey('field', $fields['id']);
-        $this->assertArrayHasKey('type', $fields['id']);
-        $this->assertArrayHasKey('is_required', $fields['id']);
-        $this->assertArrayHasKey('default_value', $fields['id']);
+        $this->assertEquals($fields['id']['field'], 'id');
+        $this->assertEquals($fields['id']['type'], 'Number');
+        $this->assertEquals($fields['id']['is_required'], true);
     }
 
     /**
@@ -210,89 +211,157 @@ class ForestModelTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @throws SchemaException
      * @return void
      */
-    public function testMergeFieldsWithRelations(): void
+    public function testMergeFieldsWithRelationsBelongsTo(): void
     {
-        $dummyModel = new Book();
-        $forestModel = m::mock(ForestModel::class, [$dummyModel])
-            ->makePartial();
-
-        $fields = collect(
-            [
-                'category_id' => ['field' => 'category_id'],
-            ]
-        );
-
+        [$forestModel, $fields] = $this->makeForestModel();
         $relations = $forestModel->getRelations($forestModel->getModel());
         $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
 
-        $c = $merge->firstWhere('field', 'category');
+        $fieldCategory = $merge->firstWhere('field', 'category');
         $category = $forestModel->getModel()->category();
-        $this->assertNotNull($c);
-        $this->assertEquals($c['relationship'], $forestModel->mapRelationships(BelongsTo::class));
-        $this->assertEquals($c['reference'], $category->getRelated()->getTable() . '.' . $category->getOwnerKeyName());
-        $this->assertEquals($c['inverse_of'], $category->getOwnerKeyName());
+        $this->assertNotNull($fieldCategory);
+        $this->assertEquals($fieldCategory['relationship'], $forestModel->mapRelationships(BelongsTo::class));
+        $this->assertEquals($fieldCategory['reference'], $category->getRelated()->getTable() . '.' . $category->getOwnerKeyName());
+        $this->assertEquals($fieldCategory['inverse_of'], $category->getOwnerKeyName());
+    }
 
-        $r = $merge->firstWhere('field', 'ranges');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsBelongsToMany(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $fieldRange = $merge->firstWhere('field', 'ranges');
         $ranges = $forestModel->getModel()->ranges();
+        $this->assertNotNull($fieldRange);
+        $this->assertEquals($fieldRange['relationship'], $forestModel->mapRelationships(BelongsToMany::class));
+        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedPivotKeyName());
+    }
 
-        $this->assertNotNull($r);
-        $this->assertEquals($r['relationship'], $forestModel->mapRelationships(BelongsToMany::class));
-        $this->assertEquals($r['inverse_of'], $ranges->getRelatedPivotKeyName());
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsHasMany(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
 
-        $co = $merge->firstWhere('field', 'comments');
+        $fieldComment = $merge->firstWhere('field', 'comments');
         $comments = $forestModel->getModel()->comments();
-        $this->assertNotNull($co);
-        $this->assertEquals($co['relationship'], $forestModel->mapRelationships(HasMany::class));
-        $this->assertEquals($co['field'], 'comments');
-        $this->assertEquals($co['reference'], $comments->getRelated()->getTable() . '.' . $comments->getForeignKeyName());
-        $this->assertEquals($co['inverse_of'], $comments->getForeignKeyName());
+        $this->assertNotNull($fieldComment);
+        $this->assertEquals($fieldComment['relationship'], $forestModel->mapRelationships(HasMany::class));
+        $this->assertEquals($fieldComment['field'], 'comments');
+        $this->assertEquals($fieldComment['reference'], $comments->getRelated()->getTable() . '.' . $comments->getForeignKeyName());
+        $this->assertEquals($fieldComment['inverse_of'], $comments->getForeignKeyName());
+    }
 
-        $d = $merge->firstWhere('field', 'deployments');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsHasManyThrough(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $fieldDeployment = $merge->firstWhere('field', 'deployments');
         $deployments = $forestModel->getModel()->deployments();
-        $this->assertNotNull($d);
-        $this->assertEquals($d['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
-        $this->assertEquals($d['field'], 'deployments');
-        $this->assertEquals($d['reference'], $deployments->getRelated()->getTable() . '.' . $deployments->getLocalKeyName());
+        $this->assertNotNull($fieldDeployment);
+        $this->assertEquals($fieldDeployment['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
+        $this->assertEquals($fieldDeployment['field'], 'deployments');
+        $this->assertEquals($fieldDeployment['reference'], $deployments->getRelated()->getTable() . '.' . $deployments->getLocalKeyName());
+    }
 
-        $e = $merge->firstWhere('field', 'editor');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsHasOne(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $editor = $merge->firstWhere('field', 'editor');
         $editors = $forestModel->getModel()->editor();
-        $this->assertNotNull($e);
-        $this->assertEquals($e['relationship'], $forestModel->mapRelationships(HasOne::class));
-        $this->assertEquals($e['field'], 'editor');
-        $this->assertEquals($e['reference'], $editors->getRelated()->getTable() . '.' . $editors->getForeignKeyName());
-        $this->assertEquals($e['inverse_of'], $editors->getForeignKeyName());
+        $this->assertNotNull($editor);
+        $this->assertEquals($editor['relationship'], $forestModel->mapRelationships(HasOne::class));
+        $this->assertEquals($editor['field'], 'editor');
+        $this->assertEquals($editor['reference'], $editors->getRelated()->getTable() . '.' . $editors->getForeignKeyName());
+        $this->assertEquals($editor['inverse_of'], $editors->getForeignKeyName());
+    }
 
-        $a = $merge->firstWhere('field', 'author');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsHasOneThrough(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $fieldAuthor = $merge->firstWhere('field', 'author');
         $author = $forestModel->getModel()->author();
-        $this->assertNotNull($a);
-        $this->assertEquals($a['relationship'], $forestModel->mapRelationships(HasOneThrough::class));
-        $this->assertEquals($a['field'], 'author');
-        $this->assertEquals($a['reference'], $author->getRelated()->getTable() . '.' . $author->getLocalKeyName());
+        $this->assertNotNull($fieldAuthor);
+        $this->assertEquals($fieldAuthor['relationship'], $forestModel->mapRelationships(HasOneThrough::class));
+        $this->assertEquals($fieldAuthor['field'], 'author');
+        $this->assertEquals($fieldAuthor['reference'], $author->getRelated()->getTable() . '.' . $author->getLocalKeyName());
+    }
 
-        $i = $merge->firstWhere('field', 'image');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsMorphOne(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $image = $merge->firstWhere('field', 'image');
         $images = $forestModel->getModel()->image();
-        $this->assertNotNull($i);
-        $this->assertEquals($i['relationship'], $forestModel->mapRelationships(MorphOne::class));
-        $this->assertEquals($i['field'], 'image');
-        $this->assertEquals($i['reference'], $images->getRelated()->getTable() . '.' . $images->getForeignKeyName());
+        $this->assertNotNull($image);
+        $this->assertEquals($image['relationship'], $forestModel->mapRelationships(MorphOne::class));
+        $this->assertEquals($image['field'], 'image');
+        $this->assertEquals($image['reference'], $images->getRelated()->getTable() . '.' . $images->getForeignKeyName());
+    }
 
-        $t = $merge->firstWhere('field', 'tags');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsMorphMany(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $fieldTag = $merge->firstWhere('field', 'tags');
         $tags = $forestModel->getModel()->tags();
-        $this->assertNotNull($t);
-        $this->assertEquals($t['relationship'], $forestModel->mapRelationships(MorphMany::class));
-        $this->assertEquals($t['field'], 'tags');
-        $this->assertEquals($t['reference'], $tags->getRelated()->getTable() . '.' . $tags->getForeignKeyName());
+        $this->assertNotNull($fieldTag);
+        $this->assertEquals($fieldTag['relationship'], $forestModel->mapRelationships(MorphMany::class));
+        $this->assertEquals($fieldTag['field'], 'tags');
+        $this->assertEquals($fieldTag['reference'], $tags->getRelated()->getTable() . '.' . $tags->getForeignKeyName());
+    }
 
-        $b = $merge->firstWhere('field', 'buys');
+    /**
+     * @return void
+     */
+    public function testMergeFieldsWithRelationsMorphToMany(): void
+    {
+        [$forestModel, $fields] = $this->makeForestModel();
+        $relations = $forestModel->getRelations($forestModel->getModel());
+        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
+
+        $fieldBuy = $merge->firstWhere('field', 'buys');
         $buys = $forestModel->getModel()->buys();
-        $this->assertNotNull($b);
-        $this->assertEquals($b['relationship'], $forestModel->mapRelationships(MorphToMany::class));
-        $this->assertEquals($b['field'], 'buys');
-        $this->assertEquals($b['inverse_of'], $buys->getRelatedPivotKeyName());
+        $this->assertNotNull($fieldBuy);
+        $this->assertEquals($fieldBuy['relationship'], $forestModel->mapRelationships(MorphToMany::class));
+        $this->assertEquals($fieldBuy['field'], 'buys');
+        $this->assertEquals($fieldBuy['inverse_of'], $buys->getRelatedPivotKeyName());
     }
 
     /**
@@ -450,7 +519,7 @@ class ForestModelTest extends TestCase
      * @throws Exception
      * @throws SchemaException
      */
-    private function getLaravelModel()
+    public function getLaravelModel()
     {
         $schemaManager = $this->prophesize(AbstractSchemaManager::class);
         $schemaManager->listTableColumns(Argument::any(), Argument::any())
@@ -479,5 +548,22 @@ class ForestModelTest extends TestCase
             ->willReturn('dummy_tables');
 
         return $model->reveal();
+    }
+
+    /**
+     * @return array
+     */
+    public function makeForestModel(): array
+    {
+        $dummyModel = new Book();
+        $forestModel = m::mock(ForestModel::class, [$dummyModel])->makePartial();
+
+        $fields = collect(
+            [
+                'category_id' => ['field' => 'category_id'],
+            ]
+        );
+
+        return [$forestModel, $fields];
     }
 }

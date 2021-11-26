@@ -27,5 +27,8 @@ class DatabaseTest extends TestCase
 
         $sqlserver = 'sqlsrv';
         $this->assertEquals('mssql', Database::getSource($sqlserver));
+
+        $foo = 'foo';
+        $this->assertEquals($foo, Database::getSource($foo));
     }
 }
