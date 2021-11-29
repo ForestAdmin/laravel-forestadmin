@@ -65,7 +65,7 @@ class SchemaTest extends TestCase
         $this->assertArrayHasKey('database_type', $metadata['meta']['stack']);
         $this->assertArrayHasKey('orm_version', $metadata['meta']['stack']);
         $this->assertEquals('laravel-forestadmin', $metadata['meta']['liana']);
-        $this->assertEquals('foo_db', $metadata['meta']['stack']['database_type']);
+        $this->assertEquals('sqlite', $metadata['meta']['stack']['database_type']);
     }
 
     /**
@@ -101,7 +101,7 @@ class SchemaTest extends TestCase
         $config = $this->prophesize(Repository::class);
         $config
             ->get('database.default')
-            ->willReturn('foo_db');
+            ->willReturn('sqlite');
         $config
             ->get('forest.models_directory')
             ->willReturn(__DIR__ . '/../Feature/Models');

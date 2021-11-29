@@ -27,8 +27,17 @@ class DatabaseTest extends TestCase
 
         $sqlserver = 'sqlsrv';
         $this->assertEquals('mssql', Database::getSource($sqlserver));
+    }
 
+    /**
+     * @return void
+     */
+    public function testGetSourceException(): void
+    {
         $foo = 'foo';
-        $this->assertEquals($foo, Database::getSource($foo));
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("The database dialect `$foo` is not supported");
+
+        Database::getSource($foo);
     }
 }

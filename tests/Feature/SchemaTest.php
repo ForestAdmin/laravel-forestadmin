@@ -89,7 +89,7 @@ class SchemaTest extends TestCase
         $config = $this->prophesize(Repository::class);
         $config
             ->get('database.default')
-            ->willReturn('foo_db');
+            ->willReturn('sqlite');
         $config
             ->get('forest.models_directory')
             ->willReturn(__DIR__ . '/../Feature/Models');
