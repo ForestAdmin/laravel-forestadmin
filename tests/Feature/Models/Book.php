@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -55,9 +54,9 @@ class Book extends Model
     /**
      * @return HasManyThrough
      */
-    public function deployments(): HasManyThrough
+    public function bookstores(): HasManyThrough
     {
-        return $this->hasManyThrough(Environment::class, Deployment::class);
+        return $this->hasManyThrough(Company::class, Bookstore::class);
     }
 
     /**

@@ -270,12 +270,12 @@ class ForestModelTest extends TestCase
         $relations = $forestModel->getRelations($forestModel->getModel());
         $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
 
-        $fieldDeployment = $merge->firstWhere('field', 'deployments');
-        $deployments = $forestModel->getModel()->deployments();
-        $this->assertNotNull($fieldDeployment);
-        $this->assertEquals($fieldDeployment['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
-        $this->assertEquals($fieldDeployment['field'], 'deployments');
-        $this->assertEquals($fieldDeployment['reference'], $deployments->getRelated()->getTable() . '.' . $deployments->getLocalKeyName());
+        $fieldBookstore = $merge->firstWhere('field', 'bookstores');
+        $bookstores = $forestModel->getModel()->bookstores();
+        $this->assertNotNull($fieldBookstore);
+        $this->assertEquals($fieldBookstore['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
+        $this->assertEquals($fieldBookstore['field'], 'bookstores');
+        $this->assertEquals($fieldBookstore['reference'], $bookstores->getRelated()->getTable() . '.' . $bookstores->getLocalKeyName());
     }
 
     /**

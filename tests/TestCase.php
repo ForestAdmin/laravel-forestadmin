@@ -188,7 +188,7 @@ class TestCase extends OrchestraTestCase
         );
 
         DB::schema()->create(
-            'environments',
+            'companies',
             function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -198,11 +198,11 @@ class TestCase extends OrchestraTestCase
         );
 
         DB::schema()->create(
-            'deployments',
+            'bookstores',
             function (Blueprint $table) {
                 $table->id();
                 $table->string('label');
-                $table->foreignId('environment_id')->constrained();
+                $table->foreignId('company_id')->constrained();
                 $table->timestamps();
             }
         );
