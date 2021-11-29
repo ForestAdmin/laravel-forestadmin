@@ -37,11 +37,8 @@ class SchemaTest extends TestCase
     public function testHandle(): void
     {
         App::shouldReceive('basePath')->andReturn(__DIR__ . '/../Feature/Models');
-        $schema = new Schema($this->getConfig(), $this->forestApiPost(204));
+        $schema = new Schema($this->getConfig(), $this->forestApiPost(204), $this->getConsole('<info>Apimap Received<info>'));
         File::shouldReceive('put')->andReturn(true);
-
-        $console = m::mock(ConsoleOutput::class);
-        $console->shouldReceive('writeln')->andReturn('<info>Apimap Received<info>');
 
         $schema->sendApiMap();
     }
@@ -55,11 +52,8 @@ class SchemaTest extends TestCase
     public function testHandleException(): void
     {
         App::shouldReceive('basePath')->andReturn(__DIR__ . '/../Feature/Models');
-        $schema = new Schema($this->getConfig(), $this->forestApiPost(404));
+        $schema = new Schema($this->getConfig(), $this->forestApiPost(404), $this->getConsole('<error>Cannot send the apimap to Forest. Are you online?</error>'));
         File::shouldReceive('put')->andReturn(true);
-
-        $console = m::mock(ConsoleOutput::class);
-        $console->shouldReceive('writeln')->andReturn('<error>Cannot send the apimap to Forest. Are you online?</error>');
 
         $schema->sendApiMap();
     }
@@ -99,5 +93,23 @@ class SchemaTest extends TestCase
 
 
         return $config->reveal();
+    }
+
+    /**
+     * @param string $notice
+     * @return object
+     */
+    public function getConsole(string $notice)
+    {
+        $console = $this->prophesize(ConsoleOutput::class);
+        $console
+            ->write('🌳🌳🌳 ')
+            ->willReturn('🌳🌳🌳 ');
+
+        $console
+            ->writeln($notice)
+            ->willReturn($notice);
+
+        return $console->reveal();
     }
 }

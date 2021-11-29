@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Class ArtisanTest
@@ -29,7 +30,7 @@ class SchemaTest extends TestCase
      */
     public function testFetchFiles(): void
     {
-        $schema = new Schema($this->getConfig(), $this->getForestApi());
+        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
         $this->invokeProperty($schema, 'directory', __DIR__ . '/../Feature/Models');
         $files = $this->invokeMethod($schema, 'fetchFiles');
 
@@ -54,7 +55,7 @@ class SchemaTest extends TestCase
      */
     public function testMetadata(): void
     {
-        $schema = new Schema($this->getConfig(), $this->getForestApi());
+        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
         $metadata = $this->invokeMethod($schema, 'metadata');
 
         $this->assertIsArray($metadata);
@@ -76,7 +77,7 @@ class SchemaTest extends TestCase
     {
         App::shouldReceive('basePath')
             ->andReturn(__DIR__ . '/../Feature/Models');
-        $schema = new Schema($this->getConfig(), $this->getForestApi());
+        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
         File::shouldReceive('put')->andReturn(true);
         $generate = $this->invokeMethod($schema, 'generate');
 
@@ -110,5 +111,15 @@ class SchemaTest extends TestCase
             ->willReturn('.forestadmin-schema.json');
 
         return $config->reveal();
+    }
+
+    /**
+     * @return object
+     */
+    public function getConsole()
+    {
+        $console = $this->prophesize(ConsoleOutput::class);
+
+        return $console->reveal();
     }
 }

@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Schema;
 
 use Composer\Autoload\ClassMapGenerator;
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Exceptions\SchemaException;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Utils\Database;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
@@ -49,14 +48,21 @@ class Schema
     private ForestApiRequester $forestApi;
 
     /**
+     * @var ConsoleOutput
+     */
+    private ConsoleOutput $console;
+
+    /**
      * @param Config             $config
      * @param ForestApiRequester $forestApi
+     * @param ConsoleOutput      $console
      */
-    public function __construct(Config $config, ForestApiRequester $forestApi)
+    public function __construct(Config $config, ForestApiRequester $forestApi, ConsoleOutput $console)
     {
         $this->config = $config;
         $this->directory = App::basePath($config->get('forest.models_directory'));
         $this->forestApi = $forestApi;
+        $this->console = $console;
     }
 
     /**
@@ -73,21 +79,20 @@ class Schema
             $this->serialize()
         );
 
-        $output = new ConsoleOutput();
-        $output->write('🌳🌳🌳 ');
+        $this->console->write('🌳🌳🌳 ');
 
         if (in_array($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_ACCEPTED, Response::HTTP_NO_CONTENT], true)) {
-            $output->writeln('<info>Apimap Received<info>');
+            $this->console->writeln('<info>Apimap Received<info>');
         } else {
-            $output->writeln('<error>Cannot send the apimap to Forest. Are you online?</error>');
+            $this->console->writeln('<error>Cannot send the apimap to Forest. Are you online?</error>');
         }
     }
 
     /**
      * @return array
-     * @throws Exception
-     * @throws SchemaException
      * @throws BindingResolutionException
+     * @throws Exception
+     * @throws \JsonException
      */
     private function generate(): array
     {
@@ -112,9 +117,10 @@ class Schema
     }
 
     /**
+     * @return array
      * @throws BindingResolutionException
      * @throws Exception
-     * @return array
+     * @throws \JsonException
      */
     private function serialize(): array
     {
