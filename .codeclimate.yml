@@ -44,7 +44,15 @@ checks:
 
 exclude_patterns:
   - "config/"
-  - "node_modules/"
+  - "db/"
+  - "**/node_modules/"
   - "script/"
   - "src/Exceptions/"
   - "src/Utils/ErrorMessages.php"
+  - "**/spec/"
+  - "**/test/"
+  - "**/tests/"
+  - "Tests/"
+  - "**/vendor/"
+  - "**/*_test.go"
+  - "**/*.d.ts"
