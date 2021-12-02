@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class Model
@@ -114,8 +115,8 @@ class ForestModel
     public function serialize(): array
     {
         return [
-            'name'                   => $this->getName(),
-            'old_name'               => $this->getOldName(),
+            'name'                   => Str::camel($this->getName()),
+            'old_name'               => Str::camel($this->getOldName()),
             'icon'                   => $this->getIcon(),
             'is_read_only'           => $this->isReadOnly(),
             'is_virtual'             => $this->isVirtual(),
@@ -168,7 +169,7 @@ class ForestModel
      */
     public function setName(string $name): ForestModel
     {
-        $this->name = $name;
+        $this->name = Str::camel($name);
         return $this;
     }
 
@@ -186,7 +187,7 @@ class ForestModel
      */
     public function setOldName(string $oldName): ForestModel
     {
-        $this->oldName = $oldName;
+        $this->oldName = Str::camel($oldName);
         return $this;
     }
 
@@ -384,8 +385,8 @@ class ForestModel
                     $field = array_merge(
                         $field,
                         [
-                            'field'      => $relation->getRelationName(),
-                            'reference'  => $relation->getRelated()->getTable() . '.' . $relation->getOwnerKeyName(),
+                            'field'      => Str::camel($relation->getRelationName()),
+                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getOwnerKeyName(),
                             'inverse_of' => $relation->getOwnerKeyName(),
                         ]
                     );
@@ -396,7 +397,7 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => $relation->getRelationName(),
+                            'field'      => Str::camel($relation->getRelationName()),
                             'inverse_of' => $relation->getRelatedPivotKeyName()
                         ]
                     );
@@ -409,8 +410,8 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => $name,
-                            'reference'  => $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName(),
+                            'field'      => Str::camel($name),
+                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getForeignKeyName(),
                             'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getForeignKeyName(),
                         ]
                     );
@@ -421,8 +422,8 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'     => $name,
-                            'reference' => $relation->getRelated()->getTable() . '.' . $relation->getLocalKeyName(),
+                            'field'     => Str::camel($name),
+                            'reference' => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getLocalKeyName(),
                         ]
                     );
                     $name = $relation->getParent()->getTable();
