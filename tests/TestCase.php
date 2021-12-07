@@ -211,7 +211,7 @@ class TestCase extends OrchestraTestCase
             'authors',
             function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->constrained();
+                $table->foreignId('book_id')->constrained();
                 $table->timestamps();
             }
         );
@@ -219,7 +219,7 @@ class TestCase extends OrchestraTestCase
         DB::schema()->table(
             'users',
             function (Blueprint $table) {
-                $table->foreignId('book_id')->nullable()->constrained();
+                $table->foreignId('author_id')->nullable()->constrained();
             }
         );
 
