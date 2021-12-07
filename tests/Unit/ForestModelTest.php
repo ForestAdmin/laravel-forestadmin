@@ -265,23 +265,6 @@ class ForestModelTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeFieldsWithRelationsHasManyThrough(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldBookstore = $merge->firstWhere('field', 'bookstores');
-        $bookstores = $forestModel->getModel()->bookstores();
-        $this->assertNotNull($fieldBookstore);
-        $this->assertEquals($fieldBookstore['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
-        $this->assertEquals($fieldBookstore['field'], 'bookstores');
-        $this->assertEquals($fieldBookstore['reference'], Str::camel(class_basename($bookstores->getParent())) . '.' . $bookstores->getLocalKeyName());
-    }
-
-    /**
-     * @return void
-     */
     public function testMergeFieldsWithRelationsHasOne(): void
     {
         [$forestModel, $fields] = $this->makeForestModel();
@@ -295,23 +278,6 @@ class ForestModelTest extends TestCase
         $this->assertEquals($editor['field'], 'editor');
         $this->assertEquals($editor['reference'], Str::camel(class_basename($editors->getRelated())) . '.' . $editors->getForeignKeyName());
         $this->assertEquals($editor['inverse_of'], $editors->getLocalKeyName());
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsHasOneThrough(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldAuthor = $merge->firstWhere('field', 'author');
-        $author = $forestModel->getModel()->author();
-        $this->assertNotNull($fieldAuthor);
-        $this->assertEquals($fieldAuthor['relationship'], $forestModel->mapRelationships(HasOneThrough::class));
-        $this->assertEquals($fieldAuthor['field'], 'author');
-        $this->assertEquals($fieldAuthor['reference'], Str::camel(class_basename($author->getParent())) . '.' . $author->getLocalKeyName());
     }
 
     /**

@@ -25,14 +25,15 @@ trait Relationships
     /**
      * @var array
      * MorphTo not listed, we use only the field RELATION_id & RELATION_type
+     * HasOneThrough & HasManyThrough not supported
      */
     protected array $doctrineTypes = [
         BelongsTo::class      => 'BelongsTo',
         BelongsToMany::class  => 'BelongsToMany',
         HasMany::class        => 'HasMany',
-        HasManyThrough::class => 'HasMany',
+        //HasManyThrough::class => 'HasMany',
         HasOne::class         => 'HasOne',
-        HasOneThrough::class  => 'HasOne',
+        //HasOneThrough::class  => 'HasOne',
         MorphMany::class      => 'HasMany',
         MorphOne::class       => 'BelongsTo',
         MorphToMany::class    => 'HasMany',

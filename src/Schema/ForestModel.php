@@ -11,9 +11,7 @@ use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
@@ -91,7 +89,11 @@ class ForestModel
     /**
      * @var array
      */
-    protected array $fields = [];
+    protected array $fields = [
+        // todo à virer
+        //['field' => 'label', 'is_required' => false],
+        //['field' => 'difficulty', 'enums' => ['easy', 'hard']],
+    ];
 
     /**
      * @param LaravelModel $laravelModel
@@ -416,17 +418,6 @@ class ForestModel
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
-                    break;
-                case HasOneThrough::class:
-                case HasManyThrough::class:
-                    $field = array_merge(
-                        $this->fieldDefaultValues(),
-                        [
-                            'field'     => Str::camel($name),
-                            'reference' => Str::camel(class_basename($relation->getParent())) . '.' . $relation->getLocalKeyName(),
-                        ]
-                    );
-                    $name = $relation->getParent()->getTable();
                     break;
             }
 
