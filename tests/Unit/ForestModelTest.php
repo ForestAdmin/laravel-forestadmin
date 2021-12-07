@@ -225,7 +225,7 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldCategory);
         $this->assertEquals($fieldCategory['relationship'], $forestModel->mapRelationships(BelongsTo::class));
         $this->assertEquals($fieldCategory['reference'], Str::camel(class_basename($category->getRelated())) . '.' . $category->getOwnerKeyName());
-        $this->assertEquals($fieldCategory['inverse_of'], $category->getOwnerKeyName());
+        $this->assertEquals($fieldCategory['inverse_of'], $category->getForeignKeyName());
     }
 
     /**
@@ -259,7 +259,7 @@ class ForestModelTest extends TestCase
         $this->assertEquals($fieldComment['relationship'], $forestModel->mapRelationships(HasMany::class));
         $this->assertEquals($fieldComment['field'], 'comments');
         $this->assertEquals($fieldComment['reference'], Str::camel(class_basename($comments->getRelated())) . '.' . $comments->getForeignKeyName());
-        $this->assertEquals($fieldComment['inverse_of'], $comments->getForeignKeyName());
+        $this->assertEquals($fieldComment['inverse_of'], $comments->getLocalKeyName());
     }
 
     /**
@@ -276,7 +276,7 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldBookstore);
         $this->assertEquals($fieldBookstore['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
         $this->assertEquals($fieldBookstore['field'], 'bookstores');
-        $this->assertEquals($fieldBookstore['reference'], Str::camel(class_basename($bookstores->getRelated())) . '.' . $bookstores->getLocalKeyName());
+        $this->assertEquals($fieldBookstore['reference'], Str::camel(class_basename($bookstores->getParent())) . '.' . $bookstores->getLocalKeyName());
     }
 
     /**
@@ -294,7 +294,7 @@ class ForestModelTest extends TestCase
         $this->assertEquals($editor['relationship'], $forestModel->mapRelationships(HasOne::class));
         $this->assertEquals($editor['field'], 'editor');
         $this->assertEquals($editor['reference'], Str::camel(class_basename($editors->getRelated())) . '.' . $editors->getForeignKeyName());
-        $this->assertEquals($editor['inverse_of'], $editors->getForeignKeyName());
+        $this->assertEquals($editor['inverse_of'], $editors->getLocalKeyName());
     }
 
     /**
@@ -311,7 +311,7 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldAuthor);
         $this->assertEquals($fieldAuthor['relationship'], $forestModel->mapRelationships(HasOneThrough::class));
         $this->assertEquals($fieldAuthor['field'], 'author');
-        $this->assertEquals($fieldAuthor['reference'], Str::camel(class_basename($author->getRelated())) . '.' . $author->getLocalKeyName());
+        $this->assertEquals($fieldAuthor['reference'], Str::camel(class_basename($author->getParent())) . '.' . $author->getLocalKeyName());
     }
 
     /**

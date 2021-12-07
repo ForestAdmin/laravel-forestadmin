@@ -387,7 +387,7 @@ class ForestModel
                         [
                             'field'      => Str::camel($relation->getRelationName()),
                             'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getOwnerKeyName(),
-                            'inverse_of' => $relation->getOwnerKeyName(),
+                            'inverse_of' => $relation->getForeignKeyName(),
                         ]
                     );
                     $name = $relation->getForeignKeyName();
@@ -412,7 +412,7 @@ class ForestModel
                         [
                             'field'      => Str::camel($name),
                             'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getForeignKeyName(),
-                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getForeignKeyName(),
+                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getLocalKeyName(),
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
@@ -423,7 +423,7 @@ class ForestModel
                         $this->fieldDefaultValues(),
                         [
                             'field'     => Str::camel($name),
-                            'reference' => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getLocalKeyName(),
+                            'reference' => Str::camel(class_basename($relation->getParent())) . '.' . $relation->getLocalKeyName(),
                         ]
                     );
                     $name = $relation->getParent()->getTable();
