@@ -31,11 +31,9 @@ trait Relationships
         BelongsTo::class      => 'BelongsTo',
         BelongsToMany::class  => 'BelongsToMany',
         HasMany::class        => 'HasMany',
-        //HasManyThrough::class => 'HasMany',
         HasOne::class         => 'HasOne',
-        //HasOneThrough::class  => 'HasOne',
         MorphMany::class      => 'HasMany',
-        MorphOne::class       => 'BelongsTo',
+        MorphOne::class       => 'HasOne',
         MorphToMany::class    => 'HasMany',
     ];
 
