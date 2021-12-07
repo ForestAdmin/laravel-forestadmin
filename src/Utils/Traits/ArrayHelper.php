@@ -20,7 +20,7 @@ trait ArrayHelper
     {
         if (!is_array($value) && !in_array($value, $array, true)) {
             $array[] = $value;
-        } else {
+        } elseif (is_array($value)) {
             foreach ($value as $v) {
                 $array = $this->mergeArray($array, $v);
             }
