@@ -18,15 +18,15 @@ class BaseTransformer extends TransformerAbstract
     /**
      * @var array
      */
-    protected array $fields;
+    //protected array $fields;
 
     /**
      * @param array $fields
      */
-    public function __construct(array $fields)
+    /*public function __construct(array $fields)
     {
         $this->fields = $fields;
-    }
+    }*/
 
     /**
      * @param          $name
