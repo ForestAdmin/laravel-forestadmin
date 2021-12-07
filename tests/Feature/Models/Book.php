@@ -70,7 +70,7 @@ class Book extends Model
     /**
      * @return HasOneThrough
      */
-    public function author(): HasOneThrough
+    public function authorUser(): HasOneThrough
     {
         return $this->hasOneThrough(User::class, Author::class);
     }
