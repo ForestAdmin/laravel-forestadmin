@@ -155,29 +155,16 @@ class BaseRepository
                 switch (get_class($relation)) {
                     case BelongsTo::class:
                         $ownerKey = $relation->getRelated()->getTable() . '.' . $relation->getOwnerKeyName();
-                        $this->addInclude(
-                            $key,
-                            $relation->getRelated()->getTable(),
-                            $this->mergeArray($fields, $ownerKey),
-                            $model->getTable() . '.' . $relation->getForeignKeyName(),
-                        );
+                        $this->addInclude($key, $relation->getRelated()->getTable(), $this->mergeArray($fields, $ownerKey), $model->getTable() . '.' . $relation->getForeignKeyName());
                         break;
                     case HasOne::class:
                         $foreignKey = $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName();
-                        $this->addInclude(
-                            $key,
-                            $relation->getRelated()->getTable(),
-                            $this->mergeArray($fields, $foreignKey),
-                        );
+                        $this->addInclude($key, $relation->getRelated()->getTable(), $this->mergeArray($fields, $foreignKey));
                         break;
                     case MorphOne::class:
                         $foreignKey = $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName();
                         $morphType = $relation->getMorphType();
-                        $this->addInclude(
-                            $key,
-                            $relation->getParent()->getTable(),
-                            $this->mergeArray($fields, [$foreignKey, $morphType]),
-                        );
+                        $this->addInclude($key, $relation->getParent()->getTable(), $this->mergeArray($fields, [$foreignKey, $morphType]));
                         break;
                 }
             }
