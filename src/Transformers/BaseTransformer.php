@@ -16,19 +16,6 @@ use League\Fractal\TransformerAbstract;
 class BaseTransformer extends TransformerAbstract
 {
     /**
-     * @var array
-     */
-    //protected array $fields;
-
-    /**
-     * @param array $fields
-     */
-    /*public function __construct(array $fields)
-    {
-        $this->fields = $fields;
-    }*/
-
-    /**
      * @param          $name
      * @param callable $callable
      * @return void
@@ -61,6 +48,6 @@ class BaseTransformer extends TransformerAbstract
             $this->addMethod('include' . Str::ucfirst($key), fn() => $this->item($value, new ChildTransformer(), Str::ucfirst($key)));
         }
 
-        return $model->toArray();
+        return $model->attributesToArray();
     }
 }
