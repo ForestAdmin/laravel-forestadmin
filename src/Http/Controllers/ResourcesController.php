@@ -35,7 +35,25 @@ class ResourcesController extends Controller
     public function __construct()
     {
         $collection = request()->route()->parameter('collection');
-        $this->model = Schema::getModel($collection);
+        $this->model = Schema::getModel(ucfirst($collection));
         $this->baseRepository = new BaseRepository($this->model);
+    }
+
+    /**
+     * @return array
+     */
+    public function index()
+    {
+        return $this->baseRepository->all();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function count()
+    {
+        $count = $this->baseRepository->count();
+
+        return response()->json(compact('count'));
     }
 }
