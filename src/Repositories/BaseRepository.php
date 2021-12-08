@@ -96,7 +96,17 @@ class BaseRepository
      */
     public function all()
     {
-        return JsonApi::render($this->query->paginate(), $this->name);
+        $pageParams = request()->query('page');
+
+        return JsonApi::render(
+            $this->query->paginate(
+                $pageParams['size'] ?? null,
+                '*',
+                'page',
+                $pageParams['number'] ?? null
+            ),
+            $this->name
+        );
     }
 
     /**
