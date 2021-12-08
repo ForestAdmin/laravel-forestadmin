@@ -19,8 +19,7 @@ class BaseTransformerTest extends TestCase
 {
     /**
      * @return void
-     * @throws SchemaException
-     * @throws Exception
+     * @throws \ReflectionException
      */
     public function testAddMethod(): void
     {
@@ -32,8 +31,7 @@ class BaseTransformerTest extends TestCase
 
     /**
      * @return void
-     * @throws SchemaException
-     * @throws Exception
+     * @throws \ReflectionException
      */
     public function testCall(): void
     {
@@ -45,8 +43,6 @@ class BaseTransformerTest extends TestCase
 
     /**
      * @return void
-     * @throws SchemaException
-     * @throws Exception
      */
     public function testTransform(): void
     {

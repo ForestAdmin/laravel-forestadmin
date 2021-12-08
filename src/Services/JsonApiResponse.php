@@ -43,12 +43,12 @@ class JsonApiResponse
         $transformer = app()->make(BaseTransformer::class);
 
         if (is_array($class) || $this->isCollection($class)) {
-            $resource = new Collection($class, $transformer);
+            $resource = new Collection($class, $transformer, $name);
         } elseif ($this->isPaginator($class)) {
             $resource = new Collection($class->getCollection(), $transformer, $name);
             $resource->setPaginator(new IlluminatePaginatorAdapter($class));
         } else {
-            $resource = new Item($class, $transformer);
+            $resource = new Item($class, $transformer, $name);
         }
 
         return $this->fractal->createData($resource)->toArray();

@@ -19,8 +19,6 @@ class JsonApiTest extends TestCase
 {
     /**
      * @return void
-     * @throws SchemaException
-     * @throws Exception
      */
     public function testRender(): void
     {

@@ -27,6 +27,15 @@ class Book extends Model
         'active'  => 'boolean',
     ];
 
+    protected $fillable = [
+        'label',
+        'comment',
+        'difficulty',
+        'amount',
+        'options',
+        'category_id',
+    ];
+
     /**
      * @return BelongsTo
      */
