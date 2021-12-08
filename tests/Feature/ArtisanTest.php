@@ -3,11 +3,9 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Listeners\ArtisanStart;
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
 
 /**
  * Class ArtisanTest
