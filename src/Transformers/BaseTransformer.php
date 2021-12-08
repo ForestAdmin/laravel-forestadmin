@@ -20,9 +20,9 @@ class BaseTransformer extends TransformerAbstract
      * @param callable $callable
      * @return void
      */
-    public function addMethod($name, callable $callable): void
+    protected function addMethod($name, callable $callable): void
     {
-        $this->{$name} = $callable;
+        $this->$name = $callable;
     }
 
     /**
@@ -32,7 +32,7 @@ class BaseTransformer extends TransformerAbstract
      */
     public function __call($method, $arguments)
     {
-        return call_user_func_array($this->{$method}, $arguments);
+        return call_user_func_array($this->$method, $arguments);
     }
 
     /**

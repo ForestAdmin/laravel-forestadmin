@@ -22,7 +22,7 @@ class JsonApiTest extends TestCase
      * @throws SchemaException
      * @throws Exception
      */
-    public function testSerialize(): void
+    public function testRender(): void
     {
         $book = new Book();
         $book->label = 'foo';

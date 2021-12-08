@@ -20,6 +20,6 @@ class ChildTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
-        return $model->toArray();
+        return $model->attributesToArray();
     }
 }
