@@ -58,7 +58,6 @@ class BaseTransformerTest extends TestCase
         $book->amount = 50.20;
         $book->setRelation('category', $category);
 
-
         $transformer = new BaseTransformer();
         $transform = $transformer->transform($book);
 

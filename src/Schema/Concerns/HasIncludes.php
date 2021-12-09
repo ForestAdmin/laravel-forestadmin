@@ -2,8 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Schema\Concerns;
 
-use Illuminate\Support\Collection;
-
 /**
  * Class HasIncludes
  *
@@ -14,35 +12,30 @@ use Illuminate\Support\Collection;
 trait HasIncludes
 {
     /**
-     * @var Collection
+     * @var array
      */
-    protected Collection $includes;
+    protected array $includes = [];
 
     /**
-     * @return Collection
+     * @return array
      */
-    public function getIncludes(): Collection
+    public function getIncludes(): array
     {
         return $this->includes;
     }
 
     /**
      * @param string      $key
-     * @param string      $relationTable
      * @param array       $fields
      * @param string|null $foreignKey
      * @return $this
      */
-    protected function addInclude(string $key, string $relationTable, array $fields, ?string $foreignKey = null): self
+    protected function addInclude(string $key, array $fields, ?string $foreignKey = null): self
     {
-        $this->includes->put(
-            $key,
-            [
-                'relation_table' => $relationTable,
-                'fields'         => implode(',', $fields),
-                'foreign_key'    => $foreignKey
-            ]
-        );
+        $this->includes[$key] = [
+            'fields'         => implode(',', $fields),
+            'foreign_key'    => $foreignKey
+        ];
 
         return $this;
     }
