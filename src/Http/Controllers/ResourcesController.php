@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
+use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -41,8 +42,9 @@ class ResourcesController extends Controller
 
     /**
      * @return array
+     * @throws Exception
      */
-    public function index()
+    public function index(): array
     {
         return $this->baseRepository->all();
     }

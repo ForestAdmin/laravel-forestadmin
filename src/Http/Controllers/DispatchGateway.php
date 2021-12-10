@@ -37,12 +37,11 @@ class DispatchGateway
      * @param Route $route
      * @return mixed
      * @throws BindingResolutionException
+     * @codeCoverageIgnore
      */
     public function __invoke(Route $route)
     {
-        $this->routeNameIsValid($route->getName());
         $action = $this->getAction($route);
-
         $controller = app()->make($this->getController($route->getName()));
 
         return $this->controllerDispatcher->dispatch($route, $controller, $action);
@@ -54,6 +53,7 @@ class DispatchGateway
      */
     public function getAction(Route $route): string
     {
+        $this->routeNameIsValid($route->getName());
         $data = explode('.', $route->getName());
 
         return $data[2];
@@ -63,7 +63,7 @@ class DispatchGateway
      * @param string|null $routeName
      * @return bool
      */
-    private function routeNameIsValid(?string $routeName): bool
+    private function routeNameIsValid(?string $routeName = null): bool
     {
         if (null === $routeName) {
             throw new ForestException('You must define a name for the route');
