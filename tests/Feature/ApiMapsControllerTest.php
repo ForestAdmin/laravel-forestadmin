@@ -15,17 +15,12 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 class ApiMapsControllerTest extends TestCase
 {
     /**
-     * @var ApiMapsController
-     */
-    private ApiMapsController $apiMapsController;
-
-    /**
      * @return void
      */
     public function testIndex(): void
     {
-        $this->apiMapsController = new ApiMapsController();
-        $indexRoute = $this->apiMapsController->index();
+        $apiMapsController = new ApiMapsController();
+        $indexRoute = $apiMapsController->index();
 
         $this->assertEmpty($indexRoute->getContent());
         $this->assertEquals(204, $indexRoute->getStatusCode());
