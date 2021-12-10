@@ -3,13 +3,19 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Mockery as m;
 
@@ -23,6 +29,25 @@ use Mockery as m;
 class BaseRepositoryTest extends TestCase
 {
     use ProphecyTrait;
+
+    /**
+     * @return void
+     * @throws Exception
+     * @throws SchemaException
+     * @throws \ReflectionException
+     */
+    public function testBuild(): void
+    {
+        $model = $this->getLaravelModel();
+        $baseRepository = m::mock(BaseRepository::class, [$model])
+            ->makePartial();
+
+        $table = $this->invokeProperty($baseRepository, 'table');
+        $database = $this->invokeProperty($baseRepository, 'database');
+
+        $this->assertEquals('dummy_tables', $table);
+        $this->assertEquals('prefix', $database);
+    }
 
     /**
      * @return void
@@ -201,5 +226,40 @@ class BaseRepositoryTest extends TestCase
         ];
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
+    }
+
+    /**
+     * @return object
+     * @throws Exception
+     * @throws SchemaException
+     */
+    public function getLaravelModel()
+    {
+        $schemaManager = $this->prophesize(AbstractSchemaManager::class);
+        $schemaManager->listTableColumns(Argument::any(), Argument::any())
+            ->willReturn(
+                [
+                    'id'            => new Column('id', Type::getType('bigint')),
+                ]
+            );
+
+        $connection = $this->prophesize(Connection::class);
+        $connection->getTablePrefix()
+            ->shouldBeCalled()
+            ->willReturn('prefix.');
+        $connection->getDoctrineSchemaManager()
+            ->willReturn($schemaManager->reveal());
+
+        $model = $this->prophesize(Model::class);
+        $model
+            ->getConnection()
+            ->shouldBeCalled()
+            ->willReturn($connection->reveal());
+        $model
+            ->getTable()
+            ->shouldBeCalledOnce()
+            ->willReturn('dummy_tables');
+
+        return $model->reveal();
     }
 }
