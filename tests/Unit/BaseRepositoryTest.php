@@ -74,6 +74,29 @@ class BaseRepositoryTest extends TestCase
     /**
      * @return void
      */
+    public function testGet(): void
+    {
+        $model = $this->getBook()->save();
+        $book = Book::first();
+        $baseRepository = m::mock(BaseRepository::class, [$book])
+            ->makePartial();
+        $data = $baseRepository->get($book->id);
+
+        $this->assertIsArray($data);
+        $this->assertEquals('Book', $data['data']['type']);
+        $this->assertEquals($this->getBook()->id, $data['data']['id']);
+        $attributes = $data['data']['attributes'];
+        $this->assertEquals($this->getBook()->label, $attributes['label']);
+        $this->assertEquals($this->getBook()->comment, $attributes['comment']);
+        $this->assertEquals($this->getBook()->difficulty, $attributes['difficulty']);
+        $this->assertEquals($this->getBook()->amount, $attributes['amount']);
+        $this->assertEquals($this->getBook()->options, $attributes['options']);
+        $this->assertEquals($this->getBook()->category_id, $attributes['category_id']);
+    }
+
+    /**
+     * @return void
+     */
     public function testCount(): void
     {
         $this->getBook()->save();

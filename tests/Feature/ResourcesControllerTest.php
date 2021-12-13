@@ -47,6 +47,23 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testShow(): void
+    {
+        $book = $this->getBook();
+        $params = ['fields' => ['book' => 'id,label']];
+        $call = $this->get('/forest/Book/1?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('Book', $data['data']['type']);
+        $this->assertEquals($book->id, $data['data']['id']);
+        $this->assertEquals($book->label, $data['data']['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testCount(): void
     {
         $book = $this->getBook();
