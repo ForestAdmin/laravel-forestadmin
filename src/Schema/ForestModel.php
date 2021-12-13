@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -395,12 +394,12 @@ class ForestModel
                     $name = $relation->getForeignKeyName();
                     break;
                 case BelongsToMany::class:
-                case MorphToMany::class:
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
                             'field'      => Str::camel($relation->getRelationName()),
-                            'inverse_of' => $relation->getRelatedPivotKeyName()
+                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getParentKeyName(),
+                            'inverse_of' => $relation->getRelatedKeyName()
                         ]
                     );
                     $name = $relation->getRelationName();

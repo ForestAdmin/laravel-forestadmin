@@ -3,13 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Schema\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -34,7 +31,6 @@ trait Relationships
         HasOne::class         => 'HasOne',
         MorphMany::class      => 'HasMany',
         MorphOne::class       => 'HasOne',
-        MorphToMany::class    => 'HasMany',
     ];
 
     /**

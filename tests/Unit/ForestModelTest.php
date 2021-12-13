@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Prophecy\Argument;
@@ -239,7 +238,9 @@ class ForestModelTest extends TestCase
         $ranges = $forestModel->getModel()->ranges();
         $this->assertNotNull($fieldRange);
         $this->assertEquals($fieldRange['relationship'], $forestModel->mapRelationships(BelongsToMany::class));
-        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedPivotKeyName());
+        $this->assertEquals($fieldRange['field'], 'ranges');
+        $this->assertEquals($fieldRange['reference'], Str::camel(class_basename($ranges->getRelated())) . '.' . $ranges->getParentKeyName());
+        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedKeyName());
     }
 
     /**
@@ -310,23 +311,6 @@ class ForestModelTest extends TestCase
         $this->assertEquals($fieldTag['relationship'], $forestModel->mapRelationships(MorphMany::class));
         $this->assertEquals($fieldTag['field'], 'tags');
         $this->assertEquals($fieldTag['reference'], Str::camel(class_basename($tags->getRelated())) . '.' . $tags->getForeignKeyName());
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsMorphToMany(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldBuy = $merge->firstWhere('field', 'buys');
-        $buys = $forestModel->getModel()->buys();
-        $this->assertNotNull($fieldBuy);
-        $this->assertEquals($fieldBuy['relationship'], $forestModel->mapRelationships(MorphToMany::class));
-        $this->assertEquals($fieldBuy['field'], 'buys');
-        $this->assertEquals($fieldBuy['inverse_of'], $buys->getRelatedPivotKeyName());
     }
 
     /**
