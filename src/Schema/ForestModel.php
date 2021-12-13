@@ -88,11 +88,7 @@ class ForestModel
     /**
      * @var array
      */
-    protected array $fields = [
-        // todo à virer
-        //['field' => 'label', 'is_required' => false],
-        //['field' => 'difficulty', 'enums' => ['easy', 'hard']],
-    ];
+    protected array $fields = [];
 
     /**
      * @param LaravelModel $laravelModel
@@ -379,6 +375,7 @@ class ForestModel
     {
         foreach ($relations as $name => $type) {
             $relation = $this->model->$name();
+            $related = Str::camel(class_basename($relation->getRelated()));
 
             switch ($type) {
                 case BelongsTo::class:
@@ -386,8 +383,8 @@ class ForestModel
                     $field = array_merge(
                         $field,
                         [
-                            'field'      => Str::camel($relation->getRelationName()),
-                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getOwnerKeyName(),
+                            'field'      => $relation->getRelationName(),
+                            'reference'  => $related . '.' . $relation->getOwnerKeyName(),
                             'inverse_of' => $relation->getForeignKeyName(),
                         ]
                     );
@@ -397,8 +394,8 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => Str::camel($relation->getRelationName()),
-                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getParentKeyName(),
+                            'field'      => $relation->getRelationName(),
+                            'reference'  => $related . '.' . $relation->getParentKeyName(),
                             'inverse_of' => $relation->getRelatedKeyName()
                         ]
                     );
@@ -411,8 +408,8 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => Str::camel($name),
-                            'reference'  => Str::camel(class_basename($relation->getRelated())) . '.' . $relation->getForeignKeyName(),
+                            'field'      => $name,
+                            'reference'  => $related . '.' . $relation->getForeignKeyName(),
                             'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getLocalKeyName(),
                         ]
                     );
@@ -420,6 +417,7 @@ class ForestModel
                     break;
             }
 
+            $field['field'] = Str::camel($field['field']);
             $field['type'] = $this->getType(Types::INTEGER);
             $field['relationship'] = $this->mapRelationships($type);
             $fields->put($name, $field);

@@ -17,10 +17,6 @@ trait RoutesConfiguration
         'forest.collection.index'        => ResourcesController::class,
         'forest.collection.count'        => ResourcesController::class,
         'forest.collection.show'         => ResourcesController::class,
-        'forest.collection.store'        => ResourcesController::class,
-        'forest.collection.update'       => ResourcesController::class,
-        'forest.collection.destroy_bulk' => ResourcesController::class,
-        'forest.collection.destroy'      => ResourcesController::class,
     ];
 
     /**
