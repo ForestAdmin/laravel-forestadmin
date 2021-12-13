@@ -359,7 +359,7 @@ class ForestModel
                 $field = $this->fieldDefaultValues();
                 $field['field'] = $column->getName();
                 $field['type'] = $this->getType($column->getType()->getName());
-                $field['is_required'] = $column->getNotnull();
+                $field['is_required'] = $column->getNotnull() && $this->model->getKeyName() !== $column->getName();
                 $field['default_value'] = $column->getDefault();
                 $fields->put($column->getName(), $field);
             }

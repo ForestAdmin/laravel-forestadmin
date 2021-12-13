@@ -182,7 +182,7 @@ class ForestModelTest extends TestCase
         $this->assertIsArray($fields['id']);
         $this->assertEquals($fields['id']['field'], 'id');
         $this->assertEquals($fields['id']['type'], 'Number');
-        $this->assertEquals($fields['id']['is_required'], true);
+        $this->assertEquals($fields['id']['is_required'], false);
     }
 
     /**
@@ -496,6 +496,9 @@ class ForestModelTest extends TestCase
             ->getTable()
             ->shouldBeCalledOnce()
             ->willReturn('dummy_tables');
+        $model
+            ->getKeyName()
+            ->willReturn('id');
 
         return $model->reveal();
     }
