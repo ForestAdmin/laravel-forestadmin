@@ -396,7 +396,7 @@ class ForestModel
                         [
                             'field'      => $relation->getRelationName(),
                             'reference'  => $related . '.' . $relation->getParentKeyName(),
-                            'inverse_of' => $relation->getRelatedKeyName()
+                            'inverse_of' => $relation->getRelatedKeyName(),
                         ]
                     );
                     $name = $relation->getRelationName();
@@ -417,8 +417,13 @@ class ForestModel
                     break;
             }
 
+
+            if (in_array($type, [BelongsToMany::class, HasMany::class, MorphMany::class], true)) {
+                $field['type'] = ['Number'];
+            } else {
+                $field['type'] = $this->getType(Types::INTEGER);
+            }
             $field['field'] = Str::camel($field['field']);
-            $field['type'] = $this->getType(Types::INTEGER);
             $field['relationship'] = $this->mapRelationships($type);
             $fields->put($name, $field);
         }
