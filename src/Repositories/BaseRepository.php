@@ -88,6 +88,16 @@ class BaseRepository
     }
 
     /**
+     * @param $id
+     * @return array
+     * @throws Exception
+     */
+    public function get($id): array
+    {
+        return JsonApi::render($this->query()->find($id), $this->name);
+    }
+
+    /**
      * @return int
      */
     public function count(): int

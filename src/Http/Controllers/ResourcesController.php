@@ -50,6 +50,17 @@ class ResourcesController extends Controller
     }
 
     /**
+     * @return array
+     * @throws Exception
+     */
+    public function show(): array
+    {
+        $id = request()->route()->parameter('id');
+
+        return $this->baseRepository->get($id);
+    }
+
+    /**
      * @return JsonResponse
      */
     public function count()
