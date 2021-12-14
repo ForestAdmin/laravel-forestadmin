@@ -42,11 +42,6 @@ abstract class BaseRepository
     protected ?string $database = null;
 
     /**
-     * @var array
-     */
-    protected array $params;
-
-    /**
      * @param Model $model
      */
     public function __construct(Model $model)
@@ -57,8 +52,6 @@ abstract class BaseRepository
         if (strpos($this->table, '.')) {
             [$this->database, $this->table] = explode('.', $this->table);
         }
-
-        $this->params = request()->query();
     }
 
     /**

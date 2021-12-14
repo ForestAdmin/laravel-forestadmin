@@ -21,6 +21,20 @@ use Illuminate\Support\Str;
 class ResourceGetter extends BaseRepository
 {
     /**
+     * @var array
+     */
+    protected array $params;
+
+    /**
+     * @param Model $model
+     */
+    public function __construct(Model $model)
+    {
+        $this->params = request()->query();
+        parent::__construct($model);
+    }
+
+    /**
      * @return array
      * @throws Exception
      */
