@@ -7,29 +7,30 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Class ResourceCreator
+ * Class ResourceUpdater
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class ResourceCreator extends BaseRepository
+class ResourceUpdater extends BaseRepository
 {
     /**
+     * @param $id
      * @return array
-     * @throws Exception
      * @throws ContainerExceptionInterface
+     * @throws Exception
      * @throws NotFoundExceptionInterface
      */
-    public function create(): array
+    public function update($id): array
     {
-        $model = new $this->model();
+        $model = $this->model::firstWhere($this->model->getKeyName(), $id);
         $this->setAttributes($model, request()->get('data'));
 
         try {
             $model->save();
         } catch (\Exception $e) {
-            return $this->throwException('Record create error: ' . $e->getMessage());
+            return $this->throwException('Record update error: ' . $e->getMessage());
         }
 
         $resourceGetter = new ResourceGetter($model);

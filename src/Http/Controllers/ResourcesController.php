@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceUpdater;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -86,13 +87,31 @@ class ResourcesController extends Controller
         }
     }
 
+
+    /**
+     * @return JsonResponse
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function update(): JsonResponse
+    {
+        try {
+            $repository = new ResourceUpdater($this->model);
+            $id = request()->input('data.' . $this->model->getKeyName());
+            return response()->json($repository->update($id), Response::HTTP_CREATED);
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
     /**
      * @return JsonResponse
      */
     public function destroy(): JsonResponse
     {
         try {
-            $id = request()->route()->parameter('id');
+            $id = request()->route()->parameter($this->model->getKeyName());
             $repository = new ResourceRemover($this->model);
             return response()->json($repository->destroy($id), Response::HTTP_NO_CONTENT);
         } catch (ForestException $e) {
