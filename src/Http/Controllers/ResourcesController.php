@@ -3,11 +3,14 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class ResourcesController
@@ -26,18 +29,12 @@ class ResourcesController extends Controller
     protected Model $model;
 
     /**
-     * @var BaseRepository
-     */
-    protected BaseRepository $baseRepository;
-
-    /**
      * @throws \Exception
      */
     public function __construct()
     {
         $collection = request()->route()->parameter('collection');
         $this->model = Schema::getModel(ucfirst($collection));
-        $this->baseRepository = new BaseRepository($this->model);
     }
 
     /**
@@ -46,7 +43,9 @@ class ResourcesController extends Controller
      */
     public function index(): array
     {
-        return $this->baseRepository->all();
+        $repository = new ResourceGetter($this->model);
+
+        return $repository->all();
     }
 
     /**
@@ -56,16 +55,31 @@ class ResourcesController extends Controller
     public function show(): array
     {
         $id = request()->route()->parameter('id');
+        $repository = new ResourceGetter($this->model);
 
-        return $this->baseRepository->get($id);
+        return $repository->get($id);
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function store(): array
+    {
+        $repository = new ResourceCreator($this->model);
+
+        return $repository->create();
     }
 
     /**
      * @return JsonResponse
      */
-    public function count()
+    public function count(): array
     {
-        $count = $this->baseRepository->count();
+        $repository = new ResourceGetter($this->model);
+        $count = $repository->count();
 
         return response()->json(compact('count'));
     }
