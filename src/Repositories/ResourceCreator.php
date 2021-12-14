@@ -46,7 +46,7 @@ class ResourceCreator extends BaseRepository
         try {
             $model->save();
         } catch (\Exception $e) {
-            return $this->throwException('Record Create error: ' . $e->getMessage());
+            return $this->throwException('Record create error: ' . $e->getMessage());
         }
 
         $resourceGetter = new ResourceGetter($model);

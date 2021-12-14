@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -79,9 +80,23 @@ class ResourcesController extends Controller
     {
         try {
             $repository = new ResourceCreator($this->model);
-            return response()->json($repository->create());
+            return response()->json($repository->create(), Response::HTTP_CREATED);
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function destroy(): JsonResponse
+    {
+        try {
+            $id = request()->route()->parameter('id');
+            $repository = new ResourceRemover($this->model);
+            return response()->json($repository->destroy($id), Response::HTTP_NO_CONTENT);
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -93,5 +108,19 @@ class ResourcesController extends Controller
         $repository = new ResourceGetter($this->model);
 
         return response()->json($repository->count());
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function destroyBulk(): JsonResponse
+    {
+        try {
+            $repository = new ResourceRemover($this->model);
+            $ids = request()->input('data.attributes.ids');
+            return response()->json($repository->destroy($ids), Response::HTTP_NO_CONTENT);
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
     }
 }
