@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
@@ -58,5 +59,14 @@ abstract class BaseRepository
         }
 
         $this->params = request()->query();
+    }
+
+    /**
+     * @param $message
+     * @return void
+     */
+    public function throwException($message): void
+    {
+        throw new ForestException($message);
     }
 }

@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Http\Response;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -42,7 +43,12 @@ class ResourceCreator extends BaseRepository
             }
         }
 
-        $model->save();
+        try {
+            $model->save();
+        } catch (\Exception $e) {
+            return $this->throwException('Record Create error: ' . $e->getMessage());
+        }
+
         $resourceGetter = new ResourceGetter($model);
 
         return $resourceGetter->get($model->id);

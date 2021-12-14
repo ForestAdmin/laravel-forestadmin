@@ -29,16 +29,17 @@ class ResourceGetter extends BaseRepository
     public function all()
     {
         $pageParams = $this->params['page'] ?? [];
-
-        return JsonApi::render(
-            $this->query()->paginate(
-                $pageParams['size'] ?? null,
-                '*',
-                'page',
-                $pageParams['number'] ?? null
-            ),
-            $this->name
+        $resources = $this->query()->paginate(
+            $pageParams['size'] ?? null,
+            '*',
+            'page',
+            $pageParams['number'] ?? null
         );
+        if (!$resources) {
+            $this->throwException('Collection not found');
+        }
+
+        return JsonApi::render($resources, $this->name);
     }
 
     /**
@@ -48,6 +49,11 @@ class ResourceGetter extends BaseRepository
      */
     public function get($id): array
     {
+        $resource = $this->query()->find($id);
+        if (!$resource) {
+            $this->throwException('Collection not found');
+        }
+
         return JsonApi::render($this->query()->find($id), $this->name);
     }
 

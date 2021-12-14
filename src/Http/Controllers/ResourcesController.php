@@ -3,11 +3,13 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -38,49 +40,58 @@ class ResourcesController extends Controller
     }
 
     /**
-     * @return array
+     * @return JsonResponse
      * @throws Exception
      */
-    public function index(): array
+    public function index(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model);
-
-        return $repository->all();
+        try {
+            $repository = new ResourceGetter($this->model);
+            return response()->json($repository->all());
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
-     * @return array
+     * @return JsonResponse
      * @throws Exception
      */
-    public function show(): array
+    public function show(): JsonResponse
     {
-        $id = request()->route()->parameter('id');
-        $repository = new ResourceGetter($this->model);
+        try {
+            $id = request()->route()->parameter('id');
+            $repository = new ResourceGetter($this->model);
 
-        return $repository->get($id);
+            return response()->json($repository->get($id));
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
-     * @return array
+     * @return JsonResponse
      * @throws Exception
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function store(): array
+    public function store(): JsonResponse
     {
-        $repository = new ResourceCreator($this->model);
-
-        return $repository->create();
+        try {
+            $repository = new ResourceCreator($this->model);
+            return response()->json($repository->create());
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
     }
 
     /**
      * @return JsonResponse
      */
-    public function count(): array
+    public function count(): JsonResponse
     {
         $repository = new ResourceGetter($this->model);
-        $count = $repository->count();
 
-        return response()->json(compact('count'));
+        return response()->json($repository->count());
     }
 }
