@@ -56,7 +56,7 @@ class DispatchGateway
         $this->routeNameIsValid($route->getName());
         $data = explode('.', $route->getName());
 
-        return $data[2];
+        return Str::camel($data[2]);
     }
 
     /**
