@@ -47,9 +47,6 @@ class ResourceGetter extends BaseRepository
             'page',
             $pageParams['number'] ?? null
         );
-        if (!$resources) {
-            $this->throwException('Collection not found');
-        }
 
         return JsonApi::render($resources, $this->name);
     }

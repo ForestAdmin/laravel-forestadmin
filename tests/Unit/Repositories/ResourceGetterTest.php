@@ -1,61 +1,34 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\SchemaException;
-use Doctrine\DBAL\Types\Type;
-use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Mockery as m;
 
 /**
- * Class ForestModelTest
+ * Class ResourceGetterTest
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class BaseRepositoryTest extends TestCase
+class ResourceGetterTest extends TestCase
 {
-    use ProphecyTrait;
-
-    /**
-     * @return void
-     * @throws Exception
-     * @throws SchemaException
-     * @throws \ReflectionException
-     */
-    public function testBuild(): void
-    {
-        $model = $this->getLaravelModel();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
-            ->makePartial();
-
-        $table = $this->invokeProperty($baseRepository, 'table');
-        $database = $this->invokeProperty($baseRepository, 'database');
-
-        $this->assertEquals('dummy_tables', $table);
-        $this->assertEquals('prefix', $database);
-    }
-
     /**
      * @return void
      */
     public function testAll(): void
     {
         $this->getBook()->save();
-        $baseRepository = m::mock(BaseRepository::class, [Book::first()])
+        $baseRepository = m::mock(ResourceGetter::class, [Book::first()])
             ->makePartial();
         $data = $baseRepository->all();
 
@@ -76,9 +49,9 @@ class BaseRepositoryTest extends TestCase
      */
     public function testGet(): void
     {
-        $model = $this->getBook()->save();
+        $this->getBook()->save();
         $book = Book::first();
-        $baseRepository = m::mock(BaseRepository::class, [$book])
+        $baseRepository = m::mock(ResourceGetter::class, [$book])
             ->makePartial();
         $data = $baseRepository->get($book->id);
 
@@ -97,10 +70,25 @@ class BaseRepositoryTest extends TestCase
     /**
      * @return void
      */
+    public function testGetExceptionNotFound(): void
+    {
+        $this->getBook()->save();
+        $baseRepository = m::mock(ResourceGetter::class, [new Book()])
+            ->makePartial();
+
+        $this->expectException(ForestException::class);
+        $this->expectExceptionMessage("🌳🌳🌳 Collection not found");
+
+        $baseRepository->get(9999);
+    }
+
+    /**
+     * @return void
+     */
     public function testCount(): void
     {
         $this->getBook()->save();
-        $baseRepository = m::mock(BaseRepository::class, [Book::first()])
+        $baseRepository = m::mock(ResourceGetter::class, [Book::first()])
             ->makePartial();
 
         $this->assertEquals(1, $baseRepository->count());
@@ -114,7 +102,7 @@ class BaseRepositoryTest extends TestCase
     public function testQuery(): void
     {
         $this->getRequest();
-        $baseRepository = new BaseRepository($this->getBook());
+        $baseRepository = new ResourceGetter($this->getBook());
         $query = $this->invokeMethod($baseRepository, 'query');
 
         $this->assertInstanceOf(Builder::class, $query);
@@ -129,7 +117,7 @@ class BaseRepositoryTest extends TestCase
     {
         $this->getRequest();
         $model = $this->getBook();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
 
@@ -146,7 +134,7 @@ class BaseRepositoryTest extends TestCase
     public function testHandleFieldsWithoutQueryFields(): void
     {
         $model = $this->getBook();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model])
             ->makePartial();
 
         $fields = $baseRepository->handleFields($model, null);
@@ -200,7 +188,7 @@ class BaseRepositoryTest extends TestCase
     {
         $this->getRequest();
         $model = $this->getBook();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model])
             ->makePartial();
 
         $handleWith = $baseRepository->handleWith($model, request()->query('fields'));
@@ -249,40 +237,5 @@ class BaseRepositoryTest extends TestCase
         ];
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
-    }
-
-    /**
-     * @return object
-     * @throws Exception
-     * @throws SchemaException
-     */
-    public function getLaravelModel()
-    {
-        $schemaManager = $this->prophesize(AbstractSchemaManager::class);
-        $schemaManager->listTableColumns(Argument::any(), Argument::any())
-            ->willReturn(
-                [
-                    'id'            => new Column('id', Type::getType('bigint')),
-                ]
-            );
-
-        $connection = $this->prophesize(Connection::class);
-        $connection->getTablePrefix()
-            ->shouldBeCalled()
-            ->willReturn('prefix.');
-        $connection->getDoctrineSchemaManager()
-            ->willReturn($schemaManager->reveal());
-
-        $model = $this->prophesize(Model::class);
-        $model
-            ->getConnection()
-            ->shouldBeCalled()
-            ->willReturn($connection->reveal());
-        $model
-            ->getTable()
-            ->shouldBeCalledOnce()
-            ->willReturn('dummy_tables');
-
-        return $model->reveal();
     }
 }

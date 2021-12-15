@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Foundation\Application;
@@ -58,6 +59,19 @@ class ResourcesControllerTest extends TestCase
         $this->assertEquals('Book', $data['data']['type']);
         $this->assertEquals($book->id, $data['data']['id']);
         $this->assertEquals($book->label, $data['data']['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testShowException(): void
+    {
+        $params = ['fields' => ['book' => 'id,label']];
+        $call = $this->get('/forest/Book/9999?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertEquals("🌳🌳🌳 Collection not found", $data['error']);
     }
 
     /**

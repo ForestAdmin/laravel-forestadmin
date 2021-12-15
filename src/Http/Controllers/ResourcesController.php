@@ -42,12 +42,8 @@ class ResourcesController extends Controller
      */
     public function index(): JsonResponse
     {
-        try {
-            $repository = new ResourceGetter($this->model);
-            return response()->json($repository->all());
-        } catch (ForestException $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
-        }
+        $repository = new ResourceGetter($this->model);
+        return response()->json($repository->all());
     }
 
     /**
