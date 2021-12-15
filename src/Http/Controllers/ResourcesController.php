@@ -3,10 +3,12 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
 /**
@@ -26,47 +28,51 @@ class ResourcesController extends Controller
     protected Model $model;
 
     /**
-     * @var BaseRepository
-     */
-    protected BaseRepository $baseRepository;
-
-    /**
      * @throws \Exception
      */
     public function __construct()
     {
         $collection = request()->route()->parameter('collection');
         $this->model = Schema::getModel(ucfirst($collection));
-        $this->baseRepository = new BaseRepository($this->model);
     }
 
     /**
-     * @return array
+     * @return JsonResponse
      * @throws Exception
      */
-    public function index(): array
+    public function index(): JsonResponse
     {
-        return $this->baseRepository->all();
+        try {
+            $repository = new ResourceGetter($this->model);
+            return response()->json($repository->all());
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
-     * @return array
+     * @return JsonResponse
      * @throws Exception
      */
-    public function show(): array
+    public function show(): JsonResponse
     {
-        $id = request()->route()->parameter('id');
+        try {
+            $id = request()->route()->parameter('id');
+            $repository = new ResourceGetter($this->model);
 
-        return $this->baseRepository->get($id);
+            return response()->json($repository->get($id));
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
      * @return JsonResponse
      */
-    public function count()
+    public function count(): JsonResponse
     {
-        $count = $this->baseRepository->count();
+        $repository = new ResourceGetter($this->model);
 
-        return response()->json(compact('count'));
+        return response()->json(['count' => $repository->count()]);
     }
 }
