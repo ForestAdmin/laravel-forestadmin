@@ -4,9 +4,9 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -23,9 +23,14 @@ class ResourcesController extends Controller
     use Schema;
 
     /**
-     * @var Model
+     * @var ResourceGetter
      */
-    protected Model $model;
+    protected ResourceGetter $repository;
+
+    /**
+     * @var string
+     */
+    protected string $name;
 
     /**
      * @throws \Exception
@@ -33,7 +38,9 @@ class ResourcesController extends Controller
     public function __construct()
     {
         $collection = request()->route()->parameter('collection');
-        $this->model = Schema::getModel(ucfirst($collection));
+        $model = Schema::getModel(ucfirst($collection));
+        $this->name = (class_basename($model));
+        $this->repository = new ResourceGetter($model, $this->name);
     }
 
     /**
@@ -42,8 +49,9 @@ class ResourcesController extends Controller
      */
     public function index(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model);
-        return response()->json($repository->all());
+        return response()->json(
+            JsonApi::render($this->repository->all(), $this->name)
+        );
     }
 
     /**
@@ -54,9 +62,9 @@ class ResourcesController extends Controller
     {
         try {
             $id = request()->route()->parameter('id');
-            $repository = new ResourceGetter($this->model);
-
-            return response()->json($repository->get($id));
+            return response()->json(
+                JsonApi::render($this->repository->get($id), $this->name)
+            );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
         }
@@ -67,8 +75,6 @@ class ResourcesController extends Controller
      */
     public function count(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model);
-
-        return response()->json(['count' => $repository->count()]);
+        return response()->json(['count' => $this->repository->count()]);
     }
 }

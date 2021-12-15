@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,44 +26,43 @@ class ResourceGetter extends BaseRepository
     protected array $params;
 
     /**
-     * @param Model $model
+     * @param Model  $model
+     * @param string $name
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, string $name)
     {
         $this->params = request()->query();
-        parent::__construct($model);
+        parent::__construct($model, $name);
     }
 
     /**
-     * @return array
+     * @return LengthAwarePaginator
      * @throws Exception
      */
-    public function all()
+    public function all(): LengthAwarePaginator
     {
         $pageParams = $this->params['page'] ?? [];
-        $resources = $this->query()->paginate(
+        return $this->query()->paginate(
             $pageParams['size'] ?? null,
             '*',
             'page',
             $pageParams['number'] ?? null
         );
-
-        return JsonApi::render($resources, $this->name);
     }
 
     /**
      * @param $id
-     * @return array
+     * @return Model
      * @throws Exception
      */
-    public function get($id): array
+    public function get($id): Model
     {
         $resource = $this->query()->find($id);
         if (!$resource) {
             $this->throwException('Collection not found');
         }
 
-        return JsonApi::render($this->query()->find($id), $this->name);
+        return $resource;
     }
 
     /**
