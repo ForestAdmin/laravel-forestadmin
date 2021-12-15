@@ -76,7 +76,7 @@ class DispatchGatewayTest extends TestCase
         $dispatch = $this->makeDispatcher();
 
         $this->expectException(ForestException::class);
-        $this->expectExceptionMessage('🌳🌳🌳 The route name must have 3 parameters and start with `forest.collection`');
+        $this->expectExceptionMessage('🌳🌳🌳 The route name must have 3 parameters and start with `forest.`');
 
         $this->invokeMethod($dispatch, 'routeNameIsValid', [$routeName]);
     }

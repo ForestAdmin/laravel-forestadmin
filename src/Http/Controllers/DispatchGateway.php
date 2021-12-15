@@ -70,8 +70,8 @@ class DispatchGateway
         }
 
         $data = explode('.', $routeName);
-        if (count($data) !== 3 || !Str::startsWith($routeName, 'forest.collection')) {
-            throw new ForestException('The route name must have 3 parameters and start with `forest.collection`)');
+        if (count($data) !== 3 || !Str::startsWith($routeName, 'forest.')) {
+            throw new ForestException('The route name must have 3 parameters and start with `forest.`)');
         }
 
         return true;
