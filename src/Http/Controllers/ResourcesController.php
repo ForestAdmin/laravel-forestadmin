@@ -126,7 +126,7 @@ class ResourcesController extends Controller
     {
         $repository = new ResourceGetter($this->model);
 
-        return response()->json($repository->count());
+        return response()->json(['count' => $repository->count()]);
     }
 
     /**

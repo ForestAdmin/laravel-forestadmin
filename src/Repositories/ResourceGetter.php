@@ -101,7 +101,6 @@ class ResourceGetter extends BaseRepository
         return $query;
     }
 
-
     /**
      * @param Model       $model
      * @param string|null $queryFields
