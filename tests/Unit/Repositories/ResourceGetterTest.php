@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Mockery as m;
@@ -28,20 +29,12 @@ class ResourceGetterTest extends TestCase
     public function testAll(): void
     {
         $this->getBook()->save();
-        $baseRepository = m::mock(ResourceGetter::class, [Book::first()])
+        $baseRepository = m::mock(ResourceGetter::class, [Book::first(), 'Book'])
             ->makePartial();
         $data = $baseRepository->all();
 
-        $this->assertIsArray($data);
-        $this->assertEquals('Book', $data['data'][0]['type']);
-        $this->assertEquals($this->getBook()->id, $data['data'][0]['id']);
-        $attributes = $data['data'][0]['attributes'];
-        $this->assertEquals($this->getBook()->label, $attributes['label']);
-        $this->assertEquals($this->getBook()->comment, $attributes['comment']);
-        $this->assertEquals($this->getBook()->difficulty, $attributes['difficulty']);
-        $this->assertEquals($this->getBook()->amount, $attributes['amount']);
-        $this->assertEquals($this->getBook()->options, $attributes['options']);
-        $this->assertEquals($this->getBook()->category_id, $attributes['category_id']);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $data);
+        $this->assertEquals(Book::first(), $data->items()[0]);
     }
 
     /**
@@ -51,20 +44,12 @@ class ResourceGetterTest extends TestCase
     {
         $this->getBook()->save();
         $book = Book::first();
-        $baseRepository = m::mock(ResourceGetter::class, [$book])
+        $baseRepository = m::mock(ResourceGetter::class, [$book, 'Book'])
             ->makePartial();
         $data = $baseRepository->get($book->id);
 
-        $this->assertIsArray($data);
-        $this->assertEquals('Book', $data['data']['type']);
-        $this->assertEquals($this->getBook()->id, $data['data']['id']);
-        $attributes = $data['data']['attributes'];
-        $this->assertEquals($this->getBook()->label, $attributes['label']);
-        $this->assertEquals($this->getBook()->comment, $attributes['comment']);
-        $this->assertEquals($this->getBook()->difficulty, $attributes['difficulty']);
-        $this->assertEquals($this->getBook()->amount, $attributes['amount']);
-        $this->assertEquals($this->getBook()->options, $attributes['options']);
-        $this->assertEquals($this->getBook()->category_id, $attributes['category_id']);
+        $this->assertInstanceOf(Book::class, $data);
+        $this->assertEquals(Book::first(), $data);
     }
 
     /**
@@ -73,7 +58,7 @@ class ResourceGetterTest extends TestCase
     public function testGetExceptionNotFound(): void
     {
         $this->getBook()->save();
-        $baseRepository = m::mock(ResourceGetter::class, [new Book()])
+        $baseRepository = m::mock(ResourceGetter::class, [new Book(), 'Book'])
             ->makePartial();
 
         $this->expectException(ForestException::class);
@@ -88,7 +73,7 @@ class ResourceGetterTest extends TestCase
     public function testCount(): void
     {
         $this->getBook()->save();
-        $baseRepository = m::mock(ResourceGetter::class, [Book::first()])
+        $baseRepository = m::mock(ResourceGetter::class, [Book::first(), 'Book'])
             ->makePartial();
 
         $this->assertEquals(1, $baseRepository->count());
@@ -102,7 +87,7 @@ class ResourceGetterTest extends TestCase
     public function testQuery(): void
     {
         $this->getRequest();
-        $baseRepository = new ResourceGetter($this->getBook());
+        $baseRepository = new ResourceGetter($this->getBook(), 'Book');
         $query = $this->invokeMethod($baseRepository, 'query');
 
         $this->assertInstanceOf(Builder::class, $query);
@@ -117,7 +102,7 @@ class ResourceGetterTest extends TestCase
     {
         $this->getRequest();
         $model = $this->getBook();
-        $baseRepository = m::mock(ResourceGetter::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model, 'Book'])
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
 
@@ -134,7 +119,7 @@ class ResourceGetterTest extends TestCase
     public function testHandleFieldsWithoutQueryFields(): void
     {
         $model = $this->getBook();
-        $baseRepository = m::mock(ResourceGetter::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model, 'Book'])
             ->makePartial();
 
         $fields = $baseRepository->handleFields($model, null);
@@ -188,7 +173,7 @@ class ResourceGetterTest extends TestCase
     {
         $this->getRequest();
         $model = $this->getBook();
-        $baseRepository = m::mock(ResourceGetter::class, [$model])
+        $baseRepository = m::mock(ResourceGetter::class, [$model, 'Book'])
             ->makePartial();
 
         $handleWith = $baseRepository->handleWith($model, request()->query('fields'));

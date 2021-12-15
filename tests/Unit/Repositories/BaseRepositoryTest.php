@@ -36,7 +36,7 @@ class BaseRepositoryTest extends TestCase
     public function testBuild(): void
     {
         $model = $this->getLaravelModel();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
+        $baseRepository = m::mock(BaseRepository::class, [$model, 'Foo'])
             ->makePartial();
 
         $table = $this->invokeProperty($baseRepository, 'table');
@@ -53,7 +53,7 @@ class BaseRepositoryTest extends TestCase
     public function testThrowException(): void
     {
         $model = $this->getLaravelModel();
-        $baseRepository = m::mock(BaseRepository::class, [$model])
+        $baseRepository = m::mock(BaseRepository::class, [$model, 'Foo'])
             ->makePartial();
 
         $this->expectException(ForestException::class);
