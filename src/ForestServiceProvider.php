@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
+use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
 use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Http\Kernel;
@@ -46,6 +47,7 @@ class ForestServiceProvider extends ServiceProvider
         $kernel->pushMiddleware(ForestCors::class);
 
         $this->app->bind('json-api', fn() => new JsonApiResponse());
+        $this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection());
     }
 
     /**

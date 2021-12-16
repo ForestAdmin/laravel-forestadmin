@@ -23,5 +23,9 @@ Route::group(
         Route::put('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.update');
         Route::delete('/{collection}', DispatchGateway::class)->name('forest.collection.destroy_bulk');
         Route::delete('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.destroy');
+
+        // ASSOCIATIONS
+        Route::get('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.index');
+        Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
     }
 );

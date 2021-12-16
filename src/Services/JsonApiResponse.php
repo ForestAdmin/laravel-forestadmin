@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
+use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -10,7 +12,6 @@ use League\Fractal\Manager;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use League\Fractal\Serializer\JsonApiSerializer;
 
 /**
  * Class JsonApiResponse
@@ -48,6 +49,7 @@ class JsonApiResponse
             $resource = new Collection($class->getCollection(), $transformer, $name);
             $resource->setPaginator(new IlluminatePaginatorAdapter($class));
         } else {
+            $transformer->setAvailableIncludes(ForestSchema::getRelatedData($name));
             $resource = new Item($class, $transformer, $name);
         }
 

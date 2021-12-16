@@ -7,7 +7,6 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class BaseRepository
@@ -43,12 +42,13 @@ abstract class BaseRepository
     protected ?string $database = null;
 
     /**
-     * @param Model $model
+     * @param Model  $model
+     * @param string $name
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, string $name)
     {
         $this->model = $model;
-        $this->name = (class_basename($this->model));
+        $this->name = $name;
         $this->table = $model->getConnection()->getTablePrefix() . $model->getTable();
         if (strpos($this->table, '.')) {
             [$this->database, $this->table] = explode('.', $this->table);

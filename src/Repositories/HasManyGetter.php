@@ -2,36 +2,51 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
+use App\Models\Book;
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasQuery;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
- * Class ResourceGetter
+ * Class HasManyGetter
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class ResourceGetter extends BaseRepository
+class HasManyGetter extends ResourceGetter
 {
-    use HasQuery;
+    /**
+     * @var string
+     */
+    protected string $relation;
 
     /**
-     * @var array
+     * @var string
      */
-    protected array $params;
+    protected string $relationName;
+
+    /**
+     * @var Model
+     */
+    private Model $parentInstance;
+
 
     /**
      * @param Model  $model
      * @param string $name
+     * @param string $relation
+     * @param string $relationName
+     * @param        $parentId
      */
-    public function __construct(Model $model, string $name)
+    public function __construct(Model $model, string $name, string $relation, string $relationName, $parentId)
     {
-        $this->params = request()->query();
         parent::__construct($model, $name);
+        $this->relation = $relation;
+        $this->relationName = $relationName;
+        $this->parentInstance = $this->model->find($parentId);
     }
 
     /**
@@ -41,7 +56,8 @@ class ResourceGetter extends BaseRepository
     public function all(): LengthAwarePaginator
     {
         $pageParams = $this->params['page'] ?? [];
-        return $this->query()->paginate(
+        $relatedModel = $this->model->{$this->relation}()->getRelated();
+        return $this->buildQuery($relatedModel, $this->relationName)->paginate(
             $pageParams['size'] ?? null,
             '*',
             'page',
@@ -50,34 +66,10 @@ class ResourceGetter extends BaseRepository
     }
 
     /**
-     * @param $id
-     * @return Model
-     * @throws Exception
-     */
-    public function get($id): Model
-    {
-        $resource = $this->query()->find($id);
-        if (!$resource) {
-            $this->throwException('Collection not found');
-        }
-
-        return $resource;
-    }
-
-    /**
      * @return int
      */
     public function count(): int
     {
-        return $this->model->count();
-    }
-
-    /**
-     * @return Builder
-     * @throws Exception
-     */
-    protected function query(): Builder
-    {
-        return $this->buildQuery($this->model, $this->name);
+        return $this->parentInstance->{$this->relation}()->count();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Utils\Traits;
 
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\RelationshipsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ResourcesController;
 
 /**
@@ -21,6 +22,8 @@ trait RoutesConfiguration
         'forest.collection.update'       => ResourcesController::class,
         'forest.collection.destroy_bulk' => ResourcesController::class,
         'forest.collection.destroy'      => ResourcesController::class,
+        'forest.relationships.index'     => RelationshipsController::class,
+        'forest.relationships.count'     => RelationshipsController::class,
     ];
 
     /**

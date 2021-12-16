@@ -6,8 +6,10 @@ use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Support\Collection;
-use Mockery as m;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class JsonApiResponseTest
@@ -18,6 +20,8 @@ use Mockery as m;
  */
 class JsonApiResponseTest extends TestCase
 {
+    use FakeSchema;
+
     /**
      * @return void
      * @throws \ReflectionException
@@ -119,15 +123,30 @@ class JsonApiResponseTest extends TestCase
         $jsonApi = new JsonApiResponse();
         $data = $this->addDatabaseContent();
 
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
             ->with('category:categories.id')
             ->first();
+
         $render = $jsonApi->render($book, 'Book');
+        $comments = [
+            'links' => [
+                'related' => [
+                    'href' => '/forest/book/1/relationships/comments'
+                ]
+            ]
+        ];
 
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('included', $render);
-        $this->assertSame($data, $render['data']);
+        $this->assertEquals($data['type'], $render['data']['type']);
+        $this->assertEquals($data['id'], $render['data']['id']);
+        $this->assertEquals($data['attributes'], $render['data']['attributes']);
+        $this->assertEquals($data['links'], $render['data']['links']);
+        $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
+        $this->assertEquals($comments, $render['data']['relationships']['comments']);
     }
 
     /**
@@ -143,11 +162,11 @@ class JsonApiResponseTest extends TestCase
 
         return [
             'type'          => 'Book',
-            'id'            => (string) $book1->id,
+            'id'            => (string)$book1->id,
             'attributes'    => [
                 'label'       => $book1->label,
                 'comment'     => $book1->comment,
-                'category_id' => (string) $category->id,
+                'category_id' => (string)$category->id,
             ],
             'links'         => [
                 'self' => 'http://localhost/Book/' . $book1->id,
@@ -156,7 +175,7 @@ class JsonApiResponseTest extends TestCase
                 'category' => [
                     'data' => [
                         'type' => class_basename($category),
-                        'id'   => (string) $category->id,
+                        'id'   => (string)$category->id,
                     ],
                 ]
             ],

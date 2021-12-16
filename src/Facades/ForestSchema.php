@@ -2,27 +2,29 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Facades;
 
-use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
+use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use Illuminate\Support\Facades\Facade;
+use JsonPath\JsonObject;
 
 /**
- * Class JsonApi
+ * Class ForestSchema
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  *
- * @method static array render($class, string $name)
+ * @method static JsonObject getSchema()
+ * @method static array|bool getRelatedData(string $collection)
  *
- * @see JsonApiResponse
+ * @see ForestSchemaInstrospection
  */
-class JsonApi extends Facade
+class ForestSchema extends Facade
 {
     /**
      * @return string
      */
     protected static function getFacadeAccessor()
     {
-        return 'json-api';
+        return 'forest-schema';
     }
 }
