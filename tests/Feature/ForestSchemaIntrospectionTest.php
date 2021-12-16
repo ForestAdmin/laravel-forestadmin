@@ -69,5 +69,4 @@ class ForestSchemaIntrospectionTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         return new ForestSchemaInstrospection();
     }
-
 }
