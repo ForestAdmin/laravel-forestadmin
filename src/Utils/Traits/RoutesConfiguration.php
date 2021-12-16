@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Utils\Traits;
 
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\RelationshipsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ResourcesController;
 
 /**
@@ -17,6 +18,8 @@ trait RoutesConfiguration
         'forest.collection.index'        => ResourcesController::class,
         'forest.collection.count'        => ResourcesController::class,
         'forest.collection.show'         => ResourcesController::class,
+        'forest.relationships.index'     => RelationshipsController::class,
+        'forest.relationships.count'     => RelationshipsController::class,
     ];
 
     /**

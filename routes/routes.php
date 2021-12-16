@@ -19,5 +19,9 @@ Route::group(
         Route::get('/{collection}', DispatchGateway::class)->name('forest.collection.index');
         Route::get('/{collection}/count', DispatchGateway::class)->name('forest.collection.count');
         Route::get('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.show');
+
+        // ASSOCIATIONS
+        Route::get('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.index');
+        Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
     }
 );

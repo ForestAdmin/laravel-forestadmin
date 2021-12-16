@@ -2,11 +2,14 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
-use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class ResourcesControllerTest
@@ -17,6 +20,9 @@ use Illuminate\Http\JsonResponse;
  */
 class ResourcesControllerTest extends TestCase
 {
+    use FakeData;
+    use FakeSchema;
+
     /**
      * @param Application $app
      * @return void
@@ -33,10 +39,11 @@ class ResourcesControllerTest extends TestCase
      */
     public function testIndex(): void
     {
-        $book = $this->getBook();
+        $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
         $call = $this->get('/forest/Book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('Book', $data['data'][0]['type']);
@@ -50,10 +57,13 @@ class ResourcesControllerTest extends TestCase
      */
     public function testShow(): void
     {
-        $book = $this->getBook();
+        $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/Book/1?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('Book', $data['data']['type']);
@@ -86,23 +96,5 @@ class ResourcesControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals($book->count(), $data['count']);
-    }
-
-    /**
-     * @return Book
-     */
-    public function getBook()
-    {
-        $book = new Book();
-        $book->id = 1;
-        $book->label = 'foo';
-        $book->comment = 'test value';
-        $book->difficulty = 'easy';
-        $book->amount = 50.20;
-        $book->options = [];
-        $book->category_id = 1;
-        $book->save();
-
-        return $book;
     }
 }
