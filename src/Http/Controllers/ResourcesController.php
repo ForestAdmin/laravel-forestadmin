@@ -6,9 +6,7 @@ use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
-use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
-use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceUpdater;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
@@ -83,7 +81,6 @@ class ResourcesController extends Controller
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function count(): JsonResponse
     public function store(): JsonResponse
     {
         return response()->json(['count' => $this->repository->count()]);
