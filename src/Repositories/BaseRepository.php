@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class BaseRepository

@@ -10,6 +10,7 @@ use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceUpdater;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -28,9 +29,9 @@ class ResourcesController extends Controller
     use Schema;
 
     /**
-     * @var ResourceGetter
+     * @var Model
      */
-    protected ResourceGetter $repository;
+    protected Model $model;
 
     /**
      * @var string
@@ -43,9 +44,8 @@ class ResourcesController extends Controller
     public function __construct()
     {
         $collection = request()->route()->parameter('collection');
-        $model = Schema::getModel(ucfirst($collection));
-        $this->name = (class_basename($model));
-        $this->repository = new ResourceGetter($model, $this->name);
+        $this->model = Schema::getModel(ucfirst($collection));
+        $this->name = (class_basename($this->model));
     }
 
     /**
@@ -54,8 +54,10 @@ class ResourcesController extends Controller
      */
     public function index(): JsonResponse
     {
+        $repository = new ResourceGetter($this->model, $this->name);
+
         return response()->json(
-            JsonApi::render($this->repository->all(), $this->name)
+            JsonApi::render($repository->all(), $this->name)
         );
     }
 
@@ -65,10 +67,12 @@ class ResourcesController extends Controller
      */
     public function show(): JsonResponse
     {
+        $repository = new ResourceGetter($this->model, $this->name);
+
         try {
             $id = request()->route()->parameter('id');
             return response()->json(
-                JsonApi::render($this->repository->get($id), $this->name)
+                JsonApi::render($repository->get($id), $this->name)
             );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
@@ -83,10 +87,12 @@ class ResourcesController extends Controller
      */
     public function store(): JsonResponse
     {
-        return response()->json(['count' => $this->repository->count()]);
         try {
-            $repository = new ResourceCreator($this->model);
-            return response()->json($repository->create(), Response::HTTP_CREATED);
+            $repository = new ResourceCreator($this->model, $this->name);
+            return response()->json(
+                JsonApi::render($repository->create(), $this->name),
+                Response::HTTP_CREATED
+            );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -102,9 +108,12 @@ class ResourcesController extends Controller
     public function update(): JsonResponse
     {
         try {
-            $repository = new ResourceUpdater($this->model);
+            $repository = new ResourceUpdater($this->model, $this->name);
             $id = request()->input('data.' . $this->model->getKeyName());
-            return response()->json($repository->update($id), Response::HTTP_CREATED);
+            return response()->json(
+                JsonApi::render($repository->update($id), $this->name),
+                Response::HTTP_CREATED
+            );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -117,7 +126,7 @@ class ResourcesController extends Controller
     {
         try {
             $id = request()->route()->parameter($this->model->getKeyName());
-            $repository = new ResourceRemover($this->model);
+            $repository = new ResourceRemover($this->model, $this->name);
             return response()->json($repository->destroy($id), Response::HTTP_NO_CONTENT);
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
@@ -129,7 +138,7 @@ class ResourcesController extends Controller
      */
     public function count(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model);
+        $repository = new ResourceGetter($this->model, $this->name);
 
         return response()->json(['count' => $repository->count()]);
     }
@@ -140,9 +149,12 @@ class ResourcesController extends Controller
     public function destroyBulk(): JsonResponse
     {
         try {
-            $repository = new ResourceRemover($this->model);
+            $repository = new ResourceRemover($this->model, $this->name);
             $ids = request()->input('data.attributes.ids');
-            return response()->json($repository->destroy($ids), Response::HTTP_NO_CONTENT);
+            return response()->json(
+                JsonApi::render($repository->destroy($ids)),
+                Response::HTTP_NO_CONTENT
+            );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
         }

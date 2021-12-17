@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
+use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -16,12 +17,12 @@ use Psr\Container\NotFoundExceptionInterface;
 class ResourceCreator extends BaseRepository
 {
     /**
-     * @return array
-     * @throws Exception
+     * @return Model
      * @throws ContainerExceptionInterface
+     * @throws Exception
      * @throws NotFoundExceptionInterface
      */
-    public function create(): array
+    public function create(): Model
     {
         $model = new $this->model();
         $this->setAttributes($model, request()->get('data'));
@@ -32,7 +33,7 @@ class ResourceCreator extends BaseRepository
             return $this->throwException('Record create error: ' . $e->getMessage());
         }
 
-        $resourceGetter = new ResourceGetter($model);
+        $resourceGetter = new ResourceGetter($model, $this->name);
 
         return $resourceGetter->get($model->id);
     }
