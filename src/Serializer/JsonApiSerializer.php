@@ -16,6 +16,44 @@ use League\Fractal\Serializer\JsonApiSerializer as FractalJsonApiSerializer;
 class JsonApiSerializer extends FractalJsonApiSerializer
 {
     /**
+     * Serialize an item.
+     *
+     * @param string $resourceKey
+     * @param array $data
+     *
+     * @return array
+     */
+    public function item($resourceKey, array $data)
+    {
+        $id = $this->getIdFromData($data);
+
+        $resource = [
+            'data' => [
+                'type' => $resourceKey,
+                'id' => "$id",
+                'attributes' => $data,
+            ],
+        ];
+
+        unset($resource['data']['attributes']['id']);
+
+        if (isset($resource['data']['attributes']['links'])) {
+            unset($resource['data']['attributes']['links']);
+        }
+
+        if (isset($resource['data']['attributes']['meta'])) {
+            $resource['data']['meta'] = $data['meta'];
+            unset($resource['data']['attributes']['meta']);
+        }
+
+        if (empty($resource['data']['attributes'])) {
+            $resource['data']['attributes'] = (object) [];
+        }
+
+        return $resource;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function injectAvailableIncludeData($data, $availableIncludes)
@@ -53,6 +91,7 @@ class JsonApiSerializer extends FractalJsonApiSerializer
         }
 
         $type = Str::camel($resource['type']);
+
         $resource['relationships'][$relationshipKey] = array_merge(
             [
                 'links' => [

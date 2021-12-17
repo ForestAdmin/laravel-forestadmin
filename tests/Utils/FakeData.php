@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 
 /**
  * Class FakeData
@@ -49,6 +50,20 @@ trait FakeData
             $comment->user_id = 1;
             $comment->book_id = 1;
             $comment->save();
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function getRanges(): void
+    {
+        $book = Book::find(1);
+        for ($i = 0; $i < 2; $i++) {
+            $range = new Range();
+            $range->id = $i + 1;
+            $range->label = 'Test comment';
+            $book->ranges()->save($range);
         }
     }
 }

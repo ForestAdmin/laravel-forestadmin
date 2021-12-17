@@ -144,7 +144,6 @@ class JsonApiResponseTest extends TestCase
         $this->assertEquals($data['type'], $render['data']['type']);
         $this->assertEquals($data['id'], $render['data']['id']);
         $this->assertEquals($data['attributes'], $render['data']['attributes']);
-        $this->assertEquals($data['links'], $render['data']['links']);
         $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
         $this->assertEquals($comments, $render['data']['relationships']['comments']);
     }
@@ -167,9 +166,6 @@ class JsonApiResponseTest extends TestCase
                 'label'       => $book1->label,
                 'comment'     => $book1->comment,
                 'category_id' => (string)$category->id,
-            ],
-            'links'         => [
-                'self' => 'http://localhost/Book/' . $book1->id,
             ],
             'relationships' => [
                 'category' => [
