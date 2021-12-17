@@ -98,7 +98,6 @@ class ResourcesController extends Controller
         }
     }
 
-
     /**
      * @return JsonResponse
      * @throws Exception
@@ -150,9 +149,10 @@ class ResourcesController extends Controller
     {
         try {
             $repository = new ResourceRemover($this->model, $this->name);
-            $ids = request()->input('data.attributes.ids');
+            $request = request()->only('data.attributes.ids', 'data.attributes.all_records', 'data.attributes.all_records_ids_excluded');
+            [$ids, $allRecords, $idsExcluded] = array_values($request['data']['attributes']);
             return response()->json(
-                JsonApi::render($repository->destroy($ids)),
+                JsonApi::render($repository->destroyBulk($ids, $allRecords, $idsExcluded)),
                 Response::HTTP_NO_CONTENT
             );
         } catch (ForestException $e) {

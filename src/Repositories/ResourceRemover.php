@@ -25,4 +25,23 @@ class ResourceRemover extends BaseRepository
             return $this->throwException('Record destroy error: Collection nof found');
         }
     }
+
+    /**
+     * @param array $ids
+     * @param bool  $allRecords
+     * @param array $idsExcluded
+     * @return void
+     */
+    public function destroyBulk(array $ids, bool $allRecords, array $idsExcluded)
+    {
+        if ($allRecords) {
+            $destroy = $this->model->whereNotIn($this->model->getKeyName(), $idsExcluded)->delete();
+        } else {
+            $destroy = $this->model->destroy($ids);
+        }
+
+        if (0 === $destroy) {
+            return $this->throwException('Records destroy error: Collection nof found');
+        }
+    }
 }
