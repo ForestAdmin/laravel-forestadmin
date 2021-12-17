@@ -66,5 +66,4 @@ trait FakeData
             $book->ranges()->save($range);
         }
     }
-
 }
