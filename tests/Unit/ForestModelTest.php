@@ -15,13 +15,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Mockery as m;
@@ -184,7 +182,7 @@ class ForestModelTest extends TestCase
         $this->assertIsArray($fields['id']);
         $this->assertEquals($fields['id']['field'], 'id');
         $this->assertEquals($fields['id']['type'], 'Number');
-        $this->assertEquals($fields['id']['is_required'], true);
+        $this->assertEquals($fields['id']['is_required'], false);
     }
 
     /**
@@ -223,8 +221,9 @@ class ForestModelTest extends TestCase
         $category = $forestModel->getModel()->category();
         $this->assertNotNull($fieldCategory);
         $this->assertEquals($fieldCategory['relationship'], $forestModel->mapRelationships(BelongsTo::class));
-        $this->assertEquals($fieldCategory['reference'], $category->getRelated()->getTable() . '.' . $category->getOwnerKeyName());
-        $this->assertEquals($fieldCategory['inverse_of'], $category->getOwnerKeyName());
+        $this->assertEquals($fieldCategory['reference'], Str::camel(class_basename($category->getRelated())) . '.' . $category->getOwnerKeyName());
+        $this->assertEquals($fieldCategory['inverse_of'], $category->getForeignKeyName());
+        $this->assertEquals($fieldCategory['type'], 'Number');
     }
 
     /**
@@ -240,7 +239,10 @@ class ForestModelTest extends TestCase
         $ranges = $forestModel->getModel()->ranges();
         $this->assertNotNull($fieldRange);
         $this->assertEquals($fieldRange['relationship'], $forestModel->mapRelationships(BelongsToMany::class));
-        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedPivotKeyName());
+        $this->assertEquals($fieldRange['field'], 'ranges');
+        $this->assertEquals($fieldRange['reference'], Str::camel(class_basename($ranges->getRelated())) . '.' . $ranges->getParentKeyName());
+        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedKeyName());
+        $this->assertEquals($fieldRange['type'], ['Number']);
     }
 
     /**
@@ -257,25 +259,9 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldComment);
         $this->assertEquals($fieldComment['relationship'], $forestModel->mapRelationships(HasMany::class));
         $this->assertEquals($fieldComment['field'], 'comments');
-        $this->assertEquals($fieldComment['reference'], $comments->getRelated()->getTable() . '.' . $comments->getForeignKeyName());
-        $this->assertEquals($fieldComment['inverse_of'], $comments->getForeignKeyName());
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsHasManyThrough(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldBookstore = $merge->firstWhere('field', 'bookstores');
-        $bookstores = $forestModel->getModel()->bookstores();
-        $this->assertNotNull($fieldBookstore);
-        $this->assertEquals($fieldBookstore['relationship'], $forestModel->mapRelationships(HasManyThrough::class));
-        $this->assertEquals($fieldBookstore['field'], 'bookstores');
-        $this->assertEquals($fieldBookstore['reference'], $bookstores->getRelated()->getTable() . '.' . $bookstores->getLocalKeyName());
+        $this->assertEquals($fieldComment['reference'], Str::camel(class_basename($comments->getRelated())) . '.' . $comments->getForeignKeyName());
+        $this->assertEquals($fieldComment['inverse_of'], $comments->getLocalKeyName());
+        $this->assertEquals($fieldComment['type'], ['Number']);
     }
 
     /**
@@ -292,25 +278,9 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($editor);
         $this->assertEquals($editor['relationship'], $forestModel->mapRelationships(HasOne::class));
         $this->assertEquals($editor['field'], 'editor');
-        $this->assertEquals($editor['reference'], $editors->getRelated()->getTable() . '.' . $editors->getForeignKeyName());
-        $this->assertEquals($editor['inverse_of'], $editors->getForeignKeyName());
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsHasOneThrough(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldAuthor = $merge->firstWhere('field', 'author');
-        $author = $forestModel->getModel()->author();
-        $this->assertNotNull($fieldAuthor);
-        $this->assertEquals($fieldAuthor['relationship'], $forestModel->mapRelationships(HasOneThrough::class));
-        $this->assertEquals($fieldAuthor['field'], 'author');
-        $this->assertEquals($fieldAuthor['reference'], $author->getRelated()->getTable() . '.' . $author->getLocalKeyName());
+        $this->assertEquals($editor['reference'], Str::camel(class_basename($editors->getRelated())) . '.' . $editors->getForeignKeyName());
+        $this->assertEquals($editor['inverse_of'], $editors->getLocalKeyName());
+        $this->assertEquals($editor['type'], 'Number');
     }
 
     /**
@@ -327,7 +297,8 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($image);
         $this->assertEquals($image['relationship'], $forestModel->mapRelationships(MorphOne::class));
         $this->assertEquals($image['field'], 'image');
-        $this->assertEquals($image['reference'], $images->getRelated()->getTable() . '.' . $images->getForeignKeyName());
+        $this->assertEquals($image['reference'], Str::camel(class_basename($images->getRelated())) . '.' . $images->getForeignKeyName());
+        $this->assertEquals($image['type'], 'Number');
     }
 
     /**
@@ -344,24 +315,8 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldTag);
         $this->assertEquals($fieldTag['relationship'], $forestModel->mapRelationships(MorphMany::class));
         $this->assertEquals($fieldTag['field'], 'tags');
-        $this->assertEquals($fieldTag['reference'], $tags->getRelated()->getTable() . '.' . $tags->getForeignKeyName());
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsMorphToMany(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldBuy = $merge->firstWhere('field', 'buys');
-        $buys = $forestModel->getModel()->buys();
-        $this->assertNotNull($fieldBuy);
-        $this->assertEquals($fieldBuy['relationship'], $forestModel->mapRelationships(MorphToMany::class));
-        $this->assertEquals($fieldBuy['field'], 'buys');
-        $this->assertEquals($fieldBuy['inverse_of'], $buys->getRelatedPivotKeyName());
+        $this->assertEquals($fieldTag['reference'], Str::camel(class_basename($tags->getRelated())) . '.' . $tags->getForeignKeyName());
+        $this->assertEquals($fieldTag['type'], ['Number']);
     }
 
     /**
@@ -373,10 +328,10 @@ class ForestModelTest extends TestCase
     {
         $forestModel = m::mock(ForestModel::class, [$this->getLaravelModel()])
             ->makePartial();
-        $value = 'name';
+        $value = 'model_name';
         $forestModel->setName($value);
 
-        $this->assertEquals($value, $forestModel->getName());
+        $this->assertEquals(Str::camel($value), $forestModel->getName());
     }
 
     /**
@@ -388,10 +343,10 @@ class ForestModelTest extends TestCase
     {
         $forestModel = m::mock(ForestModel::class, [$this->getLaravelModel()])
             ->makePartial();
-        $value = 'old-name';
+        $value = 'old_name';
         $forestModel->setOldName($value);
 
-        $this->assertEquals($value, $forestModel->getOldName());
+        $this->assertEquals(Str::camel($value), $forestModel->getOldName());
     }
 
     /**
@@ -547,6 +502,9 @@ class ForestModelTest extends TestCase
             ->getTable()
             ->shouldBeCalledOnce()
             ->willReturn('dummy_tables');
+        $model
+            ->getKeyName()
+            ->willReturn('id');
 
         return $model->reveal();
     }

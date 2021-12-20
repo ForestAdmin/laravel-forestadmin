@@ -27,6 +27,15 @@ class Book extends Model
         'active'  => 'boolean',
     ];
 
+    protected $fillable = [
+        'label',
+        'comment',
+        'difficulty',
+        'amount',
+        'options',
+        'category_id',
+    ];
+
     /**
      * @return BelongsTo
      */
@@ -70,7 +79,7 @@ class Book extends Model
     /**
      * @return HasOneThrough
      */
-    public function author(): HasOneThrough
+    public function authorUser(): HasOneThrough
     {
         return $this->hasOneThrough(User::class, Author::class);
     }

@@ -11,14 +11,12 @@ use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class Model
@@ -114,8 +112,8 @@ class ForestModel
     public function serialize(): array
     {
         return [
-            'name'                   => $this->getName(),
-            'old_name'               => $this->getOldName(),
+            'name'                   => Str::camel($this->getName()),
+            'old_name'               => Str::camel($this->getOldName()),
             'icon'                   => $this->getIcon(),
             'is_read_only'           => $this->isReadOnly(),
             'is_virtual'             => $this->isVirtual(),
@@ -168,7 +166,7 @@ class ForestModel
      */
     public function setName(string $name): ForestModel
     {
-        $this->name = $name;
+        $this->name = Str::camel($name);
         return $this;
     }
 
@@ -186,7 +184,7 @@ class ForestModel
      */
     public function setOldName(string $oldName): ForestModel
     {
-        $this->oldName = $oldName;
+        $this->oldName = Str::camel($oldName);
         return $this;
     }
 
@@ -357,7 +355,7 @@ class ForestModel
                 $field = $this->fieldDefaultValues();
                 $field['field'] = $column->getName();
                 $field['type'] = $this->getType($column->getType()->getName());
-                $field['is_required'] = $column->getNotnull();
+                $field['is_required'] = $column->getNotnull() && $this->model->getKeyName() !== $column->getName();
                 $field['default_value'] = $column->getDefault();
                 $fields->put($column->getName(), $field);
             }
@@ -377,6 +375,7 @@ class ForestModel
     {
         foreach ($relations as $name => $type) {
             $relation = $this->model->$name();
+            $related = Str::camel(class_basename($relation->getRelated()));
 
             switch ($type) {
                 case BelongsTo::class:
@@ -385,19 +384,19 @@ class ForestModel
                         $field,
                         [
                             'field'      => $relation->getRelationName(),
-                            'reference'  => $relation->getRelated()->getTable() . '.' . $relation->getOwnerKeyName(),
-                            'inverse_of' => $relation->getOwnerKeyName(),
+                            'reference'  => $related . '.' . $relation->getOwnerKeyName(),
+                            'inverse_of' => $relation->getForeignKeyName(),
                         ]
                     );
                     $name = $relation->getForeignKeyName();
                     break;
                 case BelongsToMany::class:
-                case MorphToMany::class:
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
                             'field'      => $relation->getRelationName(),
-                            'inverse_of' => $relation->getRelatedPivotKeyName()
+                            'reference'  => $related . '.' . $relation->getParentKeyName(),
+                            'inverse_of' => $relation->getRelatedKeyName(),
                         ]
                     );
                     $name = $relation->getRelationName();
@@ -410,26 +409,21 @@ class ForestModel
                         $this->fieldDefaultValues(),
                         [
                             'field'      => $name,
-                            'reference'  => $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName(),
-                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getForeignKeyName(),
+                            'reference'  => $related . '.' . $relation->getForeignKeyName(),
+                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getLocalKeyName(),
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
                     break;
-                case HasOneThrough::class:
-                case HasManyThrough::class:
-                    $field = array_merge(
-                        $this->fieldDefaultValues(),
-                        [
-                            'field'     => $name,
-                            'reference' => $relation->getRelated()->getTable() . '.' . $relation->getLocalKeyName(),
-                        ]
-                    );
-                    $name = $relation->getParent()->getTable();
-                    break;
             }
 
-            $field['type'] = $this->getType(Types::INTEGER);
+
+            if (in_array($type, [BelongsToMany::class, HasMany::class, MorphMany::class], true)) {
+                $field['type'] = ['Number'];
+            } else {
+                $field['type'] = $this->getType(Types::INTEGER);
+            }
+            $field['field'] = Str::camel($field['field']);
             $field['relationship'] = $this->mapRelationships($type);
             $fields->put($name, $field);
         }

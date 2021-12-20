@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class Range
@@ -13,4 +14,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Range extends Model
 {
+    /**
+     * @return BelongsToMany
+     */
+    public function books(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class);
+    }
 }
