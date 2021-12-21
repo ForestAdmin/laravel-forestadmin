@@ -36,17 +36,14 @@ class HasManyGetter extends ResourceGetter
      * @param Model  $model
      * @param string $name
      * @param string $relation
-     * @param string $relationName
      * @param        $parentId
      */
-    public function __construct(Model $model, string $name, string $relation, string $relationName, $parentId)
+    public function __construct(Model $model, string $name, string $relation, $parentId)
     {
         parent::__construct($model, $name);
         $this->relation = $relation;
-        $this->relationName = $relationName;
         $this->parentInstance = $this->model->find($parentId);
     }
-
 
     /**
      * @return LengthAwarePaginator
