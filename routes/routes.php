@@ -26,6 +26,7 @@ Route::group(
 
         // ASSOCIATIONS
         Route::get('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.index');
+        Route::post('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.associate');
         Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
     }
 );

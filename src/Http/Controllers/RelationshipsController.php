@@ -3,10 +3,14 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
+use ForestAdmin\LaravelForestAdmin\Repositories\HasManyAssociator;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
 /**
@@ -21,19 +25,29 @@ class RelationshipsController extends Controller
     use Schema;
 
     /**
-     * @var string
+     * @var Model
      */
-    private string $name;
+    protected Model $model;
 
     /**
      * @var string
      */
-    private string $relationName;
+    protected string $name;
 
     /**
-     * @var HasManyGetter
+     * @var string
      */
-    private HasManyGetter $repository;
+    private string $relationship;
+
+    /**
+     * @var string
+     */
+    protected string $relationName;
+
+    /**
+     * @var string
+     */
+    protected string $parentId;
 
     /**
      * @throws \Exception
@@ -41,10 +55,11 @@ class RelationshipsController extends Controller
     public function __construct()
     {
         [$collection, $parentId, $relation] = array_values(request()->route()->parameters());
-        $model = Schema::getModel(ucfirst($collection));
-        $this->name = (class_basename($model));
-        $this->relationName = (class_basename($model->$relation()->getRelated()));
-        $this->repository = new HasManyGetter($model, $this->name, $relation, $this->relationName, $parentId);
+        $this->model = Schema::getModel(ucfirst($collection));
+        $this->name = (class_basename($this->model));
+        $this->relationship = $relation;
+        $this->relationName = (class_basename($this->model->$relation()->getRelated()));
+        $this->parentId = $parentId;
     }
 
     /**
@@ -53,8 +68,10 @@ class RelationshipsController extends Controller
      */
     public function index(): JsonResponse
     {
+        $repository = new HasManyGetter($this->model, $this->name, $this->relationship, $this->parentId);
+
         return response()->json(
-            JsonApi::render($this->repository->all(), $this->relationName)
+            JsonApi::render($repository->all(), $this->relationName)
         );
     }
 
@@ -64,6 +81,20 @@ class RelationshipsController extends Controller
      */
     public function count(): JsonResponse
     {
-        return response()->json(['count' => $this->repository->count()]);
+        $repository = new HasManyGetter($this->model, $this->name, $this->relationship, $this->parentId);
+
+        return response()->json(['count' => $repository->count()]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function associate(): JsonResponse
+    {
+        $repository = new HasManyAssociator($this->model, $this->name, $this->relationship, $this->parentId);
+        $ids = collect(request()->input('data'))->pluck('id')->toArray();
+        $repository->addRelation($ids);
+
+        return response()->noContent();
     }
 }

@@ -15,15 +15,17 @@ use ForestAdmin\LaravelForestAdmin\Http\Controllers\ResourcesController;
 trait RoutesConfiguration
 {
     public array $routesList = [
-        'forest.collection.index'        => ResourcesController::class,
-        'forest.collection.count'        => ResourcesController::class,
-        'forest.collection.show'         => ResourcesController::class,
-        'forest.collection.store'        => ResourcesController::class,
-        'forest.collection.update'       => ResourcesController::class,
-        'forest.collection.destroy_bulk' => ResourcesController::class,
-        'forest.collection.destroy'      => ResourcesController::class,
-        'forest.relationships.index'     => RelationshipsController::class,
-        'forest.relationships.count'     => RelationshipsController::class,
+        'forest.collection.index'         => ResourcesController::class,
+        'forest.collection.count'         => ResourcesController::class,
+        'forest.collection.show'          => ResourcesController::class,
+        'forest.collection.store'         => ResourcesController::class,
+        'forest.collection.update'        => ResourcesController::class,
+        'forest.collection.destroy_bulk'  => ResourcesController::class,
+        'forest.collection.destroy'       => ResourcesController::class,
+        'forest.relationships.index'      => RelationshipsController::class,
+        'forest.relationships.count'      => RelationshipsController::class,
+        'forest.relationships.associate'  => RelationshipsController::class,
+        'forest.relationships.dissociate' => RelationshipsController::class,
     ];
 
     /**
