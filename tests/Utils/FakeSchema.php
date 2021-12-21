@@ -11,7 +11,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
  */
 trait FakeSchema
 {
-
     /**
      * @param bool $convertToJson
      * @return array|false|string

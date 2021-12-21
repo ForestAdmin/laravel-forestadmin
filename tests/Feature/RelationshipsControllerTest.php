@@ -42,6 +42,10 @@ class RelationshipsControllerTest extends TestCase
     {
         $this->getBook()->save();
         $this->getComments();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
         $params = ['fields' => ['comment' => 'id,body']];
         $call = $this->get('/forest/Book/1/relationships/comments?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);

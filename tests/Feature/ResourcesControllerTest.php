@@ -41,6 +41,8 @@ class ResourcesControllerTest extends TestCase
     {
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/Book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
