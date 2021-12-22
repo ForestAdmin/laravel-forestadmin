@@ -417,7 +417,6 @@ class ForestModel
                     break;
             }
 
-
             if (in_array($type, [BelongsToMany::class, HasMany::class, MorphMany::class], true)) {
                 $field['type'] = ['Number'];
             } else {
