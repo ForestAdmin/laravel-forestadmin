@@ -53,7 +53,7 @@ class HasManyAssociator extends BaseRepository
                 $relation->saveMany($records->all());
                 break;
             case BelongsToMany::class:
-                 $relation->getRelated()->attach($ids);
+                 $relation->attach($ids);
                 break;
         }
     }
