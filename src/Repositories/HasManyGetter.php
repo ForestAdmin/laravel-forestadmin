@@ -77,12 +77,7 @@ class HasManyGetter extends ResourceGetter
                 break;
         }
 
-        return $query->paginate(
-            $pageParams['size'] ?? null,
-            '*',
-            'page',
-            $pageParams['number'] ?? null
-        );
+        return $query->paginate($pageParams['size'] ?? null, '*', 'page', $pageParams['number'] ?? null);
     }
 
     /**
