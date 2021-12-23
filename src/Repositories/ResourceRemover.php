@@ -27,12 +27,12 @@ class ResourceRemover extends BaseRepository
     }
 
     /**
-     * @param array $ids
-     * @param bool  $allRecords
-     * @param array $idsExcluded
+     * @param Collection|array $ids
+     * @param bool             $allRecords
+     * @param array            $idsExcluded
      * @return void
      */
-    public function destroyBulk(array $ids, bool $allRecords, array $idsExcluded)
+    public function destroyBulk($ids, bool $allRecords = false, array $idsExcluded = [])
     {
         if ($allRecords) {
             $destroy = $this->model->whereNotIn($this->model->getKeyName(), $idsExcluded)->delete();

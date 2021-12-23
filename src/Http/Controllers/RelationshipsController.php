@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyAssociator;
+use ForestAdmin\LaravelForestAdmin\Repositories\HasManyDissociator;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyGetter;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -87,14 +88,30 @@ class RelationshipsController extends Controller
     }
 
     /**
-     * @return JsonResponse
+     * @return Response
      */
-    public function associate(): JsonResponse
+    public function associate()
     {
         $repository = new HasManyAssociator($this->model, $this->name, $this->relationship, $this->parentId);
         $ids = collect(request()->input('data'))->pluck('id')->toArray();
         $repository->addRelation($ids);
 
         return response()->noContent();
+    }
+
+    /**
+     * @return JsonResponse|Response
+     */
+    public function dissociate()
+    {
+        try {
+            $repository = new HasManyDissociator($this->model, $this->name, $this->relationship, $this->parentId);
+            $ids = collect(request()->input('data'))->pluck('id')->toArray();
+            $delete = request()->query('delete') ?? false;
+            $repository->removeRelation($ids, $delete);
+            return response()->noContent();
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
+        }
     }
 }
