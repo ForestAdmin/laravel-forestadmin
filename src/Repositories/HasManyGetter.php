@@ -6,6 +6,8 @@ use Doctrine\DBAL\Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 
 /**
@@ -52,25 +54,35 @@ class HasManyGetter extends ResourceGetter
     public function all(): LengthAwarePaginator
     {
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
-        $params = $this->params['fields'] ?? [];
-        $queryFields = $params[Str::camel(class_basename($relatedModel))] ?? null;
         $pageParams = $this->params['page'] ?? [];
+        $relation = $this->parentInstance->{$this->relation}();
+        $query = $this->buildQuery($relatedModel, (class_basename($relatedModel)));
 
-        $records = $this->parentInstance->{$this->relation}()->paginate(
+        switch (get_class($relation)) {
+            case HasMany::class:
+                $query->where($relation->getForeignKeyName(), $this->parentInstance->getKey());
+                break;
+            case BelongsToMany::class:
+                $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getForeignPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
+                $query->where($relation->getTable() . '.' . $relation->getForeignPivotKeyName(), $this->parentInstance->getKey());
+                break;
+            case MorphMany::class:
+                $query->where(
+                    [
+                        $relation->getMorphType()      => $relation->getMorphClass(),
+                        $relation->getForeignKeyName() => $this->parentInstance->getKey(),
+
+                    ]
+                );
+                break;
+        }
+
+        return $query->paginate(
             $pageParams['size'] ?? null,
-            $this->handleFields($relatedModel, $queryFields),
+            '*',
             'page',
             $pageParams['number'] ?? null
         );
-
-        if ($this->parentInstance->{$this->relation}() instanceof BelongsToMany) {
-            $records->getCollection()->transform(
-                function ($value) {
-                    return $value->unsetRelations('pivot');
-                }
-            );
-        }
-        return $records;
     }
 
     /**
