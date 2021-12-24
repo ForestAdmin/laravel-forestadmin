@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class HasManyDissociator
@@ -49,6 +48,7 @@ class HasManyDissociator extends BaseRepository
     {
         $relation = $this->parentInstance->{$this->relation}();
         $records = $relation->get()->whereIn($relation->getRelated()->getKeyName(), $ids);
+
         if ($records->count() === 0) {
             return $this->throwException('Record dissociate error: records not found');
         }
@@ -61,13 +61,13 @@ class HasManyDissociator extends BaseRepository
         try {
             switch (get_class($relation)) {
                 case HasMany::class:
-                    DB::table($relation->getRelated()->getTable())
+                    $relation->getRelated()
                         ->whereIn($relation->getRelated()->getKeyName(), $ids)
                         ->where($relation->getForeignKeyName(), $this->parentInstance->getKey())
                         ->update([$relation->getForeignKeyName() => null]);
                     break;
                 case MorphMany::class:
-                    DB::table($relation->getRelated()->getTable())
+                    $relation->getRelated()
                         ->whereIn($relation->getRelated()->getKeyName(), $records->pluck('id'))
                         ->update(
                             [
@@ -81,7 +81,7 @@ class HasManyDissociator extends BaseRepository
                     break;
             }
         } catch (\Exception $e) {
-            return $this->throwException('Record dissociate error: ' . $e->getMessage());
+            return $this->throwException('Record dissociate error: the records can not be dissociate');
         }
     }
 }
