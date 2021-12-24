@@ -4,17 +4,15 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyAssociator;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Sequel;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Mockery as m;
 
 /**
- * Class HasManyGetter
+ * Class HasManyAssociatorTest
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
