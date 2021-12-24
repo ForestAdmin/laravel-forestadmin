@@ -17,6 +17,10 @@ class Movie extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'body',
+    ];
+
     /**
      * @return BelongsTo
      */

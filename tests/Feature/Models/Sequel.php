@@ -17,6 +17,10 @@ class Sequel extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'label',
+    ];
+
     /**
      * @return MorphTo
      */

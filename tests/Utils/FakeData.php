@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
 
 /**
  * Class FakeData
@@ -26,7 +27,6 @@ trait FakeData
         $category->label = 'bar';
 
         $book = new Book();
-        $book->id = 1;
         $book->label = 'foo';
         $book->comment = 'test value';
         $book->difficulty = 'easy';
@@ -62,8 +62,23 @@ trait FakeData
         for ($i = 0; $i < 2; $i++) {
             $range = new Range();
             $range->id = $i + 1;
-            $range->label = 'Test comment';
+            $range->label = 'Test range';
             $book->ranges()->save($range);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function getTags(): void
+    {
+        $book = Book::find(1);
+        for ($i = 0; $i < 2; $i++) {
+            $tag = new Tag();
+            $tag->id = $i + 1;
+            $tag->label = 'Test range';
+            $tag->taggable()->associate($book);
+            $tag->save();
         }
     }
 }
