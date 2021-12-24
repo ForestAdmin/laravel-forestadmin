@@ -50,11 +50,11 @@ class HasManyDissociatorTest extends TestCase
     {
         $this->getBook()->save();
         $book = Book::first();
-        $movie = Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
+        $sequel = Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
 
         $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'sequels', $book->id])
             ->makePartial();
-        $data = $repository->removeRelation([$movie->id]);
+        $data = $repository->removeRelation([$sequel->id]);
 
         $this->assertNull($data);
     }
