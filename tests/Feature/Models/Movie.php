@@ -19,6 +19,7 @@ class Movie extends Model
 
     protected $fillable = [
         'body',
+        'book_id',
     ];
 
     /**

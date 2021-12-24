@@ -19,6 +19,8 @@ class Sequel extends Model
 
     protected $fillable = [
         'label',
+        'sequelable_type',
+        'sequelable_id',
     ];
 
     /**
