@@ -272,5 +272,25 @@ class TestCase extends OrchestraTestCase
                 $table->string('buyable_type');
             }
         );
+
+        DB::schema()->create(
+            'movies',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('body');
+                $table->foreignId('book_id')->nullable()->constrained()->onDelete('set null');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'sequels',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->nullableMorphs('sequelable');
+                $table->timestamps();
+            }
+        );
     }
 }
