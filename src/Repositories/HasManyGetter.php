@@ -63,7 +63,7 @@ class HasManyGetter extends ResourceGetter
                 $query->where($relation->getForeignKeyName(), $this->parentInstance->getKey());
                 break;
             case BelongsToMany::class:
-                $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getForeignPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
+                $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getRelatedPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
                 $query->where($relation->getTable() . '.' . $relation->getForeignPivotKeyName(), $this->parentInstance->getKey());
                 break;
             case MorphMany::class:
