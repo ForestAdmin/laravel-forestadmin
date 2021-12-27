@@ -23,8 +23,8 @@ trait FakeData
     public function getBook()
     {
         $category = new Category();
-        $category->id = 1;
         $category->label = 'bar';
+        $category->save();
 
         $book = new Book();
         $book->label = 'foo';

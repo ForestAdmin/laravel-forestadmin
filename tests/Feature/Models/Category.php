@@ -3,7 +3,6 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Category
@@ -18,12 +17,4 @@ class Category extends Model
         'label',
         'product_id',
     ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
 }

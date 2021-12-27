@@ -137,7 +137,6 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('label');
-                $table->foreignId('product_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );

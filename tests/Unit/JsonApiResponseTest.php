@@ -159,7 +159,7 @@ class JsonApiResponseTest extends TestCase
      */
     public function addDatabaseContent(): array
     {
-        $category = Category::create(['label' => 'category1', 'product_id' => 1]);
+        $category = Category::create(['label' => 'category1']);
         $book1 = Book::create(['label' => 'foo', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 100.00, 'options' => [], 'category_id' => 1]);
         $book1->setRelation('category', $category);
         $book2 = Book::create(['label' => 'bar', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 50.00, 'options' => [], 'category_id' => 1]);
