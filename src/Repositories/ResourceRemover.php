@@ -19,9 +19,9 @@ class ResourceRemover extends BaseRepository
      */
     public function destroy($id)
     {
-        $destroy = $this->model->destroy($id);
+        $record = $this->model->destroy($id);
 
-        if (0 === $destroy) {
+        if (0 === $record) {
             return $this->throwException('Record destroy error: Collection nof found');
         }
     }
@@ -35,12 +35,12 @@ class ResourceRemover extends BaseRepository
     public function destroyBulk($ids, bool $allRecords = false, array $idsExcluded = [])
     {
         if ($allRecords) {
-            $destroy = $this->model->whereNotIn($this->model->getKeyName(), $idsExcluded)->delete();
+            $record = $this->model->whereNotIn($this->model->getKeyName(), $idsExcluded)->delete();
         } else {
-            $destroy = $this->model->destroy($ids);
+            $record = $this->model->destroy($ids);
         }
 
-        if (0 === $destroy) {
+        if (0 === $record) {
             return $this->throwException('Records destroy error: Collection nof found');
         }
     }

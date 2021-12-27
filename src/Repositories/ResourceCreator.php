@@ -24,17 +24,17 @@ class ResourceCreator extends BaseRepository
      */
     public function create(): Model
     {
-        $model = new $this->model();
-        $this->setAttributes($model, request()->get('data'));
+        $record = new $this->model();
+        $this->setAttributes($record, request()->get('data'));
 
         try {
-            $model->save();
+            $record->save();
         } catch (\Exception $e) {
             return $this->throwException('Record create error: ' . $e->getMessage());
         }
 
-        $resourceGetter = new ResourceGetter($model, $this->name);
+        $resourceGetter = new ResourceGetter($record, $this->name);
 
-        return $resourceGetter->get($model->id);
+        return $resourceGetter->get($record->id);
     }
 }

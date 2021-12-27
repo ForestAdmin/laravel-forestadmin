@@ -56,12 +56,12 @@ class ResourceGetter extends BaseRepository
      */
     public function get($id): Model
     {
-        $resource = $this->query()->find($id);
-        if (!$resource) {
+        $record = $this->query()->find($id);
+        if (!$record) {
             $this->throwException('Collection not found');
         }
 
-        return $resource;
+        return $record;
     }
 
     /**

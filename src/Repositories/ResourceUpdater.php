@@ -25,17 +25,17 @@ class ResourceUpdater extends BaseRepository
      */
     public function update($id): Model
     {
-        $model = $this->model::firstWhere($this->model->getKeyName(), $id);
-        $this->setAttributes($model, request()->get('data'));
+        $record = $this->model::firstWhere($this->model->getKeyName(), $id);
+        $this->setAttributes($record, request()->get('data'));
 
         try {
-            $model->save();
+            $record->save();
         } catch (\Exception $e) {
             return $this->throwException('Record update error: ' . $e->getMessage());
         }
 
-        $resourceGetter = new ResourceGetter($model, $this->name);
+        $resourceGetter = new ResourceGetter($record, $this->name);
 
-        return $resourceGetter->get($model->id);
+        return $resourceGetter->get($record->id);
     }
 }
