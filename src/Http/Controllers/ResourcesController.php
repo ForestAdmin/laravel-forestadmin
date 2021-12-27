@@ -111,7 +111,7 @@ class ResourcesController extends Controller
             $id = request()->input('data.' . $this->model->getKeyName());
             return response()->json(
                 JsonApi::render($repository->update($id), $this->name),
-                Response::HTTP_CREATED
+                Response::HTTP_OK
             );
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -152,7 +152,7 @@ class ResourcesController extends Controller
             $request = request()->only('data.attributes.ids', 'data.attributes.all_records', 'data.attributes.all_records_ids_excluded');
             [$ids, $allRecords, $idsExcluded] = array_values($request['data']['attributes']);
             return response()->json(
-                JsonApi::render($repository->destroyBulk($ids, $allRecords, $idsExcluded), $this->name),
+                $repository->destroyBulk($ids, $allRecords, $idsExcluded),
                 Response::HTTP_NO_CONTENT
             );
         } catch (ForestException $e) {
