@@ -28,13 +28,12 @@ class HasManyAssociator extends BaseRepository
 
     /**
      * @param Model  $model
-     * @param string $name
      * @param string $relation
      * @param        $parentId
      */
-    public function __construct(Model $model, string $name, string $relation, $parentId)
+    public function __construct(Model $model, string $relation, $parentId)
     {
-        parent::__construct($model, $name);
+        parent::__construct($model);
         $this->relation = $relation;
         $this->parentInstance = $this->model->find($parentId);
     }

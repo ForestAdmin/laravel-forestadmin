@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
@@ -43,9 +44,8 @@ class ResourcesController extends Controller
      */
     public function __construct()
     {
-        $collection = request()->route()->parameter('collection');
-        $this->model = Schema::getModel(ucfirst($collection));
-        $this->name = (class_basename($this->model));
+        $this->name = request()->route()->parameter('collection');
+        $this->model = Schema::getModel(ucfirst($this->name));
     }
 
     /**
@@ -54,7 +54,7 @@ class ResourcesController extends Controller
      */
     public function index(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model, $this->name);
+        $repository = new ResourceGetter($this->model);
 
         return response()->json(
             JsonApi::render($repository->all(), $this->name)
@@ -67,7 +67,7 @@ class ResourcesController extends Controller
      */
     public function show(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model, $this->name);
+        $repository = new ResourceGetter($this->model);
 
         try {
             $id = request()->route()->parameter('id');
@@ -88,7 +88,7 @@ class ResourcesController extends Controller
     public function store(): JsonResponse
     {
         try {
-            $repository = new ResourceCreator($this->model, $this->name);
+            $repository = new ResourceCreator($this->model);
             return response()->json(
                 JsonApi::render($repository->create(), $this->name),
                 Response::HTTP_CREATED
@@ -107,7 +107,7 @@ class ResourcesController extends Controller
     public function update(): JsonResponse
     {
         try {
-            $repository = new ResourceUpdater($this->model, $this->name);
+            $repository = new ResourceUpdater($this->model);
             $id = request()->input('data.' . $this->model->getKeyName());
             return response()->json(
                 JsonApi::render($repository->update($id), $this->name),
@@ -137,7 +137,7 @@ class ResourcesController extends Controller
      */
     public function count(): JsonResponse
     {
-        $repository = new ResourceGetter($this->model, $this->name);
+        $repository = new ResourceGetter($this->model);
 
         return response()->json(['count' => $repository->count()]);
     }
@@ -148,7 +148,7 @@ class ResourcesController extends Controller
     public function destroyBulk(): JsonResponse
     {
         try {
-            $repository = new ResourceRemover($this->model, $this->name);
+            $repository = new ResourceRemover($this->model);
             $request = request()->only('data.attributes.ids', 'data.attributes.all_records', 'data.attributes.all_records_ids_excluded');
             [$ids, $allRecords, $idsExcluded] = array_values($request['data']['attributes']);
             return response()->json(

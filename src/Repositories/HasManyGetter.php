@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Str;
 
 /**
  * Class HasManyGetter
@@ -36,13 +35,12 @@ class HasManyGetter extends ResourceGetter
 
     /**
      * @param Model  $model
-     * @param string $name
      * @param string $relation
      * @param        $parentId
      */
-    public function __construct(Model $model, string $name, string $relation, $parentId)
+    public function __construct(Model $model, string $relation, $parentId)
     {
-        parent::__construct($model, $name);
+        parent::__construct($model);
         $this->relation = $relation;
         $this->parentInstance = $this->model->find($parentId);
     }
@@ -56,7 +54,7 @@ class HasManyGetter extends ResourceGetter
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
         $pageParams = $this->params['page'] ?? [];
         $relation = $this->parentInstance->{$this->relation}();
-        $query = $this->buildQuery($relatedModel, (class_basename($relatedModel)));
+        $query = $this->buildQuery($relatedModel);
 
         switch (get_class($relation)) {
             case HasMany::class:

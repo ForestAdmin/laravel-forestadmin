@@ -30,11 +30,6 @@ abstract class BaseRepository
     /**
      * @var string
      */
-    protected string $name;
-
-    /**
-     * @var string
-     */
     protected string $table;
 
     /**
@@ -43,13 +38,11 @@ abstract class BaseRepository
     protected ?string $database = null;
 
     /**
-     * @param Model  $model
-     * @param string $name
+     * @param Model $model
      */
-    public function __construct(Model $model, string $name)
+    public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->name = $name;
         $this->table = $model->getConnection()->getTablePrefix() . $model->getTable();
         if (strpos($this->table, '.')) {
             [$this->database, $this->table] = explode('.', $this->table);

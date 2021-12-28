@@ -31,7 +31,7 @@ class HasManyAssociatorTest extends TestCase
         $movie = Movie::create(['body' => 'test movie']);
         $book = Book::first();
 
-        $repository = m::mock(HasManyAssociator::class, [$book, 'Book', 'movies', $book->id])
+        $repository = m::mock(HasManyAssociator::class, [$book, 'movies', $book->id])
             ->makePartial();
         $data = $repository->addRelation([$movie->id]);
 
@@ -48,7 +48,7 @@ class HasManyAssociatorTest extends TestCase
         $sequel = Sequel::create(['label' => 'sequel test']);
         $book = Book::first();
 
-        $repository = m::mock(HasManyAssociator::class, [$book, 'Book', 'sequels', $book->id])
+        $repository = m::mock(HasManyAssociator::class, [$book, 'sequels', $book->id])
             ->makePartial();
         $data = $repository->addRelation([$sequel->id]);
 
@@ -72,7 +72,7 @@ class HasManyAssociatorTest extends TestCase
         $range->label = 'Test range';
         $book2->ranges()->save($range);
 
-        $repository = m::mock(HasManyAssociator::class, [$book1, 'Book', 'ranges', $book1->id])
+        $repository = m::mock(HasManyAssociator::class, [$book1, 'ranges', $book1->id])
             ->makePartial();
         $data = $repository->addRelation([$range->id]);
 

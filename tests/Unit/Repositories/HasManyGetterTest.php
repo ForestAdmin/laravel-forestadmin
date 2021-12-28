@@ -31,7 +31,7 @@ class HasManyGetterTest extends TestCase
         $this->getBook()->save();
         $this->getComments();
 
-        $repository = m::mock(HasManyGetter::class, [Book::first(), 'Book', 'comments', 1])
+        $repository = m::mock(HasManyGetter::class, [Book::first(), 'comments', 1])
             ->makePartial();
         $data = $repository->all();
 
@@ -47,7 +47,7 @@ class HasManyGetterTest extends TestCase
         $this->getBook()->save();
         $this->getRanges();
 
-        $repository = m::mock(HasManyGetter::class, [Book::first(), 'Book', 'ranges', 1])
+        $repository = m::mock(HasManyGetter::class, [Book::first(), 'ranges', 1])
             ->makePartial();
         $data = $repository->all();
 
@@ -63,7 +63,7 @@ class HasManyGetterTest extends TestCase
         $this->getBook()->save();
         $this->getTags();
 
-        $repository = m::mock(HasManyGetter::class, [Book::first(), 'Book', 'tags', 1])
+        $repository = m::mock(HasManyGetter::class, [Book::first(), 'tags', 1])
             ->makePartial();
         $data = $repository->all();
 
@@ -79,7 +79,7 @@ class HasManyGetterTest extends TestCase
         $this->getBook()->save();
         $this->getComments();
 
-        $repository = m::mock(HasManyGetter::class, [Book::first(), 'Book', 'comments', 1])
+        $repository = m::mock(HasManyGetter::class, [Book::first(), 'comments', 1])
             ->makePartial();
 
         $this->assertEquals(Comment::count(), $repository->count());

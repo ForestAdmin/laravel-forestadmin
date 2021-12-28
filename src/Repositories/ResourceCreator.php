@@ -33,7 +33,7 @@ class ResourceCreator extends BaseRepository
             return $this->throwException('Record create error: ' . $e->getMessage());
         }
 
-        $resourceGetter = new ResourceGetter($record, $this->name);
+        $resourceGetter = new ResourceGetter($record);
 
         return $resourceGetter->get($record->id);
     }

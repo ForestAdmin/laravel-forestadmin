@@ -69,7 +69,7 @@ class RelationshipsController extends Controller
      */
     public function index(): JsonResponse
     {
-        $repository = new HasManyGetter($this->model, $this->name, $this->relationship, $this->parentId);
+        $repository = new HasManyGetter($this->model, $this->relationship, $this->parentId);
 
         return response()->json(
             JsonApi::render($repository->all(), $this->relationName)
@@ -82,7 +82,7 @@ class RelationshipsController extends Controller
      */
     public function count(): JsonResponse
     {
-        $repository = new HasManyGetter($this->model, $this->name, $this->relationship, $this->parentId);
+        $repository = new HasManyGetter($this->model, $this->relationship, $this->parentId);
 
         return response()->json(['count' => $repository->count()]);
     }
@@ -92,7 +92,7 @@ class RelationshipsController extends Controller
      */
     public function associate()
     {
-        $repository = new HasManyAssociator($this->model, $this->name, $this->relationship, $this->parentId);
+        $repository = new HasManyAssociator($this->model, $this->relationship, $this->parentId);
         $ids = collect(request()->input('data'))->pluck('id')->toArray();
         $repository->addRelation($ids);
 
@@ -105,7 +105,7 @@ class RelationshipsController extends Controller
     public function dissociate()
     {
         try {
-            $repository = new HasManyDissociator($this->model, $this->name, $this->relationship, $this->parentId);
+            $repository = new HasManyDissociator($this->model, $this->relationship, $this->parentId);
             $ids = collect(request()->input('data'))->pluck('id')->toArray();
             $delete = request()->query('delete') ?? false;
             $repository->removeRelation($ids, $delete);

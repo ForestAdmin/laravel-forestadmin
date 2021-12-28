@@ -36,7 +36,7 @@ class HasManyDissociatorTest extends TestCase
         $book = Book::first();
         $movie = Movie::create(['body' => 'test movie', 'book_id' => $book->id]);
 
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'movies', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'movies', $book->id])
             ->makePartial();
         $data = $repository->removeRelation([$movie->id]);
 
@@ -52,7 +52,7 @@ class HasManyDissociatorTest extends TestCase
         $book = Book::first();
         $sequel = Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
 
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'sequels', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'sequels', $book->id])
             ->makePartial();
         $data = $repository->removeRelation([$sequel->id]);
 
@@ -68,7 +68,7 @@ class HasManyDissociatorTest extends TestCase
         $this->getRanges();
         $book = Book::first();
 
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'ranges', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'ranges', $book->id])
             ->makePartial();
         $data = $repository->removeRelation(Range::all()->pluck('id')->toArray());
 
@@ -82,7 +82,7 @@ class HasManyDissociatorTest extends TestCase
     {
         $this->getBook()->save();
         $book = Book::first();
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'movies', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'movies', $book->id])
             ->makePartial();
 
         $this->expectException(ForestException::class);
@@ -100,7 +100,7 @@ class HasManyDissociatorTest extends TestCase
         $this->getComments();
         $book = Book::first();
 
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'comments', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'comments', $book->id])
             ->makePartial();
 
         $this->expectException(ForestException::class);
@@ -118,7 +118,7 @@ class HasManyDissociatorTest extends TestCase
         $this->getComments();
         $book = Book::first();
 
-        $repository = m::mock(HasManyDissociator::class, [$book, 'Book', 'comments', $book->id])
+        $repository = m::mock(HasManyDissociator::class, [$book, 'comments', $book->id])
             ->makePartial();
         $data = $repository->removeRelation(Comment::pluck('id')->toArray(), true);
 

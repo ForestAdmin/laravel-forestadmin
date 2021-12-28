@@ -21,14 +21,14 @@ trait HasQuery
 {
     /**
      * @param $model
-     * @param $name
      * @return Builder
      * @throws Exception
      */
-    protected function buildQuery($model, $name): Builder
+    protected function buildQuery($model): Builder
     {
+        $name = Str::camel(class_basename($model));
         $params = $this->params['fields'] ?? [];
-        $queryFields = $params[Str::camel($name)] ?? null;
+        $queryFields = $params[$name] ?? null;
 
         $fields = $this->handleFields($model, $queryFields);
         $query = $model->query()->select($fields);

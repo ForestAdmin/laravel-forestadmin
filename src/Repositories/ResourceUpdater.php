@@ -34,7 +34,7 @@ class ResourceUpdater extends BaseRepository
             return $this->throwException('Record update error: ' . $e->getMessage());
         }
 
-        $resourceGetter = new ResourceGetter($record, $this->name);
+        $resourceGetter = new ResourceGetter($record);
 
         return $resourceGetter->get($record->id);
     }
