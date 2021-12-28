@@ -93,8 +93,7 @@ class RelationshipsController extends Controller
     public function associate()
     {
         $repository = new HasManyAssociator($this->model, $this->relationship, $this->parentId);
-        $ids = collect(request()->input('data'))->pluck('id')->toArray();
-        $repository->addRelation($ids);
+        $repository->addRelation($this->getIds());
 
         return response()->noContent();
     }
@@ -106,12 +105,19 @@ class RelationshipsController extends Controller
     {
         try {
             $repository = new HasManyDissociator($this->model, $this->relationship, $this->parentId);
-            $ids = collect(request()->input('data'))->pluck('id')->toArray();
             $delete = request()->query('delete') ?? false;
-            $repository->removeRelation($ids, $delete);
+            $repository->removeRelation($this->getIds(), $delete);
             return response()->noContent();
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getIds(): array
+    {
+        return collect(request()->input('data'))->pluck('id')->toArray();
     }
 }
