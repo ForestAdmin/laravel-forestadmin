@@ -117,6 +117,7 @@ class ForestModel
             'icon'                   => $this->getIcon(),
             'is_read_only'           => $this->isReadOnly(),
             'is_virtual'             => $this->isVirtual(),
+            'is_searchable'          => $this->isSearchable(),
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
@@ -361,7 +362,7 @@ class ForestModel
             }
         }
 
-        $fields = $fields->reject(fn ($item) => $item['type'] === 'unknown');
+        $fields = $fields->reject(fn($item) => $item['type'] === 'unknown');
 
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
     }
