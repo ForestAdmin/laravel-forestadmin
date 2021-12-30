@@ -37,36 +37,60 @@ trait HasQuery
         $fields = $this->handleFields($model, $queryFields);
         $query->select($fields);
 
-        if ($joins = $this->handleWith($model, $fieldsParams)) {
-            foreach ($joins as $key => $value) {
-                if ($value['foreign_key']) {
-                    $query->addSelect($value['foreign_key']);
-                }
-                $query->with($key . ':' . $value['fields']);
-            }
+        if ($includes = $this->handleWith($model, $fieldsParams)) {
+            $this->appendIncludes($query, $includes);
         }
 
         if (array_key_exists('search', $this->params)) {
-            $fieldsToSearch = $this->getFieldsToSearch();
-            $query->where(
-                function ($query) use ($fieldsToSearch) {
-                    foreach ($fieldsToSearch as $field) {
-                        $this->handleSearchField($query, $field, $this->params['search']);
-                    }
-                }
-            );
+            $isExtended = array_key_exists('searchExtended', $this->params) && $this->params['searchExtended'] === 1;
+            $this->appendSearch($query, $this->params['search'], $isExtended);
         }
 
         return $query;
     }
 
     /**
-     * @param $query
-     * @param $field
-     * @param $value
-     * @return mixed
+     * @param Builder $query
+     * @param         $search
+     * @param bool    $isExtended
+     * @return void
      */
-    protected function handleSearchField($query, $field, $value)
+    protected function appendSearch(Builder $query, $search, bool $isExtended = false)
+    {
+        $fieldsToSearch = $this->getFieldsToSearch();
+        $query->where(
+            function ($query) use ($fieldsToSearch, $search) {
+                foreach ($fieldsToSearch as $field) {
+                    $this->handleSearchField($query, $field, $search);
+                }
+            }
+        );
+    }
+
+    /**
+     * @param Builder $query
+     * @param array   $includes
+     * @return Builder
+     */
+    protected function appendIncludes(Builder $query, array $includes): Builder
+    {
+        foreach ($includes as $key => $value) {
+            if ($value['foreign_key']) {
+                $query->addSelect($value['foreign_key']);
+            }
+            $query->with($key . ':' . $value['fields']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param Builder $query
+     * @param array   $field
+     * @param mixed   $value
+     * @return Builder
+     */
+    protected function handleSearchField(Builder $query, array $field, $value)
     {
         $name = $field['field'];
         if ($field['type'] === 'Number') {
@@ -204,5 +228,4 @@ trait HasQuery
     {
         return Uuid::isValid($value);
     }
-
 }
