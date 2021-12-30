@@ -41,7 +41,7 @@ class BaseTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
-        $relations = $model->getRelations();
+        $relations = collect($model->getRelations())->filter()->all();
         $this->setDefaultIncludes(array_keys($relations));
 
         foreach ($relations as $key => $value) {
