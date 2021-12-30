@@ -41,7 +41,19 @@ class ForestSchemaInstrospection
      * @param string $collection
      * @return array
      */
-    public function getRelatedData(string $collection)
+    public function getFields(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields");
+
+        return $data ? $data[0] : [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getRelatedData(string $collection): array
     {
         $collection = Str::camel($collection);
         $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.relationship == 'HasMany' or @.relationship == 'BelongsToMany')].field");
