@@ -42,7 +42,7 @@ class HasManyAssociator extends BaseRepository
      * @param $ids
      * @return void
      */
-    public function addRelation($ids)
+    public function addRelation($ids): void
     {
         $relation = $this->parentInstance->{$this->relation}();
         switch (get_class($relation)) {
@@ -52,7 +52,7 @@ class HasManyAssociator extends BaseRepository
                 $relation->saveMany($records->all());
                 break;
             case BelongsToMany::class:
-                 $relation->attach($ids);
+                $relation->attach($ids);
                 break;
         }
     }

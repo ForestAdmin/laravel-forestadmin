@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
+use ForestAdmin\LaravelForestAdmin\Repositories\BelongsToUpdator;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyAssociator;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyDissociator;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyGetter;
@@ -107,6 +108,21 @@ class RelationshipsController extends Controller
             $repository = new HasManyDissociator($this->model, $this->relationship, $this->parentId);
             $delete = request()->query('delete') ?? false;
             $repository->removeRelation($this->getIds(), $delete);
+            return response()->noContent();
+        } catch (ForestException $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function update()
+    {
+        try {
+            $repository = new BelongsToUpdator($this->model, $this->relationship, $this->parentId);
+            $repository->updateRelation(request()->input('data')['id']);
+
             return response()->noContent();
         } catch (ForestException $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
