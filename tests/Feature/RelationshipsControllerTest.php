@@ -2,8 +2,11 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Editor;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Sequel;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
@@ -286,7 +289,6 @@ class RelationshipsControllerTest extends TestCase
         $this->assertEquals($data['error'], '🌳🌳🌳 Record dissociate error: records not found');
     }
 
-
     /**
      * @return void
      * @throws \JsonException
@@ -311,5 +313,106 @@ class RelationshipsControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(409, $call->baseResponse->getStatusCode());
         $this->assertEquals($data['error'], '🌳🌳🌳 Record dissociate error: the records can not be dissociate');
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateBelongsTo(): void
+    {
+        $this->getBook()->save();
+        $book = Book::first();
+        $category = Category::create(['label' => 'foo']);
+        $call = $this->put(
+            '/forest/book/1/relationships/category',
+            [
+                'data' => [
+                    'id'   => $category->id,
+                    'type' => 'category',
+                ]
+            ]
+        );
+        $book = $book->fresh();
+
+        $this->assertInstanceOf(Response::class, $call->baseResponse);
+        $this->assertEquals(204, $call->baseResponse->getStatusCode());
+        $this->assertEmpty($call->baseResponse->getContent());
+        $this->assertEquals($category->id, $book->category_id);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateHasOne(): void
+    {
+        $this->getBook()->save();
+        $book = Book::first();
+        $editor = Editor::create(['name' => 'foo', 'book_id' => 2]);
+        $call = $this->put(
+            '/forest/book/1/relationships/editor',
+            [
+                'data' => [
+                    'id'   => $editor->id,
+                    'type' => 'editor',
+                ]
+            ]
+        );
+        $book = $book->fresh();
+
+        $this->assertInstanceOf(Response::class, $call->baseResponse);
+        $this->assertEquals(204, $call->baseResponse->getStatusCode());
+        $this->assertEmpty($call->baseResponse->getContent());
+        $this->assertEquals($editor->id, $book->editor->id);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testUpdateExceptionRecordsNotFound(): void
+    {
+        $this->getBook()->save();
+        $category = Category::create(['label' => 'foo']);
+        $call = $this->put(
+            '/forest/book/1/relationships/category',
+            [
+                'data' => [
+                    'id'   => '100',
+                    'type' => 'category',
+                ]
+            ]
+        );
+
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(409, $call->baseResponse->getStatusCode());
+        $this->assertEquals($data['error'], '🌳🌳🌳 Record not found');
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testUpdateExceptionRecordsConstraint(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+            Advertisement::create(['label' => 'foo', 'book_id' => $i + 1]);
+        }
+        $advertisementOfBook2 = Advertisement::firstWhere('book_id', 2);
+        $call = $this->put(
+            '/forest/book/1/relationships/advertisement',
+            [
+                'data' => [
+                    'id'   => $advertisementOfBook2->id,
+                    'type' => 'advertisement',
+                ]
+            ]
+        );
+
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(409, $call->baseResponse->getStatusCode());
+        $this->assertEquals($data['error'], '🌳🌳🌳 The record can not be updated');
     }
 }

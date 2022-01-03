@@ -63,7 +63,7 @@ class BelongsToUpdator extends BaseRepository
                     break;
             }
         } catch (\Exception $e) {
-            return $this->throwException('The records can not be updated');
+            return $this->throwException('The record can not be updated');
         }
     }
 }
