@@ -65,10 +65,11 @@ class ResourceGetter extends BaseRepository
 
     /**
      * @return int
+     * @throws Exception
      */
     public function count(): int
     {
-        return $this->model->count();
+        return $this->query()->count();
     }
 
     /**
