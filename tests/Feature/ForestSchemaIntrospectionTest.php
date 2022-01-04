@@ -37,6 +37,32 @@ class ForestSchemaIntrospectionTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testGetFields(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getFields('book');
+
+        $this->assertIsArray($data);
+        $this->assertEquals($this->fakeSchema(false)['collections'][0]['fields'], $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetFieldsCollectionDoesNotExists(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getFields('foo');
+
+        $this->assertIsArray($data);
+        $this->assertEmpty($data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testGetRelatedData(): void
     {
         $forestSchema = $this->makeForestSchema();

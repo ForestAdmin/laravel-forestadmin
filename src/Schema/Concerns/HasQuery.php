@@ -132,7 +132,7 @@ trait HasQuery
      * @param Model $model
      * @return array
      */
-    public function getFieldsToSearch(Model $model): array
+    protected function getFieldsToSearch(Model $model): array
     {
         $fieldsToSearch = [];
         $fields = ForestSchema::getFields(class_basename($model));
