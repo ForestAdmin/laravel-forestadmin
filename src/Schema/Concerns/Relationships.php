@@ -60,4 +60,21 @@ trait Relationships
             []
         );
     }
+
+    /**
+     * @param Model $model
+     * @return array
+     */
+    public function getSingleRelations(Model $model): array
+    {
+        $relations = [];
+        foreach ($this->getRelations($model) as $key => $value) {
+            if ($key === 'category' &&     in_array($value, [BelongsTo::class, HasOne::class, MorphOne::class], true)) {
+                $relations[$key] = $value;
+            }
+        }
+       // dd($relations);
+
+        return $relations;
+    }
 }

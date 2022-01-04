@@ -42,7 +42,7 @@ trait HasQuery
         }
 
         if (array_key_exists('search', $this->params)) {
-            $isExtended = array_key_exists('searchExtended', $this->params) && $this->params['searchExtended'] === 1;
+            $isExtended = array_key_exists('searchExtended', $this->params) && (int) $this->params['searchExtended'] === 1;
             $this->appendSearch($query, $this->params['search'], $isExtended);
         }
 
@@ -57,14 +57,35 @@ trait HasQuery
      */
     protected function appendSearch(Builder $query, $search, bool $isExtended = false)
     {
-        $fieldsToSearch = $this->getFieldsToSearch();
-        $query->where(
-            function ($query) use ($fieldsToSearch, $search) {
-                foreach ($fieldsToSearch as $field) {
-                    $this->handleSearchField($query, $field, $search);
-                }
+        $model = $query->getModel();
+        if ($isExtended) {
+            $singleRelations = $this->getSingleRelations($model);
+            foreach ($singleRelations as $key => $value) {
+                $relatedModel = $model->$key()->getRelated();
+                $fieldsToSearch = $this->getFieldsToSearch($relatedModel);
+                $query->orWhereHas(
+                    $key,
+                    function ($query) use ($fieldsToSearch, $search, $relatedModel) {
+                        $query->where(
+                            function ($query) use ($fieldsToSearch, $search, $relatedModel) {
+                                foreach ($fieldsToSearch as $field) {
+                                    $this->handleSearchField($query, $relatedModel, $field, $search);
+                                }
+                            }
+                        );
+                    }
+                );
             }
-        );
+        } else {
+            $fieldsToSearch = $this->getFieldsToSearch($model);
+            $query->where(
+                function ($query) use ($fieldsToSearch, $search, $model) {
+                    foreach ($fieldsToSearch as $field) {
+                        $this->handleSearchField($query, $model, $field, $search);
+                    }
+                }
+            );
+        }
     }
 
     /**
@@ -86,13 +107,14 @@ trait HasQuery
 
     /**
      * @param Builder $query
+     * @param Model   $model
      * @param array   $field
-     * @param mixed   $value
+     * @param         $value
      * @return Builder
      */
-    protected function handleSearchField(Builder $query, array $field, $value)
+    protected function handleSearchField(Builder $query, Model $model, array $field, $value)
     {
-        $name = $field['field'];
+        $name = $model->getTable() . '.' . $field['field'];
         if ($field['type'] === 'Number') {
             if ($this->isNumber($value)) {
                 $query->orWhere($name, (int) $value);
@@ -107,14 +129,15 @@ trait HasQuery
     }
 
     /**
+     * @param Model $model
      * @return array
      */
-    public function getFieldsToSearch(): array
+    public function getFieldsToSearch(Model $model): array
     {
         $fieldsToSearch = [];
-        $fields = ForestSchema::getFields(class_basename($this->model));
+        $fields = ForestSchema::getFields(class_basename($model));
         foreach ($fields as $field) {
-            if (in_array($field['type'], ['String', 'Number', 'Enum'], true) && !$field['reference'] && !$field['is_virtual'] && $this->fieldInSearchFields($field['field'])) {
+            if (in_array($field['type'], ['String', 'Number', 'Enum'], true) && !$field['reference'] && !$field['is_virtual'] && $this->fieldInSearchFields($model, $field['field'])) {
                 $fieldsToSearch[] = $field;
             }
         }
@@ -123,14 +146,15 @@ trait HasQuery
     }
 
     /**
+     * @param Model  $model
      * @param string $field
      * @return bool
      */
-    protected function fieldInSearchFields(string $field): bool
+    protected function fieldInSearchFields(Model $model, string $field): bool
     {
-        return method_exists($this->model, 'searchFields') === false
-            || empty($this->model->searchFields())
-            || in_array($field, $this->model->searchFields(), true);
+        return method_exists($model, 'searchFields') === false
+            || empty($model->searchFields())
+            || in_array($field, $model->searchFields(), true);
     }
 
     /**
