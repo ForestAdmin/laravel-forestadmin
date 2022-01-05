@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 
 /**
@@ -99,11 +98,6 @@ trait HasQuery
                     case HasOne::class:
                         $foreignKey = $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName();
                         $this->addInclude($key, $this->mergeArray($fields, $foreignKey));
-                        break;
-                    case MorphOne::class:
-                        $foreignKey = $relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName();
-                        $morphType = $relation->getMorphType();
-                        $this->addInclude($key, $this->mergeArray($fields, [$foreignKey, $morphType]));
                         break;
                 }
             }
