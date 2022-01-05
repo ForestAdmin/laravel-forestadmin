@@ -63,31 +63,6 @@ class BelongsToUpdatorTest extends TestCase
     /**
      * @return void
      */
-    public function testUpdateRelationMorphOne(): void
-    {
-        $this->getBook()->save();
-        $book = Book::first();
-        $image = Image::create(
-            [
-                'name'           => 'foo',
-                'url'            => 'http://example.com',
-                'imageable_type' => Book::class,
-                'imageable_id'   => 2,
-            ]
-        );
-
-        $repository = m::mock(BelongsToUpdator::class, [$book, 'image', $book->id])
-            ->makePartial();
-        $data = $repository->updateRelation($image->id);
-        $book = $book->fresh();
-
-        $this->assertNull($data);
-        $this->assertEquals($image->id, $book->image->id);
-    }
-
-    /**
-     * @return void
-     */
     public function testUpdateRelationExceptionRecordNotFound(): void
     {
         $this->getBook()->save();

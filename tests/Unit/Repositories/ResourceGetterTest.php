@@ -156,19 +156,6 @@ class ResourceGetterTest extends TestCase
     }
 
     /**
-     * @return void
-     */
-    public function testHandleWithMorphOne(): void
-    {
-        $values = [
-            'fields'         => 'images.name,images.id,images.imageable_id,imageable_type',
-            'foreign_key'    => null,
-        ];
-
-        $this->assertEquals($values, $this->makeHandleWith()['image']);
-    }
-
-    /**
      * @return mixed
      */
     public function makeHandleWith()

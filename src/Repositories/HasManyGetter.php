@@ -64,15 +64,6 @@ class HasManyGetter extends ResourceGetter
                 $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getRelatedPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
                 $query->where($relation->getTable() . '.' . $relation->getForeignPivotKeyName(), $this->parentInstance->getKey());
                 break;
-            case MorphMany::class:
-                $query->where(
-                    [
-                        $relation->getMorphType()      => $relation->getMorphClass(),
-                        $relation->getForeignKeyName() => $this->parentInstance->getKey(),
-
-                    ]
-                );
-                break;
         }
 
         return $query->paginate($pageParams['size'] ?? null, '*', 'page', $pageParams['number'] ?? null);

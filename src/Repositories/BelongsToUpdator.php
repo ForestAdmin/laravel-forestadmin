@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Repositories;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * Class BelongsToUpdator
@@ -58,7 +57,6 @@ class BelongsToUpdator extends BaseRepository
                     $this->parentInstance->save();
                     break;
                 case HasOne::class:
-                case MorphOne::class:
                     $relation->save($record);
                     break;
             }
