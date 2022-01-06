@@ -85,6 +85,14 @@ class Book extends Model
     }
 
     /**
+     * @return HasOne
+     */
+    public function advertisement(): HasOne
+    {
+        return $this->hasOne(Advertisement::class);
+    }
+
+    /**
      * @return HasOneThrough
      */
     public function authorUser(): HasOneThrough

@@ -13,4 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Editor extends Model
 {
+    protected $fillable = [
+        'name',
+        'book_id',
+    ];
 }

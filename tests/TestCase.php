@@ -291,5 +291,16 @@ class TestCase extends OrchestraTestCase
                 $table->timestamps();
             }
         );
+
+        DB::schema()->create(
+            'advertisements',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+                $table->unique('book_id');
+            }
+        );
     }
 }

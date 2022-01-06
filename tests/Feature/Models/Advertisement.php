@@ -3,29 +3,21 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Class Image
+ * Class Advertisement
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Image extends Model
+class Advertisement extends Model
 {
-    protected $fillable = [
-        'name',
-        'url',
-        'imageable_type',
-        'imageable_id',
-    ];
+    use HasFactory;
 
-    /**
-     * @return MorphTo
-     */
-    public function imageable(): MorphTo
-    {
-        return $this->morphTo();
-    }
+    protected $fillable = [
+        'label',
+        'book_id',
+    ];
 }

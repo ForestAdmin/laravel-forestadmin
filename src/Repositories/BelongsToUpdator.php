@@ -3,18 +3,17 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * Class HasManyAssociator
+ * Class BelongsToUpdator
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class HasManyAssociator extends BaseRepository
+class BelongsToUpdator extends BaseRepository
 {
     /**
      * @var string
@@ -39,21 +38,30 @@ class HasManyAssociator extends BaseRepository
     }
 
     /**
-     * @param $ids
+     * @param $id
      * @return void
      */
-    public function addRelation($ids): void
+    public function updateRelation($id)
     {
         $relation = $this->parentInstance->{$this->relation}();
-        switch (get_class($relation)) {
-            case HasMany::class:
-            case MorphMany::class:
-                $records = $relation->getRelated()->findMany($ids);
-                $relation->saveMany($records->all());
-                break;
-            case BelongsToMany::class:
-                $relation->attach($ids);
-                break;
+        $record = $relation->getRelated()->find($id);
+
+        if (!$record) {
+            return $this->throwException('Record not found');
+        }
+
+        try {
+            switch (get_class($relation)) {
+                case BelongsTo::class:
+                    $relation->associate($record);
+                    $this->parentInstance->save();
+                    break;
+                case HasOne::class:
+                    $relation->save($record);
+                    break;
+            }
+        } catch (\Exception $e) {
+            return $this->throwException('The record can not be updated');
         }
     }
 }

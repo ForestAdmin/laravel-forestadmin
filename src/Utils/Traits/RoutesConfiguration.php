@@ -25,6 +25,7 @@ trait RoutesConfiguration
         'forest.relationships.index'      => RelationshipsController::class,
         'forest.relationships.count'      => RelationshipsController::class,
         'forest.relationships.associate'  => RelationshipsController::class,
+        'forest.relationships.update'     => RelationshipsController::class,
         'forest.relationships.dissociate' => RelationshipsController::class,
     ];
 
