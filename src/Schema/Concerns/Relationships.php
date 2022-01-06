@@ -65,7 +65,7 @@ trait Relationships
     {
         $relations = [];
         foreach ($this->getRelations($model) as $key => $value) {
-            if (in_array($value, [BelongsTo::class, HasOne::class, MorphOne::class], true)) {
+            if (in_array($value, [BelongsTo::class, HasOne::class], true)) {
                 $relations[$key] = $value;
             }
         }

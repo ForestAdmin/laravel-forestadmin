@@ -2,18 +2,11 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\SchemaException;
-use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\BaseRepository;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**

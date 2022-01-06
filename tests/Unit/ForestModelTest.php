@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Prophecy\Argument;
@@ -195,10 +193,37 @@ class ForestModelTest extends TestCase
         $dummyModel = new Book();
         $forestModel = m::mock(ForestModel::class, [$dummyModel])
             ->makePartial();
+        $publicMethods = [];
 
         $relations = $forestModel->getRelations($forestModel->getModel());
         foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             $publicMethods[$method->getName()] = (string) $method->getReturnType();
+        }
+
+        $this->assertIsArray($relations);
+        foreach ($relations as $key => $value) {
+            $this->assertcontains($key, array_keys($publicMethods));
+            $this->assertcontains($value, $publicMethods);
+        }
+    }
+
+    /**
+     * @return void
+     * @throws SchemaException
+     * @throws Exception
+     */
+    public function testGetSingleRelations(): void
+    {
+        $dummyModel = new Book();
+        $forestModel = m::mock(ForestModel::class, [$dummyModel])
+            ->makePartial();
+        $publicMethods = [];
+
+        $relations = $forestModel->getSingleRelations($forestModel->getModel());
+        foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            if (in_array((string) $method->getReturnType(), [BelongsTo::class, HasOne::class], true)) {
+                $publicMethods[$method->getName()] = (string) $method->getReturnType();
+            }
         }
 
         $this->assertIsArray($relations);

@@ -28,7 +28,7 @@ class QueryBuilder
     use ArrayHelper;
 
     /**
-     * @var Builder
+     * @var Model
      */
     protected Model $model;
 
@@ -136,7 +136,6 @@ class QueryBuilder
     {
         $relations = $this->getRelations($model);
         $relationsName = collect(array_keys($relations));
-
         foreach ($params as $key => $value) {
             if ($relationsName->contains($key)) {
                 $relation = $model->$key();
