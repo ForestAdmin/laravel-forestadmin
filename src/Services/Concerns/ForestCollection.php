@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Schema\Concerns;
+namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
 /**
  * Class ForestCollection
@@ -13,6 +13,7 @@ trait ForestCollection
 {
     /**
      * @return array
+     * @codeCoverageIgnore
      */
     public function searchFields(): array
     {

@@ -3,11 +3,11 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Class HasManyGetter
@@ -54,7 +54,7 @@ class HasManyGetter extends ResourceGetter
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
         $pageParams = $this->params['page'] ?? [];
         $relation = $this->parentInstance->{$this->relation}();
-        $query = $this->buildQuery($relatedModel);
+        $query = QueryBuilder::of($relatedModel, $this->params);
 
         switch (get_class($relation)) {
             case HasMany::class:
@@ -63,15 +63,6 @@ class HasManyGetter extends ResourceGetter
             case BelongsToMany::class:
                 $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getRelatedPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
                 $query->where($relation->getTable() . '.' . $relation->getForeignPivotKeyName(), $this->parentInstance->getKey());
-                break;
-            case MorphMany::class:
-                $query->where(
-                    [
-                        $relation->getMorphType()      => $relation->getMorphClass(),
-                        $relation->getForeignKeyName() => $this->parentInstance->getKey(),
-
-                    ]
-                );
                 break;
         }
 

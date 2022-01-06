@@ -28,72 +28,18 @@ class BaseRepositoryTest extends TestCase
     use ProphecyTrait;
 
     /**
-     * @return void
-     * @throws Exception
-     * @throws SchemaException
-     * @throws \ReflectionException
-     */
-    public function testBuild(): void
-    {
-        $model = $this->getLaravelModel();
-        $baseRepository = m::mock(BaseRepository::class, [$model, 'Foo'])
-            ->makePartial();
-
-        $table = $this->invokeProperty($baseRepository, 'table');
-        $database = $this->invokeProperty($baseRepository, 'database');
-
-        $this->assertEquals('dummy_tables', $table);
-        $this->assertEquals('prefix', $database);
-    }
-
-    /**
      * @throws \ReflectionException
      * @return void
      */
     public function testThrowException(): void
     {
-        $model = $this->getLaravelModel();
-        $baseRepository = m::mock(BaseRepository::class, [$model, 'Foo'])
+        $model = $this->prophesize(Model::class);
+        $baseRepository = m::mock(BaseRepository::class, [$model->reveal(), 'Foo'])
             ->makePartial();
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('test error');
 
         $this->invokeMethod($baseRepository, 'throwException', ['test error']);
-    }
-
-    /**
-     * @return object
-     * @throws Exception
-     * @throws SchemaException
-     */
-    public function getLaravelModel()
-    {
-        $schemaManager = $this->prophesize(AbstractSchemaManager::class);
-        $schemaManager->listTableColumns(Argument::any(), Argument::any())
-            ->willReturn(
-                [
-                    'id' => new Column('id', Type::getType('bigint')),
-                ]
-            );
-
-        $connection = $this->prophesize(Connection::class);
-        $connection->getTablePrefix()
-            ->shouldBeCalled()
-            ->willReturn('prefix.');
-        $connection->getDoctrineSchemaManager()
-            ->willReturn($schemaManager->reveal());
-
-        $model = $this->prophesize(Model::class);
-        $model
-            ->getConnection()
-            ->shouldBeCalled()
-            ->willReturn($connection->reveal());
-        $model
-            ->getTable()
-            ->shouldBeCalledOnce()
-            ->willReturn('dummy_tables');
-
-        return $model->reveal();
     }
 }
