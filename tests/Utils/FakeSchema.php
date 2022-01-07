@@ -11,7 +11,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
  */
 trait FakeSchema
 {
-
     /**
      * @param bool $convertToJson
      * @return array|false|string
@@ -22,24 +21,24 @@ trait FakeSchema
         $schema = [
             "collections" => [
                 [
-                    "name" => "book",
+                    "name"   => "book",
                     "fields" => [
                         [
-                            "field" => "comments",
-                            "type" => ["Number"],
+                            "field"         => "comments",
+                            "type"          => ["Number"],
                             "default_value" => null,
-                            "enums" => null,
-                            "integration" => null,
+                            "enums"         => null,
+                            "integration"   => null,
                             "is_filterable" => true,
-                            "is_read_only" => false,
-                            "is_required" => false,
-                            "is_sortable" => true,
-                            "is_virtual" => false,
-                            "reference" => "comment.book_id",
-                            "inverse_of" => "id",
-                            "widget" => null,
-                            "validations" => [],
-                            "relationship" => "HasMany",
+                            "is_read_only"  => false,
+                            "is_required"   => false,
+                            "is_sortable"   => true,
+                            "is_virtual"    => false,
+                            "reference"     => "comment.book_id",
+                            "inverse_of"    => "id",
+                            "widget"        => null,
+                            "validations"   => [],
+                            "relationship"  => "HasMany",
                         ],
                     ],
                 ],

@@ -61,6 +61,14 @@ class Book extends Model
     }
 
     /**
+     * @return HasMany
+     */
+    public function movies(): HasMany
+    {
+        return $this->hasMany(Movie::class);
+    }
+
+    /**
      * @return HasManyThrough
      */
     public function bookstores(): HasManyThrough
@@ -74,6 +82,14 @@ class Book extends Model
     public function editor(): HasOne
     {
         return $this->hasOne(Editor::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function advertisement(): HasOne
+    {
+        return $this->hasOne(Advertisement::class);
     }
 
     /**
@@ -106,5 +122,13 @@ class Book extends Model
     public function buys(): MorphToMany
     {
         return $this->morphToMany(Buy::class, 'buyable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function sequels(): MorphMany
+    {
+        return $this->morphMany(Sequel::class, 'sequelable');
     }
 }

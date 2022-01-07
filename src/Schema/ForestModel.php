@@ -12,9 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -379,52 +376,37 @@ class ForestModel
 
             switch ($type) {
                 case BelongsTo::class:
-                    $field = $fields->firstWhere('field', $relation->getForeignKeyName());
+                case BelongsToMany::class:
+                    $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
                     $field = array_merge(
                         $field,
                         [
                             'field'      => $relation->getRelationName(),
-                            'reference'  => $related . '.' . $relation->getOwnerKeyName(),
-                            'inverse_of' => $relation->getForeignKeyName(),
                         ]
                     );
-                    $name = $relation->getForeignKeyName();
-                    break;
-                case BelongsToMany::class:
-                    $field = array_merge(
-                        $this->fieldDefaultValues(),
-                        [
-                            'field'      => $relation->getRelationName(),
-                            'reference'  => $related . '.' . $relation->getParentKeyName(),
-                            'inverse_of' => $relation->getRelatedKeyName(),
-                        ]
-                    );
-                    $name = $relation->getRelationName();
+                    $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
                     break;
                 case HasMany::class:
                 case HasOne::class:
-                case MorphOne::class:
-                case MorphMany::class:
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
                             'field'      => $name,
-                            'reference'  => $related . '.' . $relation->getForeignKeyName(),
-                            'inverse_of' => $relation instanceof MorphOneOrMany ? null : $relation->getLocalKeyName(),
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
                     break;
             }
 
-
-            if (in_array($type, [BelongsToMany::class, HasMany::class, MorphMany::class], true)) {
+            if (in_array($type, [BelongsToMany::class, HasMany::class], true)) {
                 $field['type'] = ['Number'];
             } else {
                 $field['type'] = $this->getType(Types::INTEGER);
             }
             $field['field'] = Str::camel($field['field']);
+            $field['reference'] = $related . '.' . $relation->getRelated()->getKeyName();
             $field['relationship'] = $this->mapRelationships($type);
+            $field['inverse_of'] = Str::camel($this->getName());
             $fields->put($name, $field);
         }
 

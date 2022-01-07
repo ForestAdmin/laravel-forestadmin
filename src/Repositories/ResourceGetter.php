@@ -25,13 +25,12 @@ class ResourceGetter extends BaseRepository
     protected array $params;
 
     /**
-     * @param Model  $model
-     * @param string $name
+     * @param Model $model
      */
-    public function __construct(Model $model, string $name)
+    public function __construct(Model $model)
     {
         $this->params = request()->query();
-        parent::__construct($model, $name);
+        parent::__construct($model);
     }
 
     /**
@@ -56,12 +55,12 @@ class ResourceGetter extends BaseRepository
      */
     public function get($id): Model
     {
-        $resource = $this->query()->find($id);
-        if (!$resource) {
+        $record = $this->query()->find($id);
+        if (!$record) {
             $this->throwException('Collection not found');
         }
 
-        return $resource;
+        return $record;
     }
 
     /**
@@ -78,6 +77,6 @@ class ResourceGetter extends BaseRepository
      */
     protected function query(): Builder
     {
-        return $this->buildQuery($this->model, $this->name);
+        return $this->buildQuery($this->model);
     }
 }

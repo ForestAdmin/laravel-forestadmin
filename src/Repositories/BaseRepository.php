@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class BaseRepository
@@ -29,11 +30,6 @@ abstract class BaseRepository
     /**
      * @var string
      */
-    protected string $name;
-
-    /**
-     * @var string
-     */
     protected string $table;
 
     /**
@@ -42,13 +38,11 @@ abstract class BaseRepository
     protected ?string $database = null;
 
     /**
-     * @param Model  $model
-     * @param string $name
+     * @param Model $model
      */
-    public function __construct(Model $model, string $name)
+    public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->name = $name;
         $this->table = $model->getConnection()->getTablePrefix() . $model->getTable();
         if (strpos($this->table, '.')) {
             [$this->database, $this->table] = explode('.', $this->table);
@@ -62,5 +56,28 @@ abstract class BaseRepository
     public function throwException($message): void
     {
         throw new ForestException($message);
+    }
+
+    /**
+     * @param $model
+     * @param $data
+     * @return void
+     */
+    protected function setAttributes($model, $data): void
+    {
+        $attributes = $data['attributes'];
+        $relationships = $data['relationships'] ?? [];
+        foreach ($attributes as $key => $value) {
+            $model->$key = $value;
+        }
+
+        foreach ($relationships as $key => $value) {
+            $relation = $model->$key();
+            $attributes = $value['data'];
+            if ($relation instanceof BelongsTo && array_key_exists($relation->getOwnerKeyName(), $attributes)) {
+                $related = $relation->getRelated()->firstWhere($relation->getOwnerKeyName(), $attributes[$relation->getOwnerKeyName()]);
+                $model->$key()->associate($related);
+            }
+        }
     }
 }

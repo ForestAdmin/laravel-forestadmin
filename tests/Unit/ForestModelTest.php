@@ -221,8 +221,8 @@ class ForestModelTest extends TestCase
         $category = $forestModel->getModel()->category();
         $this->assertNotNull($fieldCategory);
         $this->assertEquals($fieldCategory['relationship'], $forestModel->mapRelationships(BelongsTo::class));
-        $this->assertEquals($fieldCategory['reference'], Str::camel(class_basename($category->getRelated())) . '.' . $category->getOwnerKeyName());
-        $this->assertEquals($fieldCategory['inverse_of'], $category->getForeignKeyName());
+        $this->assertEquals($fieldCategory['reference'], Str::camel(class_basename($category->getRelated())) . '.' . $category->getRelated()->getKeyName());
+        $this->assertEquals($fieldCategory['inverse_of'], Str::camel($forestModel->getName()));
         $this->assertEquals($fieldCategory['type'], 'Number');
     }
 
@@ -240,8 +240,8 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldRange);
         $this->assertEquals($fieldRange['relationship'], $forestModel->mapRelationships(BelongsToMany::class));
         $this->assertEquals($fieldRange['field'], 'ranges');
-        $this->assertEquals($fieldRange['reference'], Str::camel(class_basename($ranges->getRelated())) . '.' . $ranges->getParentKeyName());
-        $this->assertEquals($fieldRange['inverse_of'], $ranges->getRelatedKeyName());
+        $this->assertEquals($fieldRange['reference'], Str::camel(class_basename($ranges->getRelated())) . '.' . $ranges->getRelated()->getKeyName());
+        $this->assertEquals($fieldRange['inverse_of'], Str::camel($forestModel->getName()));
         $this->assertEquals($fieldRange['type'], ['Number']);
     }
 
@@ -259,8 +259,8 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($fieldComment);
         $this->assertEquals($fieldComment['relationship'], $forestModel->mapRelationships(HasMany::class));
         $this->assertEquals($fieldComment['field'], 'comments');
-        $this->assertEquals($fieldComment['reference'], Str::camel(class_basename($comments->getRelated())) . '.' . $comments->getForeignKeyName());
-        $this->assertEquals($fieldComment['inverse_of'], $comments->getLocalKeyName());
+        $this->assertEquals($fieldComment['reference'], Str::camel(class_basename($comments->getRelated())) . '.' . $comments->getRelated()->getKeyName());
+        $this->assertEquals($fieldComment['inverse_of'], Str::camel($forestModel->getName()));
         $this->assertEquals($fieldComment['type'], ['Number']);
     }
 
@@ -278,45 +278,9 @@ class ForestModelTest extends TestCase
         $this->assertNotNull($editor);
         $this->assertEquals($editor['relationship'], $forestModel->mapRelationships(HasOne::class));
         $this->assertEquals($editor['field'], 'editor');
-        $this->assertEquals($editor['reference'], Str::camel(class_basename($editors->getRelated())) . '.' . $editors->getForeignKeyName());
-        $this->assertEquals($editor['inverse_of'], $editors->getLocalKeyName());
+        $this->assertEquals($editor['reference'], Str::camel(class_basename($editors->getRelated())) . '.' . $editors->getRelated()->getKeyName());
+        $this->assertEquals($editor['inverse_of'], Str::camel($forestModel->getName()));
         $this->assertEquals($editor['type'], 'Number');
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsMorphOne(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $image = $merge->firstWhere('field', 'image');
-        $images = $forestModel->getModel()->image();
-        $this->assertNotNull($image);
-        $this->assertEquals($image['relationship'], $forestModel->mapRelationships(MorphOne::class));
-        $this->assertEquals($image['field'], 'image');
-        $this->assertEquals($image['reference'], Str::camel(class_basename($images->getRelated())) . '.' . $images->getForeignKeyName());
-        $this->assertEquals($image['type'], 'Number');
-    }
-
-    /**
-     * @return void
-     */
-    public function testMergeFieldsWithRelationsMorphMany(): void
-    {
-        [$forestModel, $fields] = $this->makeForestModel();
-        $relations = $forestModel->getRelations($forestModel->getModel());
-        $merge = $forestModel->mergeFieldsWithRelations($fields, $relations);
-
-        $fieldTag = $merge->firstWhere('field', 'tags');
-        $tags = $forestModel->getModel()->tags();
-        $this->assertNotNull($fieldTag);
-        $this->assertEquals($fieldTag['relationship'], $forestModel->mapRelationships(MorphMany::class));
-        $this->assertEquals($fieldTag['field'], 'tags');
-        $this->assertEquals($fieldTag['reference'], Str::camel(class_basename($tags->getRelated())) . '.' . $tags->getForeignKeyName());
-        $this->assertEquals($fieldTag['type'], ['Number']);
     }
 
     /**

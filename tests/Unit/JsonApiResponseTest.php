@@ -61,6 +61,9 @@ class JsonApiResponseTest extends TestCase
         $jsonApi = new JsonApiResponse();
         $data = $this->addDatabaseContent();
 
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
         $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
             ->with('category:categories.id')
             ->get();
@@ -80,6 +83,9 @@ class JsonApiResponseTest extends TestCase
     {
         $jsonApi = new JsonApiResponse();
         $data = $this->addDatabaseContent();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
             ->with('category:categories.id')
@@ -153,7 +159,7 @@ class JsonApiResponseTest extends TestCase
      */
     public function addDatabaseContent(): array
     {
-        $category = Category::create(['label' => 'category1', 'product_id' => 1]);
+        $category = Category::create(['label' => 'category1']);
         $book1 = Book::create(['label' => 'foo', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 100.00, 'options' => [], 'category_id' => 1]);
         $book1->setRelation('category', $category);
         $book2 = Book::create(['label' => 'bar', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 50.00, 'options' => [], 'category_id' => 1]);
@@ -172,6 +178,13 @@ class JsonApiResponseTest extends TestCase
                     'data' => [
                         'type' => class_basename($category),
                         'id'   => (string)$category->id,
+                    ],
+                ],
+                'comments' => [
+                    'links' => [
+                        'related' => [
+                            'href' => '/forest/book/1/relationships/comments'
+                        ]
                     ],
                 ]
             ],

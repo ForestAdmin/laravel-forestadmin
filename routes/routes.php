@@ -19,9 +19,16 @@ Route::group(
         Route::get('/{collection}', DispatchGateway::class)->name('forest.collection.index');
         Route::get('/{collection}/count', DispatchGateway::class)->name('forest.collection.count');
         Route::get('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.show');
+        Route::post('/{collection}', DispatchGateway::class)->name('forest.collection.store');
+        Route::put('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.update');
+        Route::delete('/{collection}', DispatchGateway::class)->name('forest.collection.destroy_bulk');
+        Route::delete('/{collection}/{id}', DispatchGateway::class)->name('forest.collection.destroy');
 
         // ASSOCIATIONS
         Route::get('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.index');
+        Route::post('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.associate');
+        Route::put('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.update');
+        Route::delete('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.dissociate');
         Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
     }
 );

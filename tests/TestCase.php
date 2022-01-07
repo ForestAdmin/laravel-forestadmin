@@ -127,7 +127,7 @@ class TestCase extends OrchestraTestCase
                 $table->id();
                 $table->string('label');
                 $table->decimal('price');
-                $table->foreignId('user_id')->constrained();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -137,7 +137,6 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('label');
-                $table->foreignId('product_id')->constrained();
                 $table->timestamps();
             }
         );
@@ -153,7 +152,7 @@ class TestCase extends OrchestraTestCase
                 $table->boolean('active')->default(true);
                 $table->jsonb('options');
                 $table->string('other')->default('N/A');
-                $table->foreignId('category_id')->constrained();
+                $table->foreignId('category_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -171,8 +170,8 @@ class TestCase extends OrchestraTestCase
             'book_range',
             function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('book_id')->constrained();
-                $table->foreignId('range_id')->constrained();
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
+                $table->foreignId('range_id')->constrained()->onDelete('cascade');
             }
         );
 
@@ -181,8 +180,8 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('body');
-                $table->foreignId('book_id')->constrained();
-                $table->foreignId('user_id')->constrained();
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -192,7 +191,7 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->foreignId('book_id')->constrained();
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -202,7 +201,7 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('label');
-                $table->foreignId('company_id')->constrained();
+                $table->foreignId('company_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -211,7 +210,7 @@ class TestCase extends OrchestraTestCase
             'authors',
             function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('book_id')->constrained();
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -219,7 +218,7 @@ class TestCase extends OrchestraTestCase
         DB::schema()->table(
             'users',
             function (Blueprint $table) {
-                $table->foreignId('author_id')->nullable()->constrained();
+                $table->foreignId('author_id')->nullable()->constrained()->onDelete('SET NULL');
             }
         );
 
@@ -228,7 +227,7 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->foreignId('book_id')->constrained();
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );
@@ -270,6 +269,37 @@ class TestCase extends OrchestraTestCase
                 $table->foreignId('buy_id')->constrained();
                 $table->integer('buyable_id');
                 $table->string('buyable_type');
+            }
+        );
+
+        DB::schema()->create(
+            'movies',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('body');
+                $table->foreignId('book_id')->nullable()->constrained()->onDelete('set null');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'sequels',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->nullableMorphs('sequelable');
+                $table->timestamps();
+            }
+        );
+
+        DB::schema()->create(
+            'advertisements',
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('label');
+                $table->foreignId('book_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+                $table->unique('book_id');
             }
         );
     }

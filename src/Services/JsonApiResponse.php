@@ -42,6 +42,7 @@ class JsonApiResponse
     {
         $this->fractal->setSerializer(new JsonApiSerializer(config('app.url')));
         $transformer = app()->make(BaseTransformer::class);
+        $transformer->setAvailableIncludes(ForestSchema::getRelatedData($name));
 
         if (is_array($class) || $this->isCollection($class)) {
             $resource = new Collection($class, $transformer, $name);
@@ -49,7 +50,6 @@ class JsonApiResponse
             $resource = new Collection($class->getCollection(), $transformer, $name);
             $resource->setPaginator(new IlluminatePaginatorAdapter($class));
         } else {
-            $transformer->setAvailableIncludes(ForestSchema::getRelatedData($name));
             $resource = new Item($class, $transformer, $name);
         }
 

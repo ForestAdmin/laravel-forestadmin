@@ -2,16 +2,12 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
-use App\Models\Book;
 use Doctrine\DBAL\Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Str;
 
 /**
  * Class HasManyGetter
@@ -35,24 +31,19 @@ class HasManyGetter extends ResourceGetter
     /**
      * @var Model
      */
-    private Model $parentInstance;
-
+    protected Model $parentInstance;
 
     /**
      * @param Model  $model
-     * @param string $name
      * @param string $relation
-     * @param string $relationName
      * @param        $parentId
      */
-    public function __construct(Model $model, string $name, string $relation, string $relationName, $parentId)
+    public function __construct(Model $model, string $relation, $parentId)
     {
-        parent::__construct($model, $name);
+        parent::__construct($model);
         $this->relation = $relation;
-        $this->relationName = $relationName;
         $this->parentInstance = $this->model->find($parentId);
     }
-
 
     /**
      * @return LengthAwarePaginator
@@ -61,25 +52,21 @@ class HasManyGetter extends ResourceGetter
     public function all(): LengthAwarePaginator
     {
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
-        $params = $this->params['fields'] ?? [];
-        $queryFields = $params[Str::camel(class_basename($relatedModel))] ?? null;
         $pageParams = $this->params['page'] ?? [];
+        $relation = $this->parentInstance->{$this->relation}();
+        $query = $this->buildQuery($relatedModel);
 
-        $records = $this->parentInstance->{$this->relation}()->paginate(
-            $pageParams['size'] ?? null,
-            $this->handleFields($relatedModel, $queryFields),
-            'page',
-            $pageParams['number'] ?? null
-        );
-
-        if ($this->parentInstance->{$this->relation}() instanceof BelongsToMany) {
-            $records->getCollection()->transform(
-                function ($value) {
-                    return $value->unsetRelations('pivot');
-                }
-            );
+        switch (get_class($relation)) {
+            case HasMany::class:
+                $query->where($relation->getForeignKeyName(), $this->parentInstance->getKey());
+                break;
+            case BelongsToMany::class:
+                $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getRelatedPivotKeyName(), '=', $relatedModel->getTable() . '.' . $relation->getRelatedKeyName());
+                $query->where($relation->getTable() . '.' . $relation->getForeignPivotKeyName(), $this->parentInstance->getKey());
+                break;
         }
-        return $records;
+
+        return $query->paginate($pageParams['size'] ?? null, '*', 'page', $pageParams['number'] ?? null);
     }
 
     /**

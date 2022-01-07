@@ -30,12 +30,12 @@ class DispatchGatewayTest extends TestCase
 
         $route = Route::any(
             'forest/foo',
-            ['as' => 'forest.collection.bar']
+            ['as' => 'forest.collection.foo_bar']
         );
 
         $action = $dispatch->getAction($route);
 
-        $this->assertEquals('bar', $action);
+        $this->assertEquals('fooBar', $action);
     }
 
     /**
