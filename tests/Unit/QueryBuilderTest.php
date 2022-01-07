@@ -81,7 +81,7 @@ class QueryBuilderTest extends TestCase
         $this->assertContains('dummy_tables.id', $fields);
         $this->assertContains('dummy_tables.foo', $fields);
         $this->assertContains('dummy_tables.bar', $fields);
-        $this->assertEquals(3, count($fields));
+        $this->assertCount(3, $fields);
     }
 
     /**
