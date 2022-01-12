@@ -379,4 +379,87 @@ class ResourcesControllerTest extends TestCase
         $this->assertEquals(404, $call->getStatusCode());
         $this->assertEquals("🌳🌳🌳 Records destroy error: Collection nof found", $data['error']);
     }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSearchWithQueryBuilder(): void
+    {
+        $this->getBook()->save();
+        $params = ['fields' => ['book' => 'id,label'], 'search' => '1'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals($book->id, $data['data'][0]['id']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSearchExtendedWithQueryBuilder(): void
+    {
+        $this->getBook()->save();
+        $params = ['fields' => ['book' => 'id,label'], 'search' => 'bar', 'searchExtended' => 1];
+        App::shouldReceive('basePath')->andReturn(null);
+        $fakeCategorySchema = [
+            "collections" => [
+                [
+                    "name"   => "category",
+                    "fields" => [
+                        [
+                            "field"         => "label",
+                            "type"          => "String",
+                            "default_value" => null,
+                            "enums"         => null,
+                            "integration"   => null,
+                            "is_filterable" => true,
+                            "is_read_only"  => false,
+                            "is_required"   => false,
+                            "is_sortable"   => true,
+                            "is_virtual"    => false,
+                            "is_searchable" => null,
+                            "reference"     => null,
+                            "inverse_of"    => null,
+                            "widget"        => null,
+                            "validations"   => [],
+                        ],
+                    ],
+                ]
+            ]
+        ];
+        File::shouldReceive('get')->andReturn(json_encode($fakeCategorySchema, JSON_THROW_ON_ERROR));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals($book->id, $data['data'][0]['id']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSearchWithQueryBuilderNoResult(): void
+    {
+        $this->getBook()->save();
+        $params = ['fields' => ['book' => 'id,label'], 'search' => '9999'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEmpty($data['data']);
+    }
 }
