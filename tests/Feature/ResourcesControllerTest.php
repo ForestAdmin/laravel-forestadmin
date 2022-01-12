@@ -44,12 +44,12 @@ class ResourcesControllerTest extends TestCase
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->get('/forest/Book?' . http_build_query($params));
+        $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals('Book', $data['data'][0]['type']);
+        $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals($book->id, $data['data'][0]['id']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
     }
@@ -64,12 +64,12 @@ class ResourcesControllerTest extends TestCase
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->get('/forest/Book/1?' . http_build_query($params));
+        $call = $this->get('/forest/book/1?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals('Book', $data['data']['type']);
+        $this->assertEquals('book', $data['data']['type']);
         $this->assertEquals($book->id, $data['data']['id']);
         $this->assertEquals($book->label, $data['data']['attributes']['label']);
     }
@@ -81,7 +81,7 @@ class ResourcesControllerTest extends TestCase
     public function testShowException(): void
     {
         $params = ['fields' => ['book' => 'id,label']];
-        $call = $this->get('/forest/Book/9999?' . http_build_query($params));
+        $call = $this->get('/forest/book/9999?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -120,14 +120,14 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->post('/forest/Book', $params);
+        $call = $this->post('/forest/book', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::all()->last();
         $attributes = $data['data']['attributes'];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(201, $call->getStatusCode());
-        $this->assertEquals('Book', $data['data']['type']);
+        $this->assertEquals('book', $data['data']['type']);
         $this->assertEquals($book->id, $data['data']['id']);
         $this->assertEquals($book->label, $attributes['label']);
         $this->assertEquals($book->comment, $attributes['comment']);
@@ -156,7 +156,7 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->post('/forest/Book', $params);
+        $call = $this->post('/forest/book', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -197,14 +197,14 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->put('/forest/Book/' . $book->id, $params);
+        $call = $this->put('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $attributes = $data['data']['attributes'];
         $paramsAttributes = $params['data']['attributes'];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(200, $call->getStatusCode());
-        $this->assertEquals('Book', $data['data']['type']);
+        $this->assertEquals('book', $data['data']['type']);
         $this->assertEquals($paramsAttributes['label'], $attributes['label']);
         $this->assertEquals($paramsAttributes['comment'], $attributes['comment']);
         $this->assertEquals($paramsAttributes['difficulty'], $attributes['difficulty']);
@@ -234,7 +234,7 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->put('/forest/Book/' . $book->id, $params);
+        $call = $this->put('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -253,7 +253,7 @@ class ResourcesControllerTest extends TestCase
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->delete('/forest/Book/' . $book->id);
+        $call = $this->delete('/forest/book/' . $book->id);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(204, $call->getStatusCode());
@@ -270,7 +270,7 @@ class ResourcesControllerTest extends TestCase
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->delete('/forest/Book/9999');
+        $call = $this->delete('/forest/book/9999');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -285,7 +285,7 @@ class ResourcesControllerTest extends TestCase
     public function testCount(): void
     {
         $book = $this->getBook();
-        $call = $this->get('/forest/Book/count');
+        $call = $this->get('/forest/book/count');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -330,7 +330,7 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->delete('/forest/Book/', $params);
+        $call = $this->delete('/forest/book/', $params);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(204, $call->getStatusCode());
@@ -372,7 +372,7 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->delete('/forest/Book/', $params);
+        $call = $this->delete('/forest/book/', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);

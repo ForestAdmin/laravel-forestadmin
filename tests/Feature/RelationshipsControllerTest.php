@@ -54,7 +54,7 @@ class RelationshipsControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $params = ['fields' => ['comment' => 'id,body']];
-        $call = $this->get('/forest/Book/1/relationships/comments?' . http_build_query($params));
+        $call = $this->get('/forest/book/1/relationships/comments?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $comment = Comment::first();
 
@@ -72,7 +72,7 @@ class RelationshipsControllerTest extends TestCase
     {
         $this->getBook()->save();
         $this->getComments();
-        $call = $this->get('/forest/Book/1/relationships/comments/count');
+        $call = $this->get('/forest/book/1/relationships/comments/count');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
