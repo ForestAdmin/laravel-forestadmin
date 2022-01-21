@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Str;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -47,6 +48,9 @@ class JsonApiResponse
             $resource = new Collection($class, $transformer, $name);
         } elseif ($this->isPaginator($class)) {
             $resource = new Collection($class->getCollection(), $transformer, $name);
+            if (request()->has('search')) {
+                $resource->setMeta($this->searchDecorator($resource->getData(), request()->get('search')));
+            }
         } else {
             $resource = new Item($class, $transformer, $name);
         }
@@ -66,5 +70,25 @@ class JsonApiResponse
     protected function isPaginator($instance): bool
     {
         return $instance instanceof LengthAwarePaginator;
+    }
+
+    /**
+     * @param BaseCollection $items
+     * @param mixed          $searchValue
+     * @return array
+     */
+    protected function searchDecorator(BaseCollection $items, $searchValue): array
+    {
+        $decorator = ['decorators' => []];
+        foreach ($items as $key => $value) {
+            $decorator['decorators'][$key]['id'] = $value->getKey();
+            foreach ($value->getAttributes() as $fieldKey => $fieldValue) {
+                if (Str::contains(Str::lower($fieldValue), Str::lower($searchValue))) {
+                    $decorator['decorators'][$key]['search'][] = $fieldKey;
+                }
+            }
+        }
+
+        return $decorator;
     }
 }

@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\File;
 class JsonApiResponseTest extends TestCase
 {
     use FakeSchema;
+    use FakeData;
 
     /**
      * @return void
@@ -131,6 +133,22 @@ class JsonApiResponseTest extends TestCase
         $this->assertEquals($data['attributes'], $render['data']['attributes']);
         $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
         $this->assertEquals($comments, $render['data']['relationships']['comments']);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testSearchDecorator(): void
+    {
+        $this->getBook()->save();
+        $jsonApi = new JsonApiResponse();
+        $books = Book::all();
+        $decorators = $this->invokeMethod($jsonApi, 'searchDecorator', [$books, 'foo']);
+
+        $this->assertIsArray($decorators);
+        $this->assertArrayHasKey('decorators', $decorators);
+        $this->assertEquals(['id' => 1, 'search' => ['label']], $decorators['decorators'][0]);
     }
 
     /**
