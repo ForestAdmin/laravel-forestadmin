@@ -79,6 +79,24 @@ class JsonApiSerializer extends FractalJsonApiSerializer
     }
 
     /**
+     * Serialize the meta.
+     *
+     * @param array $meta
+     *
+     * @return array
+     */
+    public function meta(array $meta)
+    {
+        if (empty($meta)) {
+            return [];
+        }
+
+        $result['meta'] = $meta;
+
+        return $result;
+    }
+
+    /**
      * Adds links for all available includes to a single resource.
      *
      * @param array $resource         The resource to add relationship links to

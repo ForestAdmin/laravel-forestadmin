@@ -3,8 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,25 +28,11 @@ abstract class BaseRepository
     protected Model $model;
 
     /**
-     * @var string
-     */
-    protected string $table;
-
-    /**
-     * @var string|null
-     */
-    protected ?string $database = null;
-
-    /**
      * @param Model $model
      */
     public function __construct(Model $model)
     {
         $this->model = $model;
-        $this->table = $model->getConnection()->getTablePrefix() . $model->getTable();
-        if (strpos($this->table, '.')) {
-            [$this->database, $this->table] = explode('.', $this->table);
-        }
     }
 
     /**

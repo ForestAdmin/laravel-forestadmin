@@ -14,7 +14,8 @@ use JsonPath\JsonObject;
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  *
  * @method static JsonObject getSchema()
- * @method static array|bool getRelatedData(string $collection)
+ * @method static array getFields(string $collection)
+ * @method static array getRelatedData(string $collection)
  *
  * @see ForestSchemaInstrospection
  */

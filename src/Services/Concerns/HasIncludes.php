@@ -1,6 +1,8 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Schema\Concerns;
+namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
+
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class HasIncludes
@@ -22,6 +24,23 @@ trait HasIncludes
     public function getIncludes(): array
     {
         return $this->includes;
+    }
+
+    /**
+     * @param Builder $query
+     * @param array   $includes
+     * @return Builder
+     */
+    protected function appendIncludes(Builder $query, array $includes): Builder
+    {
+        foreach ($includes as $key => $value) {
+            if ($value['foreign_key']) {
+                $query->addSelect($value['foreign_key']);
+            }
+            $query->with($key . ':' . $value['fields']);
+        }
+
+        return $query;
     }
 
     /**

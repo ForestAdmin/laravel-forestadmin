@@ -2,7 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
-use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasIncludes;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 
 /**

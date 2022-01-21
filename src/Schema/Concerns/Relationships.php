@@ -56,4 +56,20 @@ trait Relationships
             []
         );
     }
+
+    /**
+     * @param Model $model
+     * @return array
+     */
+    public function getSingleRelations(Model $model): array
+    {
+        $relations = [];
+        foreach ($this->getRelations($model) as $key => $value) {
+            if (in_array($value, [BelongsTo::class, HasOne::class], true)) {
+                $relations[$key] = $value;
+            }
+        }
+
+        return $relations;
+    }
 }

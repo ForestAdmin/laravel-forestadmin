@@ -13,7 +13,8 @@
     "guzzlehttp/guzzle": "^7.4",
     "league/fractal": "^0.19.2",
     "league/oauth2-client": "^2.6",
-    "galbar/jsonpath": "^2.0"
+    "galbar/jsonpath": "^2.0",
+    "ramsey/uuid": "^4.2"
   },
   "require-dev": {
     "orchestra/testbench": "^6.19",

@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
-use ForestAdmin\LaravelForestAdmin\Schema\Concerns\HasQuery;
+use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -17,8 +17,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ResourceGetter extends BaseRepository
 {
-    use HasQuery;
-
     /**
      * @var array
      */
@@ -65,10 +63,11 @@ class ResourceGetter extends BaseRepository
 
     /**
      * @return int
+     * @throws Exception
      */
     public function count(): int
     {
-        return $this->model->count();
+        return $this->query()->count();
     }
 
     /**
@@ -77,6 +76,6 @@ class ResourceGetter extends BaseRepository
      */
     protected function query(): Builder
     {
-        return $this->buildQuery($this->model);
+        return QueryBuilder::of($this->model, $this->params);
     }
 }
