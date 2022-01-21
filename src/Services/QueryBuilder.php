@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
@@ -22,10 +23,11 @@ use Illuminate\Support\Str;
  */
 class QueryBuilder
 {
-    use Relationships;
+    use ArrayHelper;
+    use HasFilters;
     use HasIncludes;
     use HasSearch;
-    use ArrayHelper;
+    use Relationships;
 
     /**
      * @var Model
@@ -93,6 +95,10 @@ class QueryBuilder
         if (array_key_exists('search', $this->params)) {
             $isExtended = array_key_exists('searchExtended', $this->params) && (int) $this->params['searchExtended'] === 1;
             $this->appendSearch($query, $this->params['search'], $isExtended);
+        }
+
+        if (array_key_exists('filters', $this->params)) {
+            $this->appendFilters($query, $this->params['filters']);
         }
 
         return $query;

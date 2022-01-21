@@ -22,7 +22,7 @@ trait HasSearch
      * @param bool    $isExtended
      * @return void
      */
-    protected function appendSearch(Builder $query, $search, bool $isExtended = false)
+    protected function appendSearch(Builder $query, $search, bool $isExtended = false): void
     {
         $model = $query->getModel();
         if ($isExtended) {
