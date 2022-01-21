@@ -231,7 +231,12 @@ trait HasFilters
         switch ($operator) {
             case $this->operators['blank']:
                 $query->where(
-                    fn($query) => $query->whereNull($field)->orWhere($field, '=', ''),
+                    function ($query) use ($field, $type) {
+                        $query->whereNull($field);
+                        if (in_array($type, ['Boolean', 'Uuid'], true)) {
+                            $query->orWhere($field, '=', '');
+                        }
+                    },
                     null,
                     null,
                     $aggregator
