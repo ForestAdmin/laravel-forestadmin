@@ -9,7 +9,6 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as BaseCollection;
 use League\Fractal\Manager;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
@@ -48,7 +47,6 @@ class JsonApiResponse
             $resource = new Collection($class, $transformer, $name);
         } elseif ($this->isPaginator($class)) {
             $resource = new Collection($class->getCollection(), $transformer, $name);
-            $resource->setPaginator(new IlluminatePaginatorAdapter($class));
         } else {
             $resource = new Item($class, $transformer, $name);
         }

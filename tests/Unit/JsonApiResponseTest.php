@@ -92,31 +92,10 @@ class JsonApiResponseTest extends TestCase
             ->paginate();
         $render = $jsonApi->render($books, 'Book');
 
-        $meta = [
-            'pagination' => [
-                'total'        => 2,
-                'count'        => 2,
-                'per_page'     => 15,
-                'current_page' => 1,
-                'total_pages'  => 1,
-            ],
-        ];
-
-        $links = [
-            'self'  => 'http://localhost?page=1',
-            'first' => 'http://localhost?page=1',
-            'last'  => 'http://localhost?page=1',
-        ];
-
-
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('included', $render);
-        $this->assertArrayHasKey('meta', $render);
-        $this->assertArrayHasKey('links', $render);
         $this->assertSame($data, $render['data'][0]);
-        $this->assertSame($meta, $render['meta']);
-        $this->assertSame($links, $render['links']);
     }
 
 
