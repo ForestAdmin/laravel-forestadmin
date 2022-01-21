@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
