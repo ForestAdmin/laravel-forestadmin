@@ -48,22 +48,22 @@ trait HasFilters
      * @var array
      */
     protected array $dateOperators = [
-        'after_x_hours_ago'        => '',
-        'before_x_hours_ago'       => '',
-        'future'                   => '',
-        'past'                     => '',
-        'previous_month_to_date'   => '',
-        'previous_month'           => '',
-        'previous_quarter_to_date' => '',
-        'previous_quarter'         => '',
-        'previous_week_to_date'    => '',
-        'previous_week'            => '',
-        'previous_x_days_to_date'  => '',
-        'previous_x_days'          => '',
-        'previous_year_to_date'    => '',
-        'previous_year'            => '',
-        'today'                    => '',
-        'yesterday'                => '',
+        'afterXHoursAgo',
+        'beforeXHoursAgo',
+        'future',
+        'past',
+        'previousMonthToDate',
+        'previousMonth',
+        'previousQuarterToDate',
+        'previousQuarter',
+        'previousWeekToDate',
+        'previousWeek',
+        'previousXDaysToDate',
+        'previousXDays',
+        'previousYearToDate',
+        'previousYear',
+        'today',
+        'yesterday',
     ];
 
     /**
@@ -231,7 +231,7 @@ trait HasFilters
         switch ($operator) {
             case $this->operators['blank']:
                 $query->where(
-                    fn ($query) => $query->whereNull($field)->orWhere($field, '=', ''),
+                    fn($query) => $query->whereNull($field)->orWhere($field, '=', ''),
                     null,
                     null,
                     $aggregator
@@ -239,7 +239,7 @@ trait HasFilters
                 break;
             case $this->operators['present']:
                 $query->where(
-                    fn ($query) => $query->whereNotNull($field)->orWhere($field, '!=', ''),
+                    fn($query) => $query->whereNotNull($field)->orWhere($field, '!=', ''),
                     null,
                     null,
                     $aggregator
