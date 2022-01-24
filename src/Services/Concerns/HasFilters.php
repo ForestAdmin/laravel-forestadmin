@@ -37,7 +37,6 @@ trait HasFilters
         'contains',
         'not_contains',
         'in',
-        'not_in',
         'greater_than',
         'less_than',
         'starts_with',
@@ -130,7 +129,6 @@ trait HasFilters
             'present',
             'blank',
             'in',
-            'not_in',
         ],
         'Number'   => [
             'equal',
@@ -208,6 +206,7 @@ trait HasFilters
         }
 
         [$field, $operator, $value] = array_values($filter);
+        $value = trim($value);
 
         if (Str::contains($field, ':')) {
             $parseField = explode(':', $field);
@@ -281,10 +280,8 @@ trait HasFilters
                 $query->where($field, '>', $value, $aggregator);
                 break;
             case 'in':
+                $value = explode(',', str_replace(' ', '', $value));
                 $query->whereIn($field, $value, $aggregator);
-                break;
-            case 'not_in':
-                $query->whereIn($field, $value, $aggregator, true);
                 break;
             case 'includesAll':
                 foreach ($value as $data) {
