@@ -17,14 +17,14 @@ trait DataTypes
      * @var array
      */
     protected array $dbTypes = [
-        Types::ARRAY                => 'unknown',
+        Types::ARRAY                => 'array',
         Types::ASCII_STRING         => 'String',
         Types::BIGINT               => 'Number',
         Types::BINARY               => 'unknown',
         Types::BLOB                 => 'unknown',
         Types::BOOLEAN              => 'Boolean',
-        Types::DATE_MUTABLE         => 'Date',
-        Types::DATE_IMMUTABLE       => 'Date',
+        Types::DATE_MUTABLE         => 'Dateonly',
+        Types::DATE_IMMUTABLE       => 'Dateonly',
         Types::DATEINTERVAL         => 'unknown',
         Types::DATETIME_MUTABLE     => 'Date',
         Types::DATETIME_IMMUTABLE   => 'Date',
@@ -36,7 +36,7 @@ trait DataTypes
         Types::INTEGER              => 'Number',
         Types::JSON                 => 'Json',
         Types::OBJECT               => 'unknown',
-        Types::SIMPLE_ARRAY         => 'unknown',
+        Types::SIMPLE_ARRAY         => 'array',
         Types::SMALLINT             => 'Number',
         Types::STRING               => 'String',
         Types::TEXT                 => 'String',
