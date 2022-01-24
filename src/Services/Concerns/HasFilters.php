@@ -147,6 +147,7 @@ trait HasFilters
             'less_than',
             'present',
             'blank',
+            'in',
         ],
         'String'   => [
             'equal',
@@ -157,6 +158,7 @@ trait HasFilters
             'not_contains',
             'present',
             'blank',
+            'in',
         ],
         'Uuid'     => [
             'equal',
@@ -260,7 +262,10 @@ trait HasFilters
                 $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value], $aggregator);
                 break;
             case 'in':
-                $value = explode(',', str_replace(' ', '', $value));
+                $value = array_map('trim', explode(',', $value));
+                if ($type === 'Number' && !is_numeric($value)) {
+                    $value = collect($value)->reject(fn($item) => ! is_numeric($item))->all();
+                }
                 $query->whereIn($field, $value, $aggregator);
                 break;
             case 'equal':
