@@ -153,8 +153,6 @@ trait HasFilters
         'Uuid'     => [
             'equal',
             'not_equal',
-            'greater_than',
-            'less_than',
             'present',
             'blank'
         ],
