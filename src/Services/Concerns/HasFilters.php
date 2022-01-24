@@ -57,22 +57,24 @@ trait HasFilters
      * @var array
      */
     protected array $dateOperators = [
-        'after_x_hours_ago',
-        'before_x_hours_ago',
-        'future',
-        'past',
-        'previous_month_to_date',
-        'previous_month',
-        'previous_quarter_to_date',
-        'previous_quarter',
-        'previous_week_to_date',
-        'previous_week',
-        'previous_x_days_to_date',
-        'previous_x_days',
-        'previous_year_to_date',
-        'previous_year',
         'today',
         'yesterday',
+        'before',
+        'after',
+        'previous_x_days',
+        'previous_week',
+        'previous_month',
+        'previous_quarter',
+        'previous_year',
+        'previous_x_days_to_date',
+        'previous_week_to_date',
+        'previous_month_to_date',
+        'previous_quarter_to_date',
+        'previous_year_to_date',
+        'past',
+        'future',
+        'before_x_hours_ago',
+        'after_x_hours_ago',
     ];
 
     /**
@@ -88,50 +90,14 @@ trait HasFilters
         'Date'     => [
             'equal',
             'not_equal',
-            'before',
-            'after',
             'present',
             'blank',
-            'today',
-            'yesterday',
-            'previous_x_days',
-            'previous_week',
-            'previous_month',
-            'previous_quarter',
-            'previous_year',
-            'previous_x_days_to_date',
-            'previous_week_to_date',
-            'previous_month_to_date',
-            'previous_quarter_to_date',
-            'previous_year_to_date',
-            'past',
-            'future',
-            'before_x_hours_ago',
-            'after_x_hours_ago',
         ],
         'Dateonly' => [
             'equal',
             'not_equal',
-            'before',
-            'after',
             'present',
             'blank',
-            'today',
-            'yesterday',
-            'previous_x_days',
-            'previous_week',
-            'previous_month',
-            'previous_quarter',
-            'previous_year',
-            'previous_x_days_to_date',
-            'previous_week_to_date',
-            'previous_month_to_date',
-            'previous_quarter_to_date',
-            'previous_year_to_date',
-            'past',
-            'future',
-            'before_x_hours_ago',
-            'after_x_hours_ago',
         ],
         'Enum'     => [
             'equal',
@@ -181,15 +147,6 @@ trait HasFilters
     ];
 
     /**
-     * @param string $type
-     * @return string
-     */
-    public function getOperator(string $type): string
-    {
-        return $this->operators[$type];
-    }
-
-    /**
      * @param Builder $query
      * @param string  $payload
      * @return void
@@ -233,13 +190,31 @@ trait HasFilters
             throw new ForestException("The operator $operator is not allowed to the field type : $type");
         }
 
+        if (in_array($type, ['Date', 'Dateonly'], true) && in_array($operator, $this->dateOperators, true)) {
+            $this->dateFilters($query, $field, $operator, $value, $aggregator);
+        } else {
+            $this->mainFilters($query, $field, $operator, $value, $type, $aggregator);
+        }
+    }
+
+    /**
+     * @param Builder $query
+     * @param string  $field
+     * @param string  $operator
+     * @param string  $value
+     * @param string  $type
+     * @param string  $aggregator
+     * @return void
+     */
+    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type, string $aggregator)
+    {
         switch ($operator) {
             case 'present':
             case 'blank':
                 $query->where(
                     function ($query) use ($field, $type, $operator) {
-                        $query->whereNull($field);
-                        if (!in_array($type, ['Boolean', 'Uuid', 'Json'], true)) {
+                        $operator === 'blank' ? $query->whereNull($field) : $query->whereNotNull($field);
+                        if (!in_array($type, ['Boolean', 'Uuid', 'Json', 'Date', 'Dateonly'], true)) {
                             $symbol = $operator === 'blank' ? '=' : '!=';
                             $query->orWhere($field, $symbol, '');
                         }
@@ -264,7 +239,7 @@ trait HasFilters
             case 'in':
                 $value = array_map('trim', explode(',', $value));
                 if ($type === 'Number' && !is_numeric($value)) {
-                    $value = collect($value)->reject(fn($item) => ! is_numeric($item))->all();
+                    $value = collect($value)->reject(fn($item) => !is_numeric($item))->all();
                 }
                 $query->whereIn($field, $value, $aggregator);
                 break;
@@ -272,8 +247,10 @@ trait HasFilters
             case 'not_equal':
             case 'greater_than':
             case 'less_than':
-                if (($type === 'Number' && !is_numeric($value)) || ($type === 'Uuid' && !$this->isUuid($value))) {
-                    return;
+                if (!$this->validateValue($value, $type)) {
+                    throw new ForestException(
+                        "The type of value '$value' is not compatible with the type: $type"
+                    );
                 }
                 $query->where($field, $this->basicSymbols[$operator], $value, $aggregator);
                 break;
@@ -282,6 +259,19 @@ trait HasFilters
                     "Unsupported operator: $operator"
                 );
         }
+    }
+
+    /**
+     * @param Builder $query
+     * @param string  $field
+     * @param string  $operator
+     * @param string  $value
+     * @param string  $aggregator
+     * @return void
+     */
+    public function dateFilters(Builder $query, string $field, string $operator, string $value, string $aggregator)
+    {
+        //
     }
 
     /**
@@ -333,4 +323,25 @@ trait HasFilters
 
         return in_array($operator, $this->typeFieldsOperators[$type], true);
     }
+
+    /**
+     * @param $value
+     * @param $type
+     * @return bool
+     */
+    public function validateValue($value, $type): bool
+    {
+        switch ($type) {
+            case 'Number':
+                return is_numeric($value);
+            case 'Uuid':
+                return $this->isUuid($value);
+            case 'Date':
+            case 'Dateonly':
+                return (bool) strtotime($value);
+            default:
+                return true;
+        }
+    }
+
 }
