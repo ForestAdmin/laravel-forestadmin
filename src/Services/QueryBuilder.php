@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class QueryBuilder
@@ -174,5 +175,14 @@ class QueryBuilder
         $columns = $connexion->listTableColumns($model->getTable(), $this->database);
 
         return $columns;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isUuid($value): bool
+    {
+        return Uuid::isValid($value);
     }
 }

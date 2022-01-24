@@ -69,6 +69,23 @@ class QueryBuilderTest extends TestCase
 
     /**
      * @return void
+     * @throws \ReflectionException
+     */
+    public function testIsUuid(): void
+    {
+        $data = [];
+        $model = $this->getLaravelModel();
+        $queryBuilder = m::mock(QueryBuilder::class, [$model, $data])
+            ->makePartial();
+        $stringValue = $queryBuilder->isUuid('foo');
+        $uuidValue = $queryBuilder->isUuid('AA111111-AAAA-1111-1111-11AA11AA11AA');
+
+        $this->assertFalse($stringValue);
+        $this->assertTrue($uuidValue);
+    }
+
+    /**
+     * @return void
      * @throws Exception
      * @throws SchemaException
      */
@@ -125,7 +142,7 @@ class QueryBuilderTest extends TestCase
      * @throws Exception
      * @throws SchemaException
      */
-    public function testHandleSearchFieldrOnNumber(): void
+    public function testHandleSearchFieldOnNumber(): void
     {
         $field = 'id';
         $value = '1';
