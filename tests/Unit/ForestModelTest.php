@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Schema\ForestModel;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -128,12 +129,7 @@ class ForestModelTest extends TestCase
                     ]
                 )
             );
-        $forestModel->setFields(
-            [
-                ['field' => 'label', 'is_required' => false],
-                ['field' => 'bar', 'enums' => ['easy', 'hard']],
-            ]
-        );
+
         $fields = $forestModel->getFields();
         $foo = array_search('foo', array_column($fields, 'field'), true);
         $bar = array_search('bar', array_column($fields, 'field'), true);
@@ -482,7 +478,7 @@ class ForestModelTest extends TestCase
         $connection->getDoctrineSchemaManager()
             ->willReturn($schemaManager->reveal());
 
-        $model = $this->prophesize(Model::class);
+        $model = $this->prophesize(CustomModel::class);
         $model
             ->getConnection()
             ->shouldBeCalled()
@@ -494,6 +490,14 @@ class ForestModelTest extends TestCase
         $model
             ->getKeyName()
             ->willReturn('id');
+        $model
+            ->schemaFields()
+            ->willReturn(
+                [
+                    ['field' => 'label', 'is_required' => false],
+                    ['field' => 'bar', 'enums' => ['easy', 'hard']],
+                ]
+            );
 
         return $model->reveal();
     }
