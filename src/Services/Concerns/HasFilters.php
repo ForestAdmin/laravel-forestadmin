@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
+use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,39 +30,38 @@ trait HasFilters
      * @var array
      */
     protected array $operators = [
-        'blank'       => 'blank',
-        'contains'    => 'contains',
-        'endsWith'    => 'ends_with',
-        'equal'       => 'equal',
-        'greaterThan' => 'greater_than',
-        'in'          => 'in',
-        'includesAll' => 'includes_all',
-        'lessThan'    => 'less_than',
-        'notContains' => 'not_contains',
-        'notEqual'    => 'not_equal',
-        'notIn'       => 'not_in',
-        'present'     => 'present',
-        'startsWith'  => 'starts_with',
+        'equal',
+        'not_equal',
+        'present',
+        'blank',
+        'contains',
+        'not_contains',
+        'in',
+        'not_in',
+        'greater_than',
+        'less_than',
+        'starts_with',
+        'ends_with',
     ];
 
     /**
      * @var array
      */
     protected array $dateOperators = [
-        'afterXHoursAgo',
-        'beforeXHoursAgo',
+        'after_x_hours_ago',
+        'before_x_hours_ago',
         'future',
         'past',
-        'previousMonthToDate',
-        'previousMonth',
-        'previousQuarterToDate',
-        'previousQuarter',
-        'previousWeekToDate',
-        'previousWeek',
-        'previousXDaysToDate',
-        'previousXDays',
-        'previousYearToDate',
-        'previousYear',
+        'previous_month_to_date',
+        'previous_month',
+        'previous_quarter_to_date',
+        'previous_quarter',
+        'previous_week_to_date',
+        'previous_week',
+        'previous_x_days_to_date',
+        'previous_x_days',
+        'previous_year_to_date',
+        'previous_year',
         'today',
         'yesterday',
     ];
@@ -70,101 +70,105 @@ trait HasFilters
      * @var array
      */
     protected array $typeFieldsOperators = [
-        'String'   => [
-            'blank',
-            'present',
-            'equal',
-            'notEqual',
-            'in',
-            'notIn',
-            'contains',
-            'notContains',
-            'endsWith',
-            'startsWith',
-        ],
-        'Number'   => [
-            'present',
-            'equal',
-            'notEqual',
-            'greaterThan',
-            'notIn',
-            'lessThan',
-        ],
         'Boolean'  => [
             'equal',
-            'notEqual',
-            'blank'
-        ],
-        'Dateonly' => [
-            'equal',
-            'notEqual',
+            'not_equal',
             'present',
-            'blank',
-            'today',
-            'yesterday',
-            'previousXDaysToDate',
-            'previousWeek',
-            'previousWeekToDate',
-            'previousMonth',
-            'previousMonthToDate',
-            'previousQuarterToDate',
-            'previousQuarter',
-            'previousYear',
-            'previousYearToDate',
-            'past',
-            'future',
-            'previousXDays',
+            'blank'
         ],
         'Date'     => [
             'equal',
-            'notEqual',
+            'not_equal',
+            'before',
+            'after',
             'present',
             'blank',
             'today',
             'yesterday',
-            'previousXDaysToDate',
-            'previousWeek',
-            'previousWeekToDate',
-            'previousMonth',
-            'previousMonthToDate',
-            'previousQuarterToDate',
-            'previousQuarter',
-            'previousYear',
-            'previousYearToDate',
+            'previous_x_days',
+            'previous_week',
+            'previous_month',
+            'previous_quarter',
+            'previous_year',
+            'previous_x_days_to_date',
+            'previous_week_to_date',
+            'previous_month_to_date',
+            'previous_quarter_to_date',
+            'previous_year_to_date',
             'past',
             'future',
-            'previousXDays',
-            'beforeXHoursAgo',
-            'afterXHoursAgo',
+            'before_x_hours_ago',
+            'after_x_hours_ago',
         ],
-        'Timeonly' => [
+        'Dateonly' => [
             'equal',
-            'notEqual',
-            'lessThan',
-            'greaterThan',
+            'not_equal',
+            'before',
+            'after',
             'present',
             'blank',
+            'today',
+            'yesterday',
+            'previous_x_days',
+            'previous_week',
+            'previous_month',
+            'previous_quarter',
+            'previous_year',
+            'previous_x_days_to_date',
+            'previous_week_to_date',
+            'previous_month_to_date',
+            'previous_quarter_to_date',
+            'previous_year_to_date',
+            'past',
+            'future',
+            'before_x_hours_ago',
+            'after_x_hours_ago',
         ],
         'Enum'     => [
             'equal',
-            'notEqual',
+            'not_equal',
             'present',
             'blank',
             'in',
-            'notIn',
+            'not_in',
+        ],
+        'Number'   => [
+            'equal',
+            'not_equal',
+            'greater_than',
+            'less_than',
+            'present',
+            'blank',
+        ],
+        'String'   => [
+            'equal',
+            'not_equal',
+            'starts_with',
+            'ends_with',
+            'contains',
+            'not_contains',
+            'present',
+            'blank',
+        ],
+        'Uuid'     => [
+            'equal',
+            'not_equal',
+            'greater_than',
+            'less_than',
+            'present',
+            'blank'
+        ],
+        'Time' => [
+            'equal',
+            'not_equal',
+            'greater_than',
+            'less_than',
+            'present',
+            'blank',
         ],
         'Json'     => [
             'present',
             'blank',
-        ],
-        'Point'    => [
-            'equal'
-        ],
-        'Uuid'     => [
-            'equal',
-            'notEqual',
-            'present',
-            'blank'
         ],
     ];
 
@@ -196,7 +200,7 @@ trait HasFilters
      * @param array       $filter
      * @param string|null $aggregator
      * @return void
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function handleFilter(Builder $query, array $filter, ?string $aggregator): void
     {
@@ -227,13 +231,12 @@ trait HasFilters
         //dd($field, $operator, $value);
         //, string $operator, $value
 
-
         switch ($operator) {
-            case $this->operators['blank']:
+            case 'blank':
                 $query->where(
                     function ($query) use ($field, $type) {
                         $query->whereNull($field);
-                        if (in_array($type, ['Boolean', 'Uuid'], true)) {
+                        if (!in_array($type, ['Boolean', 'Uuid'], true)) {
                             $query->orWhere($field, '=', '');
                         }
                     },
@@ -242,45 +245,50 @@ trait HasFilters
                     $aggregator
                 );
                 break;
-            case $this->operators['present']:
+            case 'present':
                 $query->where(
-                    fn($query) => $query->whereNotNull($field)->orWhere($field, '!=', ''),
+                    function ($query) use ($field, $type) {
+                        $query->whereNotNull($field);
+                        if (!in_array($type, ['Boolean', 'Uuid'], true)) {
+                            $query->orWhere($field, '!=', '');
+                        }
+                    },
                     null,
                     null,
                     $aggregator
                 );
                 break;
-            case $this->operators['contains']:
+            case 'contains':
                 $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value . '%'], $aggregator);
                 break;
-            case $this->operators['notContains']:
+            case 'not_contains':
                 $query->whereRaw("LOWER ($field) NOT LIKE LOWER(?)", ['%' . $value . '%'], $aggregator);
                 break;
-            case $this->operators['startsWith']:
+            case 'starts_with':
                 $query->whereRaw("LOWER ($field) LIKE LOWER(?)", [$value . '%'], $aggregator);
                 break;
-            case $this->operators['endsWith']:
+            case 'ends_with':
                 $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value], $aggregator);
                 break;
-            case $this->operators['lessThan']:
+            case 'less_than':
                 $query->where($field, '<', $value, $aggregator);
                 break;
-            case $this->operators['equal']:
+            case 'equal':
                 $query->where($field, '=', $value, $aggregator);
                 break;
-            case $this->operators['notEqual']:
+            case 'not_equal':
                 $query->where($field, '!=', $value, $aggregator);
                 break;
-            case $this->operators['greaterThan']:
+            case 'greater_than':
                 $query->where($field, '>', $value, $aggregator);
                 break;
-            case $this->operators['in']:
+            case 'in':
                 $query->whereIn($field, $value, $aggregator);
                 break;
-            case $this->operators['notIn']:
+            case 'not_in':
                 $query->whereIn($field, $value, $aggregator, true);
                 break;
-            case $this->operators['includesAll']:
+            case 'includesAll':
                 foreach ($value as $data) {
                     $query->whereIn($field, $data, $aggregator);
                 }
