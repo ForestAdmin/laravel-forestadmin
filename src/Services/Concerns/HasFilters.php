@@ -46,6 +46,16 @@ trait HasFilters
     /**
      * @var array
      */
+    protected array $basicSymbols = [
+        'equal'        => '=',
+        'not_equal'    => '!=',
+        'greater_than' => '>',
+        'less_than'    => '<',
+    ];
+
+    /**
+     * @var array
+     */
     protected array $dateOperators = [
         'after_x_hours_ago',
         'before_x_hours_ago',
@@ -154,7 +164,7 @@ trait HasFilters
             'present',
             'blank'
         ],
-        'Time' => [
+        'Time'     => [
             'equal',
             'not_equal',
             'greater_than',
@@ -221,33 +231,15 @@ trait HasFilters
             throw new ForestException("The operator $operator is not allowed to the field type : $type");
         }
 
-        // DATES OPERATORS PR FINIR
-
-
-        //$query->where('id', 1);
-        //dd($field, $operator, $value);
-        //, string $operator, $value
-
         switch ($operator) {
+            case 'present':
             case 'blank':
                 $query->where(
-                    function ($query) use ($field, $type) {
+                    function ($query) use ($field, $type, $operator) {
                         $query->whereNull($field);
                         if (!in_array($type, ['Boolean', 'Uuid'], true)) {
-                            $query->orWhere($field, '=', '');
-                        }
-                    },
-                    null,
-                    null,
-                    $aggregator
-                );
-                break;
-            case 'present':
-                $query->where(
-                    function ($query) use ($field, $type) {
-                        $query->whereNotNull($field);
-                        if (!in_array($type, ['Boolean', 'Uuid'], true)) {
-                            $query->orWhere($field, '!=', '');
+                            $symbol = $operator === 'blank' ? '=' : '!=';
+                            $query->orWhere($field, $symbol, '');
                         }
                     },
                     null,
@@ -267,26 +259,18 @@ trait HasFilters
             case 'ends_with':
                 $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value], $aggregator);
                 break;
-            case 'less_than':
-                $query->where($field, '<', $value, $aggregator);
-                break;
-            case 'equal':
-                $query->where($field, '=', $value, $aggregator);
-                break;
-            case 'not_equal':
-                $query->where($field, '!=', $value, $aggregator);
-                break;
-            case 'greater_than':
-                $query->where($field, '>', $value, $aggregator);
-                break;
             case 'in':
                 $value = explode(',', str_replace(' ', '', $value));
                 $query->whereIn($field, $value, $aggregator);
                 break;
-            case 'includesAll':
-                foreach ($value as $data) {
-                    $query->whereIn($field, $data, $aggregator);
+            case 'equal':
+            case 'not_equal':
+            case 'greater_than':
+            case 'less_than':
+                if (($type === 'Number' && !is_numeric($value)) || ($type === 'Uuid' && !$this->isUuid($value))) {
+                    return;
                 }
+                $query->where($field, $this->basicSymbols[$operator], $value, $aggregator);
                 break;
             default:
                 throw new ForestException(

@@ -104,7 +104,7 @@ class ForestCors
         return [
             'allowedHeaders'         => ['*'],
             'allowedMethods'         => ['GET', 'POST', 'PUT', 'DELETE'],
-            'allowedOrigins'         => ['*.forestadmin.com', 'localhost:(\d){4}'],
+            'allowedOrigins'         => ['*.forestadmin.com'],
             'allowedOriginsPatterns' => ['#^.*\.forestadmin\.com\z#u'],
             'exposedHeaders'         => false,
             'maxAge'                 => 86400,
