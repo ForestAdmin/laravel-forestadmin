@@ -471,7 +471,7 @@ class ForestModelTest extends TestCase
                 [
                     'id'            => new Column('id', Type::getType('bigint')),
                     'foo'           => new Column('foo', Type::getType('string')),
-                    'field_exclude' => new Column('field_exclude', Type::getType('array')),
+                    'field_exclude' => new Column('field_exclude', Type::getType('blob')),
                 ]
             );
 

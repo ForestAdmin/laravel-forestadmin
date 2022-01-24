@@ -127,6 +127,8 @@ class TestCase extends OrchestraTestCase
                 $table->id();
                 $table->string('label');
                 $table->decimal('price');
+                $table->uuid('token')->nullable();
+                $table->date('delivery_date')->nullable()->default(date('Y-m-d'));
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
