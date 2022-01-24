@@ -104,11 +104,9 @@ class Schema
             if (class_exists($file)) {
                 $class = (new \ReflectionClass($file));
                 if ($class->isSubclassOf(Model::class) && $class->isInstantiable()) {
-                   // if ($file === 'App\Models\Book') {
-                        $model = app()->make($file);
-                        $forestModel = new ForestModel($model);
-                        $collections[] = $forestModel->serialize();
-                   // }
+                    $model = app()->make($file);
+                    $forestModel = new ForestModel($model);
+                    $collections[] = $forestModel->serialize();
                 }
             }
         }
