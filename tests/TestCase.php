@@ -129,6 +129,7 @@ class TestCase extends OrchestraTestCase
                 $table->decimal('price');
                 $table->uuid('token')->nullable();
                 $table->date('delivery_date')->nullable()->default(date('Y-m-d'));
+                $table->time('delivery_hour')->nullable()->default(date('h:i:s'));
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
