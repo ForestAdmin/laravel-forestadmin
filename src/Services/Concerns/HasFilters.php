@@ -322,11 +322,11 @@ trait HasFilters
      */
     public function isOperatorValidToFieldType(string $type, string $operator): bool
     {
-        if (!array_key_exists($type, $this->typeFieldsOperators)) {
+        if (!array_key_exists($type, $this->typeFieldsOperators) || !in_array($type, ['Date', 'Dateonly'], true)) {
             throw new ForestException("Field type unknown: $type");
         }
 
-        return in_array($operator, $this->typeFieldsOperators[$type], true);
+        return in_array($operator, $this->typeFieldsOperators[$type], true) || in_array($operator, $this->dateOperators, true);
     }
 
     /**
