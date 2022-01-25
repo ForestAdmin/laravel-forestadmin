@@ -336,6 +336,10 @@ trait HasFilters
      */
     public function validateValue($value, $type): bool
     {
+        if (! in_array($type, array_keys($this->typeFieldsOperators), true)) {
+            throw new ForestException("Unknown type: $type");
+        }
+
         switch ($type) {
             case 'Number':
                 return is_numeric($value);
