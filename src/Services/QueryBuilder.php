@@ -99,7 +99,8 @@ class QueryBuilder
         }
 
         if (array_key_exists('filters', $this->params)) {
-            $this->appendFilters($query, $this->params['filters']);
+            $this->timezone = $this->params['timezone'] ?? null;
+            $this->appendFilters($query, $this->params['filters'], $this->timezone);
         }
 
         return $query;

@@ -19,6 +19,16 @@ use Illuminate\Support\Str;
 trait HasFilters
 {
     /**
+     * @var string
+     */
+    protected string $aggregator;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $timezone;
+
+    /**
      * @var array
      */
     protected array $aggregators = [
@@ -150,30 +160,27 @@ trait HasFilters
      * @param Builder $query
      * @param string  $payload
      * @return void
+     * @throws Exception
      * @throws \JsonException
      */
     protected function appendFilters(Builder $query, string $payload)
     {
         [$aggregator, $filters] = $this->parseFilters($payload);
+        $this->setAggregator($aggregator);
+
         foreach ($filters as $filter) {
-            $this->handleFilter($query, $filter, $aggregator);
+            $this->handleFilter($query, $filter);
         }
     }
 
     /**
-     * @param Builder     $query
-     * @param array       $filter
-     * @param string|null $aggregator
+     * @param Builder $query
+     * @param array   $filter
      * @return void
      * @throws Exception
      */
-    protected function handleFilter(Builder $query, array $filter, ?string $aggregator): void
+    protected function handleFilter(Builder $query, array $filter): void
     {
-        $aggregator = $aggregator ?? 'and';
-        if (!in_array($aggregator, $this->aggregators, true)) {
-            throw new ForestException("Unsupported operator: $aggregator");
-        }
-
         [$field, $operator, $value] = array_values($filter);
         $value = trim($value);
 
@@ -191,9 +198,9 @@ trait HasFilters
         }
 
         if (in_array($type, ['Date', 'Dateonly'], true) && in_array($operator, $this->dateOperators, true)) {
-            $this->dateFilters($query, $field, $operator, $value, $aggregator);
+            $this->dateFilters($query, $field, $operator, $value);
         } else {
-            $this->mainFilters($query, $field, $operator, $value, $type, $aggregator);
+            $this->mainFilters($query, $field, $operator, $value, $type);
         }
     }
 
@@ -203,10 +210,9 @@ trait HasFilters
      * @param string  $operator
      * @param string  $value
      * @param string  $type
-     * @param string  $aggregator
      * @return void
      */
-    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type, string $aggregator)
+    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type)
     {
         switch ($operator) {
             case 'present':
@@ -221,27 +227,27 @@ trait HasFilters
                     },
                     null,
                     null,
-                    $aggregator
+                    $this->aggregator
                 );
                 break;
             case 'contains':
-                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value . '%'], $aggregator);
+                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value . '%'], $this->aggregator);
                 break;
             case 'not_contains':
-                $query->whereRaw("LOWER ($field) NOT LIKE LOWER(?)", ['%' . $value . '%'], $aggregator);
+                $query->whereRaw("LOWER ($field) NOT LIKE LOWER(?)", ['%' . $value . '%'], $this->aggregator);
                 break;
             case 'starts_with':
-                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", [$value . '%'], $aggregator);
+                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", [$value . '%'], $this->aggregator);
                 break;
             case 'ends_with':
-                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value], $aggregator);
+                $query->whereRaw("LOWER ($field) LIKE LOWER(?)", ['%' . $value], $this->aggregator);
                 break;
             case 'in':
                 $value = array_map('trim', explode(',', $value));
                 if ($type === 'Number' && !is_numeric($value)) {
                     $value = collect($value)->reject(fn($item) => !is_numeric($item))->all();
                 }
-                $query->whereIn($field, $value, $aggregator);
+                $query->whereIn($field, $value, $this->aggregator);
                 break;
             case 'equal':
             case 'not_equal':
@@ -252,7 +258,7 @@ trait HasFilters
                         "The type of value '$value' is not compatible with the type: $type"
                     );
                 }
-                $query->where($field, $this->basicSymbols[$operator], $value, $aggregator);
+                $query->where($field, $this->basicSymbols[$operator], $value, $this->aggregator);
                 break;
             default:
                 throw new ForestException(
@@ -266,10 +272,9 @@ trait HasFilters
      * @param string  $field
      * @param string  $operator
      * @param string  $value
-     * @param string  $aggregator
      * @return void
      */
-    public function dateFilters(Builder $query, string $field, string $operator, string $value, string $aggregator)
+    public function dateFilters(Builder $query, string $field, string $operator, string $value)
     {
         //
     }
@@ -344,4 +349,18 @@ trait HasFilters
         }
     }
 
+    /**
+     * @param string|null $aggregator
+     * @return $this
+     */
+    public function setAggregator(?string $aggregator): self
+    {
+        $aggregator = $aggregator ?? 'and';
+        if (!in_array($aggregator, $this->aggregators, true)) {
+            throw new ForestException("Unsupported operator: $aggregator");
+        }
+        $this->aggregator = $aggregator;
+
+        return $this;
+    }
 }
