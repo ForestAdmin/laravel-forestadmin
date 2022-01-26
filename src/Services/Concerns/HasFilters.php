@@ -306,7 +306,7 @@ trait HasFilters
     public function getTypeByField(Model $model, string $field): array
     {
         $type = ForestSchema::getTypeByField(class_basename($model), $field);
-        $field = $this->model->getTable() . '.' . $field;
+        $field = $model->getTable() . '.' . $field;
 
         if (is_null($type)) {
             throw new ForestException("Unknown field $field for this collection");
@@ -322,11 +322,15 @@ trait HasFilters
      */
     public function isOperatorValidToFieldType(string $type, string $operator): bool
     {
-        if (!array_key_exists($type, $this->typeFieldsOperators) || !in_array($type, ['Date', 'Dateonly'], true)) {
+        if (!array_key_exists($type, $this->typeFieldsOperators)) {
             throw new ForestException("Field type unknown: $type");
         }
 
-        return in_array($operator, $this->typeFieldsOperators[$type], true) || in_array($operator, $this->dateOperators, true);
+        if (in_array($type, ['Date', 'Dateonly'], true)) {
+            return in_array($operator, $this->typeFieldsOperators[$type], true) || in_array($operator, $this->dateOperators, true);
+        }
+
+        return in_array($operator, $this->typeFieldsOperators[$type], true);
     }
 
     /**
@@ -336,7 +340,7 @@ trait HasFilters
      */
     public function validateValue($value, $type): bool
     {
-        if (! in_array($type, array_keys($this->typeFieldsOperators), true)) {
+        if (!array_key_exists($type, $this->typeFieldsOperators)) {
             throw new ForestException("Unknown type: $type");
         }
 
