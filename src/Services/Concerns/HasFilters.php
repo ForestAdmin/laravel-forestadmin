@@ -92,69 +92,15 @@ trait HasFilters
      * @var array
      */
     protected array $typeFieldsOperators = [
-        'Boolean'  => [
-            'equal',
-            'not_equal',
-            'present',
-            'blank'
-        ],
-        'Date'     => [
-            'equal',
-            'not_equal',
-            'present',
-            'blank',
-        ],
-        'Dateonly' => [
-            'equal',
-            'not_equal',
-            'present',
-            'blank',
-        ],
-        'Enum'     => [
-            'equal',
-            'not_equal',
-            'present',
-            'blank',
-            'in',
-        ],
-        'Number'   => [
-            'equal',
-            'not_equal',
-            'greater_than',
-            'less_than',
-            'present',
-            'blank',
-            'in',
-        ],
-        'String'   => [
-            'equal',
-            'not_equal',
-            'starts_with',
-            'ends_with',
-            'contains',
-            'not_contains',
-            'present',
-            'blank',
-            'in',
-        ],
-        'Uuid'     => [
-            'equal',
-            'not_equal',
-            'present',
-            'blank'
-        ],
-        'Time'     => [
-            'equal',
-            'not_equal',
-            'greater_than',
-            'less_than',
-            'present',
-            'blank',
-        ],
-        'Json'     => [
-            'present',
-            'blank',
-        ],
+        'Boolean'  => ['equal', 'not_equal', 'present', 'blank',],
+        'Date'     => ['equal', 'not_equal', 'present', 'blank',],
+        'Dateonly' => ['equal', 'not_equal', 'present', 'blank',],
+        'Enum'     => ['equal', 'not_equal', 'present', 'blank', 'in',],
+        'Number'   => ['equal', 'not_equal', 'greater_than', 'less_than', 'present', 'blank', 'in',],
+        'String'   => ['equal', 'not_equal', 'starts_with', 'ends_with', 'contains', 'not_contains', 'present', 'blank', 'in',],
+        'Uuid'     => ['equal', 'not_equal', 'present', 'blank'],
+        'Time'     => ['equal', 'not_equal', 'greater_than', 'less_than', 'present', 'blank',],
+        'Json'     => ['present', 'blank',],
     ];
 
     /**
