@@ -186,4 +186,17 @@ class QueryBuilder
     {
         return Uuid::isValid($value);
     }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function ensureIntegerValue($value): bool
+    {
+        if (!is_numeric($value)) {
+            throw new ForestException("The value '$value' should be an Integer");
+        }
+
+        return true;
+    }
 }
