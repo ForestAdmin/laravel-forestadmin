@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Support\Facades\App;
@@ -84,6 +85,23 @@ class ForestSchemaIntrospectionTest extends TestCase
         $this->assertIsArray($data);
         $this->assertEmpty($data);
     }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetTypeByField(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $model = new Book();
+
+        $result = $forestSchema->getTypeByField(class_basename($model), 'label');
+        $resultUnknownType = $forestSchema->getTypeByField(class_basename($model), 'foo');
+
+        $this->assertEquals('String', $result);
+        $this->assertNull($resultUnknownType);
+    }
+
 
     /**
      * @return ForestSchemaInstrospection

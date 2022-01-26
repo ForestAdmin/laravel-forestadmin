@@ -157,9 +157,9 @@ trait HasFilters
      * @param string  $operator
      * @param string  $value
      * @param string  $type
-     * @return void
+     * @return Builder
      */
-    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type)
+    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type): Builder
     {
         switch ($operator) {
             case 'present':
@@ -212,6 +212,8 @@ trait HasFilters
                     "Unsupported operator: $operator"
                 );
         }
+
+        return $query;
     }
 
     /**
@@ -369,6 +371,7 @@ trait HasFilters
                 return $this->isUuid($value);
             case 'Date':
             case 'Dateonly':
+            case 'Time':
                 return (bool) strtotime($value);
             default:
                 return true;

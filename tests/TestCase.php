@@ -37,15 +37,15 @@ class TestCase extends OrchestraTestCase
     /**
      * Call protected/private property of a class.
      * @param object $object
-     * @param string $methodName
+     * @param string $propertyName
      * @param null   $setData
      * @return mixed
      * @throws \ReflectionException
      */
-    public function invokeProperty(object &$object, string $methodName, $setData = null)
+    public function invokeProperty(object &$object, string $propertyName, $setData = null)
     {
         $reflection = new \ReflectionClass(get_class($object));
-        $property = $reflection->getProperty($methodName);
+        $property = $reflection->getProperty($propertyName);
         $property->setAccessible(true);
 
         if ($setData) {

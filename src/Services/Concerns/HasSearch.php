@@ -58,10 +58,10 @@ trait HasSearch
      * @param Builder $query
      * @param Model   $model
      * @param array   $field
-     * @param         $value
+     * @param string  $value
      * @return Builder
      */
-    protected function handleSearchField(Builder $query, Model $model, array $field, $value)
+    protected function handleSearchField(Builder $query, Model $model, array $field, string $value): Builder
     {
         $name = $model->getTable() . '.' . $field['field'];
         if ($field['type'] === 'Number') {
