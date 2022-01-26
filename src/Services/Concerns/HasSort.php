@@ -16,14 +16,12 @@ trait HasSort
     /**
      * @param Builder $query
      * @param string  $sort
-     * @return Builder
+     * @return void
      */
-    protected function appendSort(Builder $query, string $sort): Builder
+    protected function appendSort(Builder $query, string $sort): void
     {
         [$sortBy, $direction] = $this->sortByAndDirection($sort);
         $query->orderBy($sortBy, $direction);
-
-        return $query;
     }
 
     /**

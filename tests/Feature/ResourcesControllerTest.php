@@ -462,4 +462,46 @@ class ResourcesControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEmpty($data['data']);
     }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortAscWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label'], 'sort' => 'id'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::all()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortDescWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label'], 'sort' => '-id'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::all()->last()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::first()->id, $data['data'][1]['id']);
+    }
 }
