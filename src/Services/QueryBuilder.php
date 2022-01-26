@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
@@ -78,6 +79,7 @@ class QueryBuilder
     /**
      * @return Builder
      * @throws Exception
+     * @throws \JsonException
      */
     public function query(): Builder
     {
@@ -99,8 +101,8 @@ class QueryBuilder
         }
 
         if (array_key_exists('filters', $this->params)) {
-            $this->timezone = $this->params['timezone'] ?? null;
-            $this->appendFilters($query, $this->params['filters'], $this->timezone);
+            $this->timezone = new \DateTimeZone($this->params['timezone'] ?? config('app.timezone'));
+            $this->appendFilters($query, $this->params['filters']);
         }
 
         return $query;

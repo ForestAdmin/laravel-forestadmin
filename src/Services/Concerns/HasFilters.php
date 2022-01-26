@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -24,9 +25,9 @@ trait HasFilters
     protected string $aggregator;
 
     /**
-     * @var string|null
+     * @var \DateTimeZone
      */
-    protected ?string $timezone;
+    protected \DateTimeZone $timezone;
 
     /**
      * @var array
@@ -273,10 +274,81 @@ trait HasFilters
      * @param string  $operator
      * @param string  $value
      * @return void
+     * @throws \Exception
      */
     public function dateFilters(Builder $query, string $field, string $operator, string $value)
     {
-        //
+        switch ($operator) {
+            case 'today':
+                $query->whereBetween(
+                    $field,
+                    [
+                        Carbon::now($this->timezone)->startOfDay(),
+                        Carbon::now($this->timezone)->endOfDay()
+                    ]
+                );
+                break;
+            case 'before':
+                $query->where($field, '<', new Carbon(new \DateTime($value), $this->timezone));
+                break;
+            case 'after':
+                $query->where($field, '>', new Carbon(new \DateTime($value), $this->timezone));
+                break;
+            case 'previous_x_days':
+                $this->ensureIntegerValue($value);
+                $query->whereBetween(
+                    $field,
+                    [
+                        Carbon::now($this->timezone)->subDays($value)->startOfDay(),
+                        Carbon::now($this->timezone)->subDay()->endOfDay()
+                    ]
+                );
+                break;
+            case 'previous_x_days_to_date':
+                $this->ensureIntegerValue($value);
+                $query->whereBetween(
+                    $field,
+                    [
+                        Carbon::now($this->timezone)->subDays($value)->startOfDay(),
+                        Carbon::now($this->timezone)->endOfDay()
+                    ]
+                );
+                break;
+            case 'past':
+                $query->where($field, '<=', Carbon::now());
+                break;
+            case 'future':
+                $query->where($field, '>=', Carbon::now());
+                break;
+            case 'before_x_hours_ago':
+                $this->ensureIntegerValue($value);
+                $query->where($field, '<', Carbon::now($this->timezone)->subHours($value));
+                break;
+            case 'after_x_hours_ago':
+                $this->ensureIntegerValue($value);
+                $query->where($field, '>', Carbon::now($this->timezone)->subHours($value));
+                break;
+            case 'yesterday':
+            case 'previous_week':
+            case 'previous_month':
+            case 'previous_quarter':
+            case 'previous_year':
+            case 'previous_week_to_date':
+            case 'previous_month_to_date':
+            case 'previous_quarter_to_date':
+            case 'previous_year_to_date':
+                $period = $operator === 'yesterday' ? 'Day' : Str::ucfirst(Str::of('previous_week')->explode('_')->get(1));
+                $sub = 'sub' . $period;
+                $start = 'startOf' . $period;
+                $end = 'endOf' . $period;
+                if (Str::endsWith($operator, 'to_date')) {
+                    $interval = [Carbon::now($this->timezone)->$start(), Carbon::now()];
+                } else {
+                    $interval = [Carbon::now($this->timezone)->$sub()->$start(), Carbon::now($this->timezone)->$sub()->$end()];
+                }
+                $query->whereBetween($field, $interval);
+                break;
+        }
     }
 
     /**
