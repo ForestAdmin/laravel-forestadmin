@@ -507,7 +507,7 @@ class HasFiltersOperatorsTest extends TestCase
             $queryBuilder->setAggregator('and');
 
             $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] .'\' is not compatible with the type: ' . $value['type']);
+            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] . '\' is not compatible with the type: ' . $value['type']);
             $this->invokeMethod(
                 $queryBuilder,
                 'mainFilters',
@@ -581,7 +581,7 @@ class HasFiltersOperatorsTest extends TestCase
             $queryBuilder->setAggregator('and');
 
             $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] .'\' is not compatible with the type: ' . $value['type']);
+            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] . '\' is not compatible with the type: ' . $value['type']);
             $this->invokeMethod(
                 $queryBuilder,
                 'mainFilters',
@@ -637,7 +637,7 @@ class HasFiltersOperatorsTest extends TestCase
             $queryBuilder->setAggregator('and');
 
             $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] .'\' is not compatible with the type: ' . $value['type']);
+            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] . '\' is not compatible with the type: ' . $value['type']);
             $this->invokeMethod(
                 $queryBuilder,
                 'mainFilters',
@@ -693,7 +693,7 @@ class HasFiltersOperatorsTest extends TestCase
             $queryBuilder->setAggregator('and');
 
             $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] .'\' is not compatible with the type: ' . $value['type']);
+            $this->expectExceptionMessage('🌳🌳🌳 The type of value \'' . $value['value'] . '\' is not compatible with the type: ' . $value['type']);
             $this->invokeMethod(
                 $queryBuilder,
                 'mainFilters',
