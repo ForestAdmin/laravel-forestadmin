@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSort;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class QueryBuilder
     use HasFilters;
     use HasIncludes;
     use HasSearch;
+    use HasSort;
     use Relationships;
 
     /**
@@ -103,6 +105,10 @@ class QueryBuilder
         if (array_key_exists('filters', $this->params)) {
             $this->timezone = new \DateTimeZone($this->params['timezone'] ?? config('app.timezone'));
             $this->appendFilters($query, $this->params['filters']);
+        }
+
+        if (array_key_exists('sort', $this->params)) {
+            $this->appendSort($query, $this->params['sort']);
         }
 
         return $query;
