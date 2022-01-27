@@ -94,7 +94,7 @@ class QueryBuilder
         $query->select($fields);
 
         if ($includes = $this->handleWith($this->model, $fieldsParams)) {
-            $this->appendIncludes($query, $includes);
+            $this->appendRelations($query, $includes);
         }
 
         if (array_key_exists('search', $this->params)) {

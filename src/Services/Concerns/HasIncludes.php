@@ -31,7 +31,7 @@ trait HasIncludes
      * @param array   $includes
      * @return Builder
      */
-    protected function appendIncludes(Builder $query, array $includes): Builder
+    protected function appendRelations(Builder $query, array $includes): Builder
     {
         foreach ($includes as $key => $value) {
             if ($value['foreign_key']) {
