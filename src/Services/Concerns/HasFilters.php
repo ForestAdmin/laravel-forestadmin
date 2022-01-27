@@ -134,12 +134,30 @@ trait HasFilters
         if (Str::contains($field, ':')) {
             $parseField = explode(':', $field);
             $relationName = $parseField[0];
-            $this->appendIncludes($query, $this->handleWith($this->model, [$relationName => $parseField[1]]));
             [$field, $type] = $this->getTypeByField($this->model->$relationName()->getRelated(), $parseField[1]);
+            $query->whereHas(
+                $relationName,
+                function ($query) use ($field, $type, $operator, $value) {
+                    $this->callFilter($query, $field, $type, $operator, $value);
+                }
+            );
         } else {
             [$field, $type] = $this->getTypeByField($this->model, $field);
+            $this->callFilter($query, $field, $type, $operator, $value);
         }
+    }
 
+    /**
+     * @param Builder $query
+     * @param string  $field
+     * @param string  $type
+     * @param string  $operator
+     * @param string  $value
+     * @return void
+     * @throws \Exception
+     */
+    protected function callFilter(Builder $query, string $field, string $type, string $operator, string $value): void
+    {
         if (!$this->isOperatorValidToFieldType($type, $operator)) {
             throw new ForestException("The operator $operator is not allowed to the field type : $type");
         }
@@ -232,7 +250,7 @@ trait HasFilters
                     $field,
                     [
                         Carbon::now($this->timezone)->startOfDay(),
-                        Carbon::now($this->timezone)->endOfDay()
+                        Carbon::now($this->timezone)->endOfDay(),
                     ]
                 );
                 break;
@@ -248,7 +266,7 @@ trait HasFilters
                     $field,
                     [
                         Carbon::now($this->timezone)->subDays($value)->startOfDay(),
-                        Carbon::now($this->timezone)->subDay()->endOfDay()
+                        Carbon::now($this->timezone)->subDay()->endOfDay(),
                     ]
                 );
                 break;
@@ -258,7 +276,7 @@ trait HasFilters
                     $field,
                     [
                         Carbon::now($this->timezone)->subDays($value)->startOfDay(),
-                        Carbon::now($this->timezone)->endOfDay()
+                        Carbon::now($this->timezone)->endOfDay(),
                     ]
                 );
                 break;
