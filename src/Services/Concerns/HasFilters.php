@@ -239,10 +239,10 @@ trait HasFilters
      * @param string  $field
      * @param string  $operator
      * @param string  $value
-     * @return void
+     * @return Builder
      * @throws \Exception
      */
-    public function dateFilters(Builder $query, string $field, string $operator, string $value)
+    public function dateFilters(Builder $query, string $field, string $operator, string $value): Builder
     {
         switch ($operator) {
             case 'today':
@@ -303,7 +303,7 @@ trait HasFilters
             case 'previous_month_to_date':
             case 'previous_quarter_to_date':
             case 'previous_year_to_date':
-                $period = $operator === 'yesterday' ? 'Day' : Str::ucfirst(Str::of('previous_week')->explode('_')->get(1));
+                $period = $operator === 'yesterday' ? 'Day' : Str::ucfirst(Str::of($operator)->explode('_')->get(1));
                 $sub = 'sub' . $period;
                 $start = 'startOf' . $period;
                 $end = 'endOf' . $period;
@@ -315,6 +315,8 @@ trait HasFilters
                 $query->whereBetween($field, $interval);
                 break;
         }
+
+        return $query;
     }
 
     /**

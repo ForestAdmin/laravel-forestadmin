@@ -21,28 +21,13 @@ class HasFiltersOperatorsTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
-    public function testMainFiltersException(): void
-    {
-        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-            ->makePartial();
-        $model = $this->invokeProperty($queryBuilder, 'model');
-
-        $this->expectException(ForestException::class);
-        $this->expectExceptionMessage('🌳🌳🌳 Unknown type: Foo');
-        $this->invokeMethod($queryBuilder, 'mainFilters', [$model->query(), 'label', 'equal', 'test', 'Foo']);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
     public function testMainFiltersPresentOperator(): void
     {
         $operator = 'present';
         $data = $this->getData();
         $results = [
             'Date'     => [
-                ['type' => 'NotNull', 'column' => 'created_at', 'boolean' => 'and'],
+                ['type' => 'NotNull', 'column' => 'created_at', 'boolean' => 'and',],
             ],
             'Dateonly' => [
                 ['type' => 'NotNull', 'column' => 'published_at', 'boolean' => 'and',],

@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Product;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Support\Facades\App;
@@ -275,5 +276,127 @@ class HasFiltersTest extends TestCase
         $result = $this->invokeMethod($trait, 'parseFilters', [$json]);
         $this->assertIsArray($result);
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testHandleFilter(): void
+    {
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+
+        $data = [
+            "field"    => "label",
+            "operator" => "equal",
+            "value"    => "foo",
+        ];
+
+        $query = $queryBuilder->query();
+        $this->invokeMethod(
+            $queryBuilder,
+            'handleFilter',
+            [$query, $data]
+        );
+
+        $this->assertIsArray($query->getQuery()->wheres);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testHandleFilterRelation(): void
+    {
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+
+        $data = [
+            "field"    => "editor:name",
+            "operator" => "equal",
+            "value"    => "foo",
+        ];
+
+        $query = $queryBuilder->query();
+        $this->invokeMethod(
+            $queryBuilder,
+            'handleFilter',
+            [$query, $data]
+        );
+        $queryNested = $query->getQuery()->wheres;
+        $this->assertIsArray($queryNested);
+        $this->assertIsArray($queryNested[0]);
+        $this->assertArrayHasKey('type', $queryNested[0]);
+        $this->assertEquals('Exists', $queryNested[0]['type']);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testCallFilter(): void
+    {
+        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+
+
+        $this->expectException(ForestException::class);
+        $this->expectExceptionMessage('🌳🌳🌳 The operator previous_week is not allowed to the field type : String');
+        $this->invokeMethod(
+            $queryBuilder,
+            'CallFilter',
+            [$queryBuilder->query(), 'label', 'String', 'previous_week', 'foo']
+        );
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testCallFilterException(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $data = [
+            [
+                'type' => 'String',
+                'field' => 'label',
+                'operator' => 'equal',
+                'value' => 'foo',
+            ],
+            [
+                'type' => 'Date',
+                'field' => 'published_at',
+                'operator' => 'before',
+                'value' => '2022-01-01 12:00:00',
+            ],
+            [
+                'type' => 'Dateonly',
+                'field' => 'sold_at',
+                'operator' => 'previous_week',
+                'value' => '',
+            ]
+        ];
+
+        foreach ($data as $value) {
+            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+                ->makePartial();
+            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+            $queryBuilder->setAggregator('and');
+            $query = $queryBuilder->query();
+            $this->invokeMethod(
+                $queryBuilder,
+                'CallFilter',
+                [$query, $value['field'], $value['type'], $value['operator'], $value['value']]
+            );
+            $this->assertIsArray($query->getQuery()->wheres);
+        }
     }
 }
