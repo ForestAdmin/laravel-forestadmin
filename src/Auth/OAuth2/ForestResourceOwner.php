@@ -80,6 +80,6 @@ class ForestResourceOwner implements ResourceOwnerInterface
             'exp'          => $this->expirationInSeconds(),
         ];
 
-        return JWT::encode($user, config('forest.api.auth-secret'));
+        return JWT::encode($user, config('forest.api.auth-secret'), 'HS256');
     }
 }

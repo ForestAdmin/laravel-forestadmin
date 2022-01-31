@@ -9,7 +9,7 @@
     "composer/composer": "^2.1",
     "doctrine/dbal": "^3.1",
     "ext-json": "*",
-    "firebase/php-jwt": "^5.4",
+    "firebase/php-jwt": "^6.0",
     "guzzlehttp/guzzle": "^7.4",
     "league/fractal": "^0.19.2",
     "league/oauth2-client": "^2.6",
