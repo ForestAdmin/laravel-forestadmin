@@ -60,7 +60,7 @@ class AuthController extends Controller
     public function callback()
     {
         $token = $this->auth->verifyCodeAndGenerateToken(route('forest.auth.callback'), request()->all());
-        $tokenData = JWT::decode($token, config('forest.api.auth-secret'), array('HS256'));
+        $tokenData = JWT::decode($token, config('forest.api.auth-secret'), ['HS256']);
 
         return response()->json(compact('token', 'tokenData'));
     }
