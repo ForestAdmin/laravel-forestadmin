@@ -48,7 +48,9 @@ class ForestAuthorization
     {
         if (Auth::guard('forest')->check()) {
             $forestUser = Auth::guard('forest')->user();
-            $this->getPermissions($forestUser->getKey(), $forestUser->getAttribute('rendering_id'));
+            $forestUser->setPermissions(
+                $this->getPermissions($forestUser->getKey(), $forestUser->getAttribute('rendering_id'))
+            );
 
             return $next($request);
         }
