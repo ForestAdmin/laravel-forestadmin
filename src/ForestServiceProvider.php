@@ -5,14 +5,10 @@ namespace ForestAdmin\LaravelForestAdmin;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
-use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 /**
  * Class ForestServiceProvider
@@ -23,11 +19,6 @@ use Illuminate\Support\Str;
  */
 class ForestServiceProvider extends ServiceProvider
 {
-    /**
-     * @var string $serveCommand
-     */
-    protected string $serveCommand = 'artisan serve';
-
     /**
      * Bootstrap the application events.
      * @param Kernel $kernel
