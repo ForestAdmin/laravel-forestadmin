@@ -51,13 +51,22 @@ class ForestServiceProvider extends ServiceProvider
     }
 
     /**
-     * Merge module config if it's not published or some entries are missing.
-     *
      * @return void
      */
     public function register(): void
     {
         $this->mergeConfigFrom($this->configFile(), 'forest');
+
+        config(
+            [
+                'auth.guards.forest' => array_merge(
+                    [
+                        'driver'   => 'forest-token',
+                    ],
+                    config('auth.guards.forest', [])
+                ),
+            ]
+        );
     }
 
     /**
