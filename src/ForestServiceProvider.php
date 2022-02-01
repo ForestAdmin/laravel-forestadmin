@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin;
 
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
+use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
@@ -35,6 +36,7 @@ class ForestServiceProvider extends ServiceProvider
     public function boot(Kernel $kernel): void
     {
         $this->app->register(EventProvider::class);
+        $this->app->register(AuthorizationProvider::class);
 
         $this->publishes(
             [
