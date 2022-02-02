@@ -3,15 +3,19 @@
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSort;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class QueryBuilder
@@ -22,10 +26,12 @@ use Illuminate\Support\Str;
  */
 class QueryBuilder
 {
-    use Relationships;
+    use ArrayHelper;
+    use HasFilters;
     use HasIncludes;
     use HasSearch;
-    use ArrayHelper;
+    use HasSort;
+    use Relationships;
 
     /**
      * @var Model
@@ -75,6 +81,7 @@ class QueryBuilder
     /**
      * @return Builder
      * @throws Exception
+     * @throws \JsonException
      */
     public function query(): Builder
     {
@@ -87,12 +94,21 @@ class QueryBuilder
         $query->select($fields);
 
         if ($includes = $this->handleWith($this->model, $fieldsParams)) {
-            $this->appendIncludes($query, $includes);
+            $this->appendRelations($query, $includes);
         }
 
         if (array_key_exists('search', $this->params)) {
             $isExtended = array_key_exists('searchExtended', $this->params) && (int) $this->params['searchExtended'] === 1;
             $this->appendSearch($query, $this->params['search'], $isExtended);
+        }
+
+        if (array_key_exists('filters', $this->params)) {
+            $this->timezone = new \DateTimeZone($this->params['timezone'] ?? config('app.timezone'));
+            $this->appendFilters($query, $this->params['filters']);
+        }
+
+        if (array_key_exists('sort', $this->params)) {
+            $this->appendSort($query, $this->params['sort']);
         }
 
         return $query;
@@ -168,5 +184,27 @@ class QueryBuilder
         $columns = $connexion->listTableColumns($model->getTable(), $this->database);
 
         return $columns;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function isUuid($value): bool
+    {
+        return Uuid::isValid($value);
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function ensureIntegerValue($value): bool
+    {
+        if (!is_numeric($value)) {
+            throw new ForestException("The value '$value' should be an Integer");
+        }
+
+        return true;
     }
 }

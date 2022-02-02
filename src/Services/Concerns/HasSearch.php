@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Uuid;
 
 /**
  * Class HasSearch
@@ -22,7 +21,7 @@ trait HasSearch
      * @param bool    $isExtended
      * @return void
      */
-    protected function appendSearch(Builder $query, $search, bool $isExtended = false)
+    protected function appendSearch(Builder $query, $search, bool $isExtended = false): void
     {
         $model = $query->getModel();
         if ($isExtended) {
@@ -59,14 +58,14 @@ trait HasSearch
      * @param Builder $query
      * @param Model   $model
      * @param array   $field
-     * @param         $value
+     * @param string  $value
      * @return Builder
      */
-    protected function handleSearchField(Builder $query, Model $model, array $field, $value)
+    protected function handleSearchField(Builder $query, Model $model, array $field, string $value): Builder
     {
         $name = $model->getTable() . '.' . $field['field'];
         if ($field['type'] === 'Number') {
-            if ($this->isNumber($value)) {
+            if (is_numeric($value)) {
                 $query->orWhere($name, (int) $value);
             }
         } elseif ($field['type'] === 'Enum' || $this->isUuid($value)) {
@@ -105,23 +104,5 @@ trait HasSearch
         return method_exists($model, 'searchFields') === false
             || empty($model->searchFields())
             || in_array($field, $model->searchFields(), true);
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isNumber($value): bool
-    {
-        return (int) $value > 0;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isUuid($value): bool
-    {
-        return Uuid::isValid($value);
     }
 }

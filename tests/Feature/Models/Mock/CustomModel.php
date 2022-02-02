@@ -16,6 +16,14 @@ class CustomModel extends Model
     /**
      * @return array
      */
+    public function schemaFields(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
     public function searchFields(): array
     {
         return ['id', 'foo'];

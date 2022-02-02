@@ -51,6 +51,19 @@ class ForestSchemaInstrospection
 
     /**
      * @param string $collection
+     * @param string $field
+     * @return string|null
+     */
+    public function getTypeByField(string $collection, string $field): ?string
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.field == '$field')].type");
+
+        return $data ? $data[0] : null;
+    }
+
+    /**
+     * @param string $collection
      * @return array
      */
     public function getRelatedData(string $collection): array

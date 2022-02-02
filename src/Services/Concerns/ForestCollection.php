@@ -15,6 +15,15 @@ trait ForestCollection
      * @return array
      * @codeCoverageIgnore
      */
+    public function schemaFields(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     * @codeCoverageIgnore
+     */
     public function searchFields(): array
     {
         return [];

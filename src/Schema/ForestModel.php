@@ -83,11 +83,6 @@ class ForestModel
     protected string $table;
 
     /**
-     * @var array
-     */
-    protected array $fields = [];
-
-    /**
      * @param LaravelModel $laravelModel
      */
     public function __construct(LaravelModel $laravelModel)
@@ -129,7 +124,8 @@ class ForestModel
     {
         $fields = $this->fetchFieldsFromTable();
 
-        foreach ($this->fields as $field) {
+        $schemaFields = method_exists($this->model, 'schemaFields') ? $this->model->schemaFields() : [];
+        foreach ($schemaFields as $field) {
             $values = $fields->firstWhere('field', $field['field']) ?: $this->fieldDefaultValues($field['field']);
             if (array_key_exists('enums', $field)) {
                 $values['type'] = 'Enum';
@@ -138,16 +134,6 @@ class ForestModel
         }
 
         return $fields->values()->toArray();
-    }
-
-    /**
-     * @param array $fields
-     * @return ForestModel
-     */
-    public function setFields(array $fields): ForestModel
-    {
-        $this->fields = $fields;
-        return $this;
     }
 
     /**

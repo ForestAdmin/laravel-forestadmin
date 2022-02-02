@@ -113,32 +113,4 @@ class HasSearchTest extends TestCase
         return method_exists($model, 'searchFields') &&
             (empty($model->searchFields()) || in_array($field, $model->searchFields(), true));
     }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testIsNumber(): void
-    {
-        $trait = $this->getObjectForTrait(HasSearch::class);
-        $stringValue = $this->invokeMethod($trait, 'isNumber', ['foo']);
-        $intValue = $this->invokeMethod($trait, 'isNumber', [1]);
-
-        $this->assertFalse($stringValue);
-        $this->assertTrue($intValue);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testIsUuid(): void
-    {
-        $trait = $this->getObjectForTrait(HasSearch::class);
-        $stringValue = $this->invokeMethod($trait, 'isUuid', ['foo']);
-        $uuidValue = $this->invokeMethod($trait, 'isUuid', ['AA111111-AAAA-1111-1111-11AA11AA11AA']);
-
-        $this->assertFalse($stringValue);
-        $this->assertTrue($uuidValue);
-    }
 }

@@ -462,4 +462,98 @@ class ResourcesControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEmpty($data['data']);
     }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortAscWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label'], 'sort' => 'id'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::all()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortDescWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label'], 'sort' => '-id'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::all()->last()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::first()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testFiltersWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->label = 'my favorite book';
+        $book->save();
+
+        $params = ['fields' => ['book' => 'id,label'], 'filters' => '{"field":"label","operator":"equal","value":"my favorite book"}'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals('my favorite book', $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testFiltersAggregatorWithQueryBuilder(): void
+    {
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->difficulty = 'hard';
+        $book->save();
+
+        $params = [
+            'fields' => ['book' => 'id,label,difficulty'],
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}'
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals('hard', $data['data'][0]['attributes']['difficulty']);
+    }
 }
