@@ -108,7 +108,7 @@ class ForestUser
      */
     public function hasPermission(string $key, string $action): bool
     {
-        return in_array($action, $this->getPermissions()[$key], true);
+        return isset($this->getPermissions()[$key]) && in_array($action, $this->getPermissions()[$key], true);
     }
 
     /**
