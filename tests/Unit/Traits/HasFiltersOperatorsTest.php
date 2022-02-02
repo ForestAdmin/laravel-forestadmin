@@ -748,6 +748,7 @@ class HasFiltersOperatorsTest extends TestCase
                     'type'  => 'String',
                     'field' => 'label',
                     'value' => 'foo,   john,  doe',
+                    // Add many space between foo, john and doe for the trim() test in case of IN operator
                 ],
                 [
                     'type'  => 'Uuid',
