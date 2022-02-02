@@ -77,7 +77,7 @@ class ForestUserFactory
      * @param int $renderingId
      * @return array
      */
-    private function getPermissions(int $renderingId): array
+    protected function getPermissions(int $renderingId): array
     {
         $cacheKey = 'permissions:rendering-' . $renderingId;
 
@@ -104,7 +104,7 @@ class ForestUserFactory
      * @throws GuzzleException
      * @throws \JsonException
      */
-    private function fetchPermissions(int $renderingId): array
+    protected function fetchPermissions(int $renderingId): array
     {
         try {
             $response = $this->forestApi->get('/liana/v3/permissions', compact('renderingId'));

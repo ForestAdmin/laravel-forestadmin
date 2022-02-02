@@ -2,10 +2,12 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -23,6 +25,12 @@ class ResourcesControllerTest extends TestCase
 {
     use FakeData;
     use FakeSchema;
+    use MockForestUserFactory;
+
+    /**
+     * @var ForestResourceOwner
+     */
+    private ForestResourceOwner $forestResourceOwner;
 
     /**
      * @param Application $app
@@ -32,6 +40,39 @@ class ResourcesControllerTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
+    }
+
+    /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->forestResourceOwner = new ForestResourceOwner(
+            [
+                'type'                              => 'users',
+                'id'                                => '1',
+                'first_name'                        => 'John',
+                'last_name'                         => 'Doe',
+                'email'                             => 'jdoe@forestadmin.com',
+                'teams'                             => [
+                    0 => 'Operations'
+                ],
+                'tags'                              => [
+                    0 => [
+                        'key'   => 'demo',
+                        'value' => '1234',
+                    ],
+                ],
+                'two_factor_authentication_enabled' => false,
+                'two_factor_authentication_active'  => false,
+            ],
+            1234
+        );
+        $this->withHeader('Authorization', 'Bearer ' . $this->forestResourceOwner->makeJwt());
+
+        $this->mockForestUserFactory();
     }
 
     /**
@@ -47,6 +88,7 @@ class ResourcesControllerTest extends TestCase
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
+
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
