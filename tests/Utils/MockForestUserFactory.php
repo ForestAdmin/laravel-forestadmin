@@ -18,7 +18,7 @@ trait MockForestUserFactory
      * @param bool $allowed
      * @return void
      */
-    public function mockForestUserFactory(bool $allowed = true)
+    public function mockForestUserFactory(bool $allowed = true): void
     {
         $factory = m::mock(ForestUserFactory::class)
             ->shouldAllowMockingProtectedMethods()
@@ -29,7 +29,6 @@ trait MockForestUserFactory
 
         app()->instance(ForestUserFactory::class, $factory);
     }
-
 
     /**
      * @param bool $allowed
