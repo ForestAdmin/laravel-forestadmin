@@ -4,7 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use ForestAdmin\LaravelForestAdmin\Auth\Model\ForestUser;
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,10 +25,13 @@ class AuthorizationProvider extends AuthServiceProvider
     {
         $this->registerPolicies();
 
-        Auth::viaRequest('forest-token', function (Request $request) {
-            $tokenData = JWT::decode($request->bearerToken(), new Key(config('forest.api.auth-secret'), 'HS256'));
+        Auth::viaRequest(
+            'forest-token',
+            static function (Request $request) {
+                $tokenData = JWT::decode($request->bearerToken(), new Key(config('forest.api.auth-secret'), 'HS256'));
 
-            return new ForestUser((array) $tokenData);
-        });
+                return new ForestUser((array) $tokenData);
+            }
+        );
     }
 }
