@@ -46,11 +46,6 @@ class ForestUserFactory
         $permissions = $this->getPermissions($renderingId);
         $forestUser->setStats($permissions['stats']);
 
-        //////TEST
-        $permissions['collections']['advertisement']['actions'] = [
-            "MV Smart action" => ["triggerEnabled" => true]
-        ];
-
         if (array_key_exists('collections', $permissions)) {
             $collections = array_keys($permissions['collections']);
             foreach ($collections as $collection) {
