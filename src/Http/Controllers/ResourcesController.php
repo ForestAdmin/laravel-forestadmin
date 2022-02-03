@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
@@ -14,8 +15,11 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Excel;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class ResourcesController
@@ -39,28 +43,46 @@ class ResourcesController extends ForestController
     protected string $name;
 
     /**
+     * @var string
+     */
+    protected string $requestFormat = 'json';
+
+    /**
      * @throws \Exception
      */
     public function __construct()
     {
         $this->name = request()->route()->parameter('collection');
+        if (Str::endsWith($this->name, '.csv')) {
+            $this->name = Str::replaceLast('.csv', '', $this->name);
+            $this->requestFormat = 'csv';
+        }
         $this->model = Schema::getModel(ucfirst($this->name));
     }
 
     /**
-     * @return JsonResponse
+     * @return CollectionExport|JsonResponse
      * @throws Exception
      * @throws AuthorizationException
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $this->authorize('viewAny',  $this->model);
+        $authorizeAction = $this->requestFormat === 'csv' ? 'export' : 'viewAny';
+        $this->authorize($authorizeAction,  $this->model);
 
         $repository = new ResourceGetter($this->model);
 
-        return response()->json(
-            JsonApi::render($repository->all(), $this->name)
-        );
+        if ($this->requestFormat === 'csv') {
+            return new CollectionExport(
+                $repository->all(false),
+                request()->input('filename', $this->name),
+                request()->input('header')
+            );
+        } else {
+            return response()->json(
+                JsonApi::render($repository->all(), $this->name)
+            );
+        }
     }
 
     /**

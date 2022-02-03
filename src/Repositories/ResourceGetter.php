@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -32,18 +33,23 @@ class ResourceGetter extends BaseRepository
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @param  bool $paginate
+     * @return LengthAwarePaginator|Collection
      * @throws Exception
      */
-    public function all(): LengthAwarePaginator
+    public function all(bool $paginate = true)
     {
         $pageParams = $this->params['page'] ?? [];
-        return $this->query()->paginate(
-            $pageParams['size'] ?? null,
-            '*',
-            'page',
-            $pageParams['number'] ?? null
-        );
+        if ($paginate) {
+            return $this->query()->paginate(
+                $pageParams['size'] ?? null,
+                '*',
+                'page',
+                $pageParams['number'] ?? null
+            );
+        } else {
+            return $this->query()->get();
+        }
     }
 
     /**
