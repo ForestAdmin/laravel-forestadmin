@@ -44,6 +44,9 @@ class RelationshipsControllerTest extends TestCase
         $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
     }
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
