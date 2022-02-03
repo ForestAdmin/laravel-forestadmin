@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
+use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
@@ -13,7 +14,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response as Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResourcesControllerTest
@@ -58,7 +61,7 @@ class ResourcesControllerTest extends TestCase
                 'last_name'                         => 'Doe',
                 'email'                             => 'jdoe@forestadmin.com',
                 'teams'                             => [
-                    0 => 'Operations'
+                    0 => 'Operations',
                 ],
                 'tags'                              => [
                     0 => [
@@ -109,6 +112,58 @@ class ResourcesControllerTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testExport(): void
+    {
+        $this->getBook()->save();
+        $params = [
+            'fields'   => ['book' => 'id,label'],
+            'filename' => 'books',
+            'header'   => 'id,label',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        Excel::fake();
+
+        $call = $this->get('/forest/book.csv?' . http_build_query($params));
+        $book = Book::first();
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $call->baseResponse);
+        Excel::assertDownloaded($params['filename'] . '.csv',
+            static function(CollectionExport $export) use ($book) {
+                return $export->collection()->count() === 1
+                && $export->collection()->first() instanceof Book
+                && $export->collection()->first()->label === $book->label;
+            }
+        );
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testExportPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $params = [
+            'fields'   => ['book' => 'id,label'],
+            'filename' => 'books',
+            'header'   => 'id,label',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book.csv?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -677,8 +732,8 @@ class ResourcesControllerTest extends TestCase
                             "validations"   => [],
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         File::shouldReceive('get')->andReturn(json_encode($fakeCategorySchema, JSON_THROW_ON_ERROR));
         $call = $this->get('/forest/book?' . http_build_query($params));
@@ -789,8 +844,8 @@ class ResourcesControllerTest extends TestCase
         $book->save();
 
         $params = [
-            'fields' => ['book' => 'id,label,difficulty'],
-            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}'
+            'fields'  => ['book' => 'id,label,difficulty'],
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}',
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

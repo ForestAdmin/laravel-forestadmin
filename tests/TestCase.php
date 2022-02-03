@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\ForestServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
+use Maatwebsite\Excel\ExcelServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 /**
@@ -99,6 +100,7 @@ class TestCase extends OrchestraTestCase
     {
         return [
             ForestServiceProvider::class,
+            ExcelServiceProvider::class,
         ];
     }
 
