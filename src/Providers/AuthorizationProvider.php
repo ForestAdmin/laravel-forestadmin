@@ -30,9 +30,11 @@ class AuthorizationProvider extends AuthServiceProvider
         Auth::viaRequest(
             'forest-token',
             static function (Request $request) {
-                $tokenData = JWT::decode($request->bearerToken(), new Key(config('forest.api.auth-secret'), 'HS256'));
+                if ($request->bearerToken()) {
+                    $tokenData = JWT::decode($request->bearerToken(), new Key(config('forest.api.auth-secret'), 'HS256'));
 
-                return new ForestUser((array) $tokenData);
+                    return new ForestUser((array) $tokenData);
+                }
             }
         );
 

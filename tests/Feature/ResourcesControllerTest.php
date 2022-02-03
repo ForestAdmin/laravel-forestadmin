@@ -123,6 +123,24 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testIndexUserNotLoggedIn(): void
+    {
+        $this->withHeader('Authorization', '');
+        $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('You must be logged in to access at this resource.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testExport(): void
     {
         $this->getBook()->save();
