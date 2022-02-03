@@ -53,9 +53,7 @@ class ForestUserFactory
                     if (array_key_exists($type, $permissions['collections'][$collection])) {
                         $actions = [];
                         foreach ($permissions['collections'][$collection][$type] as $key => $value) {
-                            if ($type === 'actions') {
-                                $value = $value['triggerEnabled'];
-                            }
+                            $value = $type === 'actions' ? $value['triggerEnabled'] : $value;
                             if ($value === true || (is_array($value) && in_array($forestUser->getKey(), $value, true))) {
                                 $actions[] = $key;
                             }
