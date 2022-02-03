@@ -6,6 +6,7 @@
     <exclude-pattern>*/*.css</exclude-pattern>
     <exclude-pattern>*/*.xml</exclude-pattern>
     <exclude-pattern>*/*.blade.php</exclude-pattern>
+    <exclude-pattern>*/src/Services/Concerns/HasFilters.php</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/tests/ExampleTest.php*</exclude-pattern>
     <exclude-pattern>*/tests/Unit/Traits/HasFiltersDateOperatorsTest.php</exclude-pattern>
