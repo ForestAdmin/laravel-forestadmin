@@ -8,7 +8,6 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Illuminate\Database\Eloquent\Collection;
 
-
 /**
  * Class CollectionExportTest
  *

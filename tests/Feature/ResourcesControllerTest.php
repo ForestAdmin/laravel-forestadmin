@@ -157,8 +157,9 @@ class ResourcesControllerTest extends TestCase
         $book = Book::first();
 
         $this->assertInstanceOf(BinaryFileResponse::class, $call->baseResponse);
-        Excel::assertDownloaded($params['filename'] . '.csv',
-            static function(CollectionExport $export) use ($book) {
+        Excel::assertDownloaded(
+            $params['filename'] . '.csv',
+            static function (CollectionExport $export) use ($book) {
                 return $export->collection()->count() === 1
                 && $export->collection()->first() instanceof Book
                 && $export->collection()->first()->label === $book->label;
