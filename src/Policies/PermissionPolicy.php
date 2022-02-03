@@ -18,8 +18,6 @@ class PermissionPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any models.
-     *
      * @param ForestUser $forestUser
      * @param mixed      $collection
      * @return Response|bool
@@ -30,8 +28,6 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
-     *
      * @param ForestUser $forestUser
      * @param mixed      $collection
      * @return Response|bool
@@ -42,8 +38,6 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can create models.
-     *
      * @param ForestUser $forestUser
      * @param mixed      $collection
      * @return Response|bool
@@ -54,8 +48,6 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
-     *
      * @param ForestUser $forestUser
      * @param mixed      $collection
      * @return Response|bool
@@ -66,8 +58,6 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
-     *
      * @param ForestUser $forestUser
      * @param            $collection
      * @return Response|bool
@@ -78,8 +68,6 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
-     *
      * @param ForestUser $forestUser
      * @param mixed      $collection
      * @return Response|bool

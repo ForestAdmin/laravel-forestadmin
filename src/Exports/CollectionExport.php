@@ -9,6 +9,13 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Excel;
 
+/**
+ * Class CollectionExport
+ *
+ * @package Laravel-forestadmin
+ * @license GNU https://www.gnu.org/licenses/licenses.html
+ * @link    https://github.com/ForestAdmin/laravel-forestadmin
+ */
 class CollectionExport implements FromCollection, WithHeadings, Responsable
 {
     use Exportable;
