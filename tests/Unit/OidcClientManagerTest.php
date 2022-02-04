@@ -124,7 +124,6 @@ class OidcClientManagerTest extends TestCase
 
     /**
      * @return string
-     * todo migrate to utils
      */
     public static function mockedConfig()
     {

@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
@@ -13,6 +14,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -30,6 +32,7 @@ class RelationshipsControllerTest extends TestCase
 {
     use FakeData;
     use FakeSchema;
+    use MockForestUserFactory;
 
     /**
      * @param Application $app
@@ -39,6 +42,39 @@ class RelationshipsControllerTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
+    }
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->forestResourceOwner = new ForestResourceOwner(
+            [
+                'type'                              => 'users',
+                'id'                                => '1',
+                'first_name'                        => 'John',
+                'last_name'                         => 'Doe',
+                'email'                             => 'jdoe@forestadmin.com',
+                'teams'                             => [
+                    0 => 'Operations'
+                ],
+                'tags'                              => [
+                    0 => [
+                        'key'   => 'demo',
+                        'value' => '1234',
+                    ],
+                ],
+                'two_factor_authentication_enabled' => false,
+                'two_factor_authentication_active'  => false,
+            ],
+            1234
+        );
+        $this->withHeader('Authorization', 'Bearer ' . $this->forestResourceOwner->makeJwt());
+
+        $this->mockForestUserFactory();
     }
 
     /**

@@ -4,16 +4,18 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceCreator;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceUpdater;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -24,7 +26,7 @@ use Psr\Container\NotFoundExceptionInterface;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class ResourcesController extends Controller
+class ResourcesController extends ForestController
 {
     use Schema;
 
@@ -39,33 +41,56 @@ class ResourcesController extends Controller
     protected string $name;
 
     /**
+     * @var string
+     */
+    protected string $requestFormat = 'json';
+
+    /**
      * @throws \Exception
      */
     public function __construct()
     {
         $this->name = request()->route()->parameter('collection');
+        if (Str::endsWith($this->name, '.csv')) {
+            $this->name = Str::replaceLast('.csv', '', $this->name);
+            $this->requestFormat = 'csv';
+        }
         $this->model = Schema::getModel(ucfirst($this->name));
     }
 
     /**
-     * @return JsonResponse
+     * @return CollectionExport|JsonResponse
      * @throws Exception
+     * @throws AuthorizationException
      */
-    public function index(): JsonResponse
+    public function index()
     {
+        $authorizeAction = $this->requestFormat === 'csv' ? 'export' : 'viewAny';
+        $this->authorize($authorizeAction,  $this->model);
+
         $repository = new ResourceGetter($this->model);
 
-        return response()->json(
-            JsonApi::render($repository->all(), $this->name)
-        );
+        if ($this->requestFormat === 'csv') {
+            return new CollectionExport(
+                $repository->all(false),
+                request()->input('filename', $this->name),
+                request()->input('header')
+            );
+        } else {
+            return response()->json(
+                JsonApi::render($repository->all(), $this->name)
+            );
+        }
     }
 
     /**
      * @return JsonResponse
-     * @throws Exception
+     * @throws Exception|AuthorizationException
      */
     public function show(): JsonResponse
     {
+        $this->authorize('view', $this->model);
+
         $repository = new ResourceGetter($this->model);
 
         try {
@@ -82,10 +107,12 @@ class ResourcesController extends Controller
      * @return JsonResponse
      * @throws Exception
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|AuthorizationException
      */
     public function store(): JsonResponse
     {
+        $this->authorize('create', $this->model);
+
         try {
             $repository = new ResourceCreator($this->model);
             return response()->json(
@@ -101,10 +128,12 @@ class ResourcesController extends Controller
      * @return JsonResponse
      * @throws Exception
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|AuthorizationException
      */
     public function update(): JsonResponse
     {
+        $this->authorize('update', $this->model);
+
         try {
             $repository = new ResourceUpdater($this->model);
             $id = request()->input('data.' . $this->model->getKeyName());
@@ -119,9 +148,12 @@ class ResourcesController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function destroy(): JsonResponse
     {
+        $this->authorize('delete', $this->model);
+
         try {
             $id = request()->route()->parameter($this->model->getKeyName());
             $repository = new ResourceRemover($this->model, $this->name);
@@ -133,9 +165,13 @@ class ResourcesController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws Exception
+     * @throws AuthorizationException
      */
     public function count(): JsonResponse
     {
+        $this->authorize('viewAny',  $this->model);
+
         $repository = new ResourceGetter($this->model);
 
         return response()->json(['count' => $repository->count()]);
@@ -143,9 +179,12 @@ class ResourcesController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function destroyBulk(): JsonResponse
     {
+        $this->authorize('delete', $this->model);
+
         try {
             $repository = new ResourceRemover($this->model);
             $request = request()->only('data.attributes.ids', 'data.attributes.all_records', 'data.attributes.all_records_ids_excluded');

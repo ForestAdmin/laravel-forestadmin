@@ -46,10 +46,11 @@ class HasManyGetter extends ResourceGetter
     }
 
     /**
+     * @param bool $paginate
      * @return LengthAwarePaginator
      * @throws Exception
      */
-    public function all(): LengthAwarePaginator
+    public function all(bool $paginate = true): LengthAwarePaginator
     {
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
         $pageParams = $this->params['page'] ?? [];

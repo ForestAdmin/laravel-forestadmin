@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 
@@ -87,7 +88,7 @@ class ForestResourceOwnerTest extends TestCase
      */
     public function testMakeJwt(): void
     {
-        $result = JWT::decode($this->forestResourceOwner->makeJwt(), config('forest.api.auth-secret'), array('HS256'));
+        $result = JWT::decode($this->forestResourceOwner->makeJwt(), new Key(config('forest.api.auth-secret'), 'HS256'));
 
         $this->assertEquals(1, $result->id);
     }

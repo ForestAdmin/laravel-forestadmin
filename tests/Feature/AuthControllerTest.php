@@ -78,7 +78,7 @@ class AuthControllerTest extends TestCase
             'rendering_id' => 1,
             'exp'          => (new \DateTime())->modify('+ 1 hour')->format('U'),
         ];
-        $jwt = JWT::encode($user, config('forest.api.auth-secret'));
+        $jwt = JWT::encode($user, config('forest.api.auth-secret'), 'HS256');
 
         $auth = $this->prophesize(AuthManager::class);
         $auth

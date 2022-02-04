@@ -15,6 +15,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery as m;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -200,7 +201,6 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($expectResult, $handleSearchUuid->getQuery()->wheres[0]);
     }
 
-
     /**
      * @return void
      * @throws Exception
@@ -256,6 +256,9 @@ class QueryBuilderTest extends TestCase
                 ]
             );
 
+        $grammar = $this->prophesize(Grammar::class);
+        $grammar->getBitOperators()
+            ->willReturn([]);
         $connection = $this->prophesize(Connection::class);
         $connection->getTablePrefix()
             ->shouldBeCalled()
@@ -263,7 +266,7 @@ class QueryBuilderTest extends TestCase
         $connection->getDoctrineSchemaManager()
             ->willReturn($schemaManager->reveal());
         $connection->getQueryGrammar()
-            ->willReturn(null);
+            ->willReturn($grammar->reveal());
         $connection->getPostProcessor()
             ->willReturn(null);
 

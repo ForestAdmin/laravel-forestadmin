@@ -3,15 +3,12 @@
 namespace ForestAdmin\LaravelForestAdmin;
 
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
+use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
-use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 /**
  * Class ForestServiceProvider
@@ -23,11 +20,6 @@ use Illuminate\Support\Str;
 class ForestServiceProvider extends ServiceProvider
 {
     /**
-     * @var string $serveCommand
-     */
-    protected string $serveCommand = 'artisan serve';
-
-    /**
      * Bootstrap the application events.
      * @param Kernel $kernel
      * @return void
@@ -35,6 +27,7 @@ class ForestServiceProvider extends ServiceProvider
     public function boot(Kernel $kernel): void
     {
         $this->app->register(EventProvider::class);
+        $this->app->register(AuthorizationProvider::class);
 
         $this->publishes(
             [
@@ -51,13 +44,22 @@ class ForestServiceProvider extends ServiceProvider
     }
 
     /**
-     * Merge module config if it's not published or some entries are missing.
-     *
      * @return void
      */
     public function register(): void
     {
         $this->mergeConfigFrom($this->configFile(), 'forest');
+
+        config(
+            [
+                'auth.guards.forest' => array_merge(
+                    [
+                        'driver'   => 'forest-token',
+                    ],
+                    config('auth.guards.forest', [])
+                ),
+            ]
+        );
     }
 
     /**

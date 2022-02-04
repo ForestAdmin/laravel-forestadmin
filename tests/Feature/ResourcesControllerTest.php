@@ -2,15 +2,21 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
+use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResourcesControllerTest
@@ -23,6 +29,12 @@ class ResourcesControllerTest extends TestCase
 {
     use FakeData;
     use FakeSchema;
+    use MockForestUserFactory;
+
+    /**
+     * @var ForestResourceOwner
+     */
+    private ForestResourceOwner $forestResourceOwner;
 
     /**
      * @param Application $app
@@ -32,6 +44,39 @@ class ResourcesControllerTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
+    }
+
+    /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->forestResourceOwner = new ForestResourceOwner(
+            [
+                'type'                              => 'users',
+                'id'                                => '1',
+                'first_name'                        => 'John',
+                'last_name'                         => 'Doe',
+                'email'                             => 'jdoe@forestadmin.com',
+                'teams'                             => [
+                    0 => 'Operations',
+                ],
+                'tags'                              => [
+                    0 => [
+                        'key'   => 'demo',
+                        'value' => '1234',
+                    ],
+                ],
+                'two_factor_authentication_enabled' => false,
+                'two_factor_authentication_active'  => false,
+            ],
+            1234
+        );
+        $this->withHeader('Authorization', 'Bearer ' . $this->forestResourceOwner->makeJwt());
+
+        $this->mockForestUserFactory();
     }
 
     /**
@@ -48,10 +93,101 @@ class ResourcesControllerTest extends TestCase
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
 
+
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals($book->id, $data['data'][0]['id']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexUserNotLoggedIn(): void
+    {
+        $this->withHeader('Authorization', '');
+        $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('You must be logged in to access at this resource.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testExport(): void
+    {
+        $this->getBook()->save();
+        $params = [
+            'fields'   => ['book' => 'id,label'],
+            'filename' => 'books',
+            'header'   => 'id,label',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        Excel::fake();
+
+        $call = $this->get('/forest/book.csv?' . http_build_query($params));
+        $book = Book::first();
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $call->baseResponse);
+        Excel::assertDownloaded(
+            $params['filename'] . '.csv',
+            static function (CollectionExport $export) use ($book) {
+                return $export->collection()->count() === 1
+                && $export->collection()->first() instanceof Book
+                && $export->collection()->first()->label === $book->label;
+            }
+        );
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testExportPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $params = [
+            'fields'   => ['book' => 'id,label'],
+            'filename' => 'books',
+            'header'   => 'id,label',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book.csv?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
     }
 
     /**
@@ -72,6 +208,25 @@ class ResourcesControllerTest extends TestCase
         $this->assertEquals('book', $data['data']['type']);
         $this->assertEquals($book->id, $data['data']['id']);
         $this->assertEquals($book->label, $data['data']['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testShowPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $params = ['fields' => ['book' => 'id,label']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->getJson('/forest/book/1?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
     }
 
     /**
@@ -137,6 +292,46 @@ class ResourcesControllerTest extends TestCase
         $this->assertEquals($book->options, $attributes['options']);
         $this->assertEquals($book->other, $attributes['other']);
         $this->assertEquals($book->category_id, $attributes['category_id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testStorePermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $params = [
+            'data' => [
+                'attributes'    => [
+                    'label'      => 'test label',
+                    'comment'    => 'test comment',
+                    'difficulty' => 'easy',
+                    'amount'     => 10,
+                    'active'     => true,
+                    'options'    => ['key' => 'value'],
+                    'other'      => 'N/A',
+                ],
+                'relationships' => [
+                    'category' => [
+                        'data' => [
+                            'type' => 'categories',
+                            'id'   => '1',
+                        ],
+                    ],
+                ],
+            ],
+            'type' => 'books',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->postJson('/forest/book', $params);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
     }
 
     /**
@@ -219,6 +414,48 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testUpdatePermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $book = Book::first();
+        $params = [
+            'data' => [
+                'id'            => $book->id,
+                'attributes'    => [
+                    'label'      => 'test label',
+                    'comment'    => 'test comment',
+                    'difficulty' => 'easy',
+                    'amount'     => 10,
+                    'active'     => true,
+                    'options'    => ['key' => 'value'],
+                    'other'      => 'N/A',
+                ],
+                'relationships' => [
+                    'category' => [
+                        'data' => [
+                            'type' => 'categories',
+                            'id'   => '1',
+                        ],
+                    ],
+                ],
+            ],
+            'type' => 'books',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->putJson('/forest/book/' . $book->id, $params);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testUpdateException(): void
     {
         $this->getBook()->save();
@@ -264,6 +501,25 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testDestroyPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $this->getBook()->save();
+        $book = Book::first();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->deleteJson('/forest/book/' . $book->id);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testDestroyException(): void
     {
         $this->getBook()->save();
@@ -290,6 +546,22 @@ class ResourcesControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals($book->count(), $data['count']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testCountPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        $book = $this->getBook();
+        $call = $this->getJson('/forest/book/count');
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
     }
 
     /**
@@ -335,6 +607,53 @@ class ResourcesControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(204, $call->getStatusCode());
         $this->assertTrue(empty(Book::where('id', '<=', 5)->get()->toArray()));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testDestroyBulkPermissionDenied(): void
+    {
+        $this->mockForestUserFactory(false);
+        for ($i = 0; $i < 19; $i++) {
+            $this->getBook()->save();
+        }
+        $params = [
+            'data' => [
+                'attributes' => [
+                    'ids'                      => ['1', '2', '3', '4', '5'],
+                    'collection_name'          => 'book',
+                    'parent_collection_name'   => null,
+                    'parent_collection_id'     => null,
+                    'parent_association_name'  => null,
+                    'all_records'              => true,
+                    'all_records_subset_query' => [
+                        'fields[book]'     => 'id,label,comment,difficulty,amount,active,options,other,created_at,updated_at,category,editor,image',
+                        'fields[category]' => 'label',
+                        'fields[editor]'   => 'name',
+                        'fields[image]'    => 'name',
+                        'page[number]'     => 1,
+                        'page[size]'       => 15,
+                        'sort'             => '-id',
+                        'searchExtended'   => 0,
+                    ],
+                    'all_records_ids_excluded' => [
+                        '6', '7', '8', '9', '10', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                    ],
+                    'smart_action_id'          => null,
+                ],
+                'type'       => 'action-requests',
+            ],
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->deleteJson('/forest/book/', $params);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $data['message']);
     }
 
     /**
@@ -432,8 +751,8 @@ class ResourcesControllerTest extends TestCase
                             "validations"   => [],
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         File::shouldReceive('get')->andReturn(json_encode($fakeCategorySchema, JSON_THROW_ON_ERROR));
         $call = $this->get('/forest/book?' . http_build_query($params));
@@ -544,8 +863,8 @@ class ResourcesControllerTest extends TestCase
         $book->save();
 
         $params = [
-            'fields' => ['book' => 'id,label,difficulty'],
-            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}'
+            'fields'  => ['book' => 'id,label,difficulty'],
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}',
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

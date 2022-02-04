@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use ForestAdmin\LaravelForestAdmin\Auth\AuthManager;
 use ForestAdmin\LaravelForestAdmin\Auth\OidcConfiguration;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
@@ -60,7 +61,7 @@ class AuthController extends Controller
     public function callback()
     {
         $token = $this->auth->verifyCodeAndGenerateToken(route('forest.auth.callback'), request()->all());
-        $tokenData = JWT::decode($token, config('forest.api.auth-secret'), ['HS256']);
+        $tokenData = JWT::decode($token, new Key(config('forest.api.auth-secret'), 'HS256'));
 
         return response()->json(compact('token', 'tokenData'));
     }
