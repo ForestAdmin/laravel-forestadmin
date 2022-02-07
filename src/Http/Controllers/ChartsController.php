@@ -3,7 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
+use ForestAdmin\LaravelForestAdmin\Transformers\ChartTransformer;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class ChartsController
@@ -31,7 +34,16 @@ class ChartsController extends ForestController
         $model = Schema::getModel(ucfirst($name));
         $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\\' . $type)($model);
 
-        dd($repository);
+        return response()->json(
+            JsonApi::renderItem(
+                [
+                    'id'    => Uuid::uuid4(),
+                    'value' => $repository->get(),
+                ],
+                'stats',
+                ChartTransformer::class
+            )
+        );
     }
 
 
