@@ -443,7 +443,7 @@ class HasFiltersOperatorsTest extends TestCase
                 ['type' => 'Basic', 'column' => 'published_at', 'operator' => '=', 'value' => '2022-01-01', 'boolean' => 'and'],
             ],
             'Boolean'  => [
-                ['type' => 'Basic', 'column' => 'active', 'operator' => '=', 'value' => '1', 'boolean' => 'and'],
+                ['type' => 'Basic', 'column' => 'active', 'operator' => '=', 'value' => true, 'boolean' => 'and'],
             ],
             'Enum'     => [
                 ['type' => 'Basic', 'column' => 'difficulty', 'operator' => '=', 'value' => 'easy', 'boolean' => 'and'],
@@ -475,6 +475,34 @@ class HasFiltersOperatorsTest extends TestCase
             $this->assertIsArray($queryResult->getQuery()->wheres);
             $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'Result for type ' . $value['type'] . ' is incorrect.');
         }
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testMainFiltersEqualOperatorWithFalse(): void
+    {
+        $operator = 'equal';
+        $data = $this->getData(['Boolean']);
+        $data = array_shift($data);
+        $data['value'] = false;
+        $results = [
+            'Boolean'  => [
+                ['type' => 'Basic', 'column' => 'active', 'operator' => '=', 'value' => false, 'boolean' => 'and'],
+            ],
+        ];
+        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $queryResult = $this->invokeMethod(
+            $queryBuilder,
+            'mainFilters',
+            [$queryBuilder->query(), $data['field'], $operator, $data['value'], $data['type']]
+        );
+
+        $this->assertIsArray($queryResult->getQuery()->wheres);
+        $this->assertEquals($results[$data['type']], $queryResult->getQuery()->wheres, 'Result for type ' . $data['type'] . ' is incorrect.');
     }
 
     /**
@@ -517,7 +545,7 @@ class HasFiltersOperatorsTest extends TestCase
                 ['type' => 'Basic', 'column' => 'published_at', 'operator' => '!=', 'value' => '2022-01-01', 'boolean' => 'and'],
             ],
             'Boolean'  => [
-                ['type' => 'Basic', 'column' => 'active', 'operator' => '!=', 'value' => '1', 'boolean' => 'and'],
+                ['type' => 'Basic', 'column' => 'active', 'operator' => '!=', 'value' => true, 'boolean' => 'and'],
             ],
             'Enum'     => [
                 ['type' => 'Basic', 'column' => 'difficulty', 'operator' => '!=', 'value' => 'easy', 'boolean' => 'and'],
@@ -550,6 +578,35 @@ class HasFiltersOperatorsTest extends TestCase
             $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'Result for type ' . $value['type'] . ' is incorrect.');
         }
     }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testMainFiltersNotEqualOperatorWithFalse(): void
+    {
+        $operator = 'not_equal';
+        $data = $this->getData(['Boolean']);
+        $data = array_shift($data);
+        $data['value'] = false;
+        $results = [
+            'Boolean'  => [
+                ['type' => 'Basic', 'column' => 'active', 'operator' => '!=', 'value' => false, 'boolean' => 'and'],
+            ],
+        ];
+        $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $queryResult = $this->invokeMethod(
+            $queryBuilder,
+            'mainFilters',
+            [$queryBuilder->query(), $data['field'], $operator, $data['value'], $data['type']]
+        );
+
+        $this->assertIsArray($queryResult->getQuery()->wheres);
+        $this->assertEquals($results[$data['type']], $queryResult->getQuery()->wheres, 'Result for type ' . $data['type'] . ' is incorrect.');
+    }
+
 
     /**
      * @return void
