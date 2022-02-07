@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  *
  * @method static array render($class, string $name)
+ * @method static array renderItem($class, string $name, string $transformer)
  *
  * @see JsonApiResponse
  */
