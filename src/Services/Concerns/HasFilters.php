@@ -235,14 +235,14 @@ trait HasFilters
     }
 
     /**
-     * @param Builder $query
-     * @param string  $field
-     * @param string  $operator
-     * @param string  $value
+     * @param Builder     $query
+     * @param string      $field
+     * @param string      $operator
+     * @param string|null $value
      * @return Builder
      * @throws \Exception
      */
-    public function dateFilters(Builder $query, string $field, string $operator, string $value): Builder
+    public function dateFilters(Builder $query, string $field, string $operator, ?string $value = null): Builder
     {
         switch ($operator) {
             case 'today':
