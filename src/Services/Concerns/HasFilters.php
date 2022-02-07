@@ -129,7 +129,7 @@ trait HasFilters
     protected function handleFilter(Builder $query, array $filter): void
     {
         [$field, $operator, $value] = array_values($filter);
-        $value = trim($value);
+        $value = is_string($value) ? trim($value) : $value;
 
         if (Str::contains($field, ':')) {
             $parseField = explode(':', $field);
@@ -152,11 +152,11 @@ trait HasFilters
      * @param string  $field
      * @param string  $type
      * @param string  $operator
-     * @param string  $value
+     * @param         $value
      * @return void
      * @throws \Exception
      */
-    protected function callFilter(Builder $query, string $field, string $type, string $operator, string $value): void
+    protected function callFilter(Builder $query, string $field, string $type, string $operator, $value): void
     {
         if (!$this->isOperatorValidToFieldType($type, $operator)) {
             throw new ForestException("The operator $operator is not allowed to the field type : $type");
@@ -173,11 +173,11 @@ trait HasFilters
      * @param Builder $query
      * @param string  $field
      * @param string  $operator
-     * @param string  $value
+     * @param         $value
      * @param string  $type
      * @return Builder
      */
-    public function mainFilters(Builder $query, string $field, string $operator, string $value, string $type): Builder
+    public function mainFilters(Builder $query, string $field, string $operator, $value, string $type): Builder
     {
         switch ($operator) {
             case 'present':
