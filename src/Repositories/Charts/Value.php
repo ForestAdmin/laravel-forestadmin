@@ -3,7 +3,6 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Value
@@ -14,9 +13,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Value extends ChartRepository
 {
-    public function __construct(Model $model)
+    /**
+     * @param $data
+     * @return array
+     */
+    public function serialize($data): array
     {
-        dd('value');
-        parent::__construct($model);
+        return [
+            'countCurrent'  => $data,
+            'countPrevious' => null,
+        ];
     }
 }
