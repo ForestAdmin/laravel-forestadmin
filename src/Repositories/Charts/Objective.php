@@ -23,5 +23,4 @@ class Objective extends ChartRepository
             'value'  => $data,
         ];
     }
-
 }
