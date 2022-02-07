@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Class ChartRepository
  *

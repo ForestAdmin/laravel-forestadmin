@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Value
@@ -13,5 +14,9 @@ use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
  */
 class Value extends ChartRepository
 {
-
+    public function __construct(Model $model)
+    {
+        dd('value');
+        parent::__construct($model);
+    }
 }
