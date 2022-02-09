@@ -47,7 +47,7 @@ trait RawQuery
     protected function abortIf(bool $condition, Collection $result, string $keyNames): void
     {
         if ($condition) {
-            $resultKeys = implode(',', array_keys($result));
+            $resultKeys = $result->keys()->implode(',');
             throw new ForestException("The result columns must be named '$keyNames' instead of '$resultKeys'");
         }
     }
