@@ -19,7 +19,7 @@ class Objective extends LiveQueryRepository
      */
     public function serialize($data): array
     {
-        $this->abortIf(!isset($data->first()->value, $data->first()->objective), $data, "'value', 'objective'");
+        $this->abortIf(!isset($data->first()->value, $data->first()->objective), collect($data->first()), "'value', 'objective'");
 
         return [
             'value' => $data->first()->value,

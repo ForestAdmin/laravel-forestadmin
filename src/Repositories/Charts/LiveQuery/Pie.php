@@ -20,7 +20,7 @@ class Pie extends LiveQueryRepository
     public function serialize($data): array
     {
         $data->each(
-            fn ($item) => $this->abortIf(!isset($item->value, $item->key), $data, "'key', 'value'")
+            fn ($item) => $this->abortIf(!isset($item->value, $item->key), collect($item), "'key', 'value'")
         );
 
         return $data->toArray();

@@ -19,7 +19,7 @@ class Value extends LiveQueryRepository
      */
     public function serialize($data): array
     {
-        $this->abortIf(!isset($data->first()->value), $data, "'value'");
+        $this->abortIf(!isset($data->first()->value), collect($data->first()), "'value'");
 
         return [
             'countCurrent'  => $data->first()->value,
