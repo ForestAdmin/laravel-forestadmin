@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use function collect;
-use function request;
 
 /**
  * Class Pie
@@ -23,15 +21,6 @@ use function request;
  */
 class Pie extends ChartRepository
 {
-    /**
-     * @param Model $model
-     * @throws Exception
-     */
-    public function __construct(Model $model)
-    {
-        parent::__construct($model);
-    }
-
     /**
      * @return array
      * @throws Exception
