@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts;
+namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple;
 
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use function collect;
+use function request;
 
 /**
  * Class Pie

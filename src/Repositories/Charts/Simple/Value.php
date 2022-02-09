@@ -1,17 +1,17 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts;
+namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
 
 /**
- * Class Objective
+ * Class Value
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Objective extends ChartRepository
+class Value extends ChartRepository
 {
     /**
      * @param $data
@@ -20,7 +20,8 @@ class Objective extends ChartRepository
     public function serialize($data): array
     {
         return [
-            'value'  => $data,
+            'countCurrent'  => $data,
+            'countPrevious' => null,
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts;
+namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
 

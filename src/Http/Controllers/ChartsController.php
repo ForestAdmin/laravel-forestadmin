@@ -32,7 +32,7 @@ class ChartsController extends ForestController
 
         $name = request()->route()->parameter('collection');
         $model = Schema::getModel(ucfirst($name));
-        $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\\' . $type)($model);
+        $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\\' . $type)($model);
 
         return response()->json(
             JsonApi::renderItem(
