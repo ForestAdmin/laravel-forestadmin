@@ -3,10 +3,13 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\DatabaseHelper;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 /**
@@ -74,5 +77,81 @@ abstract class ChartRepository extends BaseRepository
     protected function query(): Builder
     {
         return QueryBuilder::of($this->model, $this->params);
+    }
+
+    /**
+     * @param string $dataField
+     * @return array
+     * @throws Exception
+     */
+    protected function handleGroupByField(string $dataField): array
+    {
+        if (Str::contains($dataField, ':')) {
+            $parseField = explode(':', $dataField);
+            $relationName = $parseField[0];
+            [$relationTable, $keys, $field] = $this->fetchFieldsOnRelation($relationName, $parseField[1]);
+            return [
+                'relationTable' => $relationTable,
+                'keys'          => $keys,
+                'field'         => $field,
+                'responseField' => $parseField[1],
+            ];
+        } else {
+            $field = $this->handleField($this->model, $dataField);
+            $responseField = $dataField;
+            return compact('field', 'responseField');
+        }
+    }
+
+    /**
+     * @param string $relationName
+     * @param string $dataField
+     * @return array
+     * @throws Exception
+     */
+    protected function fetchFieldsOnRelation(string $relationName, string $dataField): array
+    {
+        $relations = $this->getRelations($this->model);
+        $relationsName = collect(array_keys($relations));
+
+        if (!$relationsName->contains($relationName)) {
+            throw new ForestException("Unknown relation $relationName");
+        }
+
+        $relation = $this->model->$relationName();
+        $field = $this->handleField($relation->getRelated(), $dataField);
+
+        switch (get_class($relation)) {
+            case BelongsTo::class:
+                $keys = [$this->table . '.' . $relation->getForeignKeyName(), $relation->getRelated()->getTable() . '.' . $relation->getOwnerKeyName()];
+                break;
+            case HasOne::class:
+                $keys = [$relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName(), $this->table . '.' . $relation->getLocalKeyName()];
+                break;
+        }
+
+        return [$relation->getRelated()->getTable(), $keys, $field];
+    }
+
+    /**
+     * @param Model  $model
+     * @param string $dataField
+     * @return string
+     * @throws Exception
+     */
+    protected function handleField(Model $model, string $dataField): string
+    {
+        $table = $model->getTable();
+        $field = null;
+        $columnsKeys = collect(array_keys($this->getColumns($model)));
+        if ($columnsKeys->contains($dataField)) {
+            $field = $table . '.' . $dataField;
+        }
+
+        if (!$field) {
+            throw new ForestException("The field $dataField doesn't exist in the table $table");
+        }
+
+        return $field;
     }
 }
