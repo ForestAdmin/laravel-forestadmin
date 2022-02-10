@@ -22,8 +22,9 @@ trait RawQuery
 
     /**
      * @return void
+     * @throws ForestException
      */
-    private function validateQuery(): void
+    protected function validateQuery(): void
     {
         if (empty($this->rawQuery)) {
             throw new ForestException('You cannot execute an empty SQL query.');
@@ -43,6 +44,7 @@ trait RawQuery
      * @param Collection $result
      * @param string     $keyNames
      * @return void
+     * @throws ForestException
      */
     protected function abortIf(bool $condition, Collection $result, string $keyNames): void
     {
