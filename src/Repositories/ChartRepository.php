@@ -65,7 +65,7 @@ abstract class ChartRepository extends BaseRepository
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      * @return array
      */
     abstract public function serialize($data): array;

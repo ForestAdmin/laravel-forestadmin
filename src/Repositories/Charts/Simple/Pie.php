@@ -44,7 +44,7 @@ class Pie extends ChartRepository
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      * @return array
      */
     public function serialize($data): array

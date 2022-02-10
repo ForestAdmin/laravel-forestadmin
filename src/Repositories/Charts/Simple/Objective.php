@@ -14,7 +14,7 @@ use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
 class Objective extends ChartRepository
 {
     /**
-     * @param $data
+     * @param mixed $data
      * @return array
      */
     public function serialize($data): array
