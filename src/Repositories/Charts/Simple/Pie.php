@@ -29,7 +29,7 @@ class Pie extends ChartRepository
             $this->aggregateField = $this->table . '.' . $this->aggregateField;
         }
 
-        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ')'), $groupBy['field']);
+        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ') AS ' . $this->aggregate), $groupBy['field']);
 
         if (array_key_exists('relationTable', $groupBy)) {
             $query = $query->join($groupBy['relationTable'], $groupBy['keys'][0], '=', $groupBy['keys'][1]);

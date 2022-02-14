@@ -36,7 +36,7 @@ class Leaderboard extends ChartRepository
             $this->aggregateField = $this->handleField($relatedModel, $this->aggregateField);
         }
 
-        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ')'), $groupBy['field']);
+        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ') AS ' . $this->aggregate), $groupBy['field']);
 
         switch (get_class($relation)) {
             case HasMany::class:

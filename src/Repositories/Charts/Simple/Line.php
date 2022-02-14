@@ -30,7 +30,7 @@ class Line extends ChartRepository
             $this->aggregateField = $this->table . '.' . $this->aggregateField;
         }
 
-        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ')'), $groupBy['field'])
+        $query = $this->query()->select(DB::raw($this->aggregate . '(' . $this->aggregateField . ') AS ' . $this->aggregate), $groupBy['field'])
             ->groupBy($groupBy['field'])
             ->get()
             ->mapWithKeys(fn($item, $key) => [Arr::get($item, $groupBy['responseField'])->format($this->getFormat()) => $item->{$this->aggregate}])
