@@ -58,9 +58,11 @@ class ChartsController extends ForestController
 
     /**
      * @return JsonResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function liveQuery(): JsonResponse
     {
+        $this->authorize('liveQuery', [request()->input('query')]);
         $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $this->type)();
 
         return response()->json(

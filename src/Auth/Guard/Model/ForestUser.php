@@ -29,6 +29,11 @@ class ForestUser
     protected Collection $smartActionPermissions;
 
     /**
+     * @var Collection
+     */
+    protected Collection $chartPermissions;
+
+    /**
      * @var array
      */
     protected array $stats;
@@ -152,6 +157,21 @@ class ForestUser
     public function hasSmartActionPermission(string $key, string $action): bool
     {
         return in_array($action, $this->getSmartActionPermissions()[$key], true);
+    }
+
+    /**
+     * @param string $query
+     * @return bool
+     */
+    public function hasLiveQueryPermission(string $query): bool
+    {
+        foreach ($this->stats['queries'] as $queryAllowed) {
+            if (trim($queryAllowed) === trim($query)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

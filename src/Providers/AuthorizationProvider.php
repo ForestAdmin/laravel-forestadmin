@@ -10,6 +10,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 /**
  * Class AuthorizationProvider
@@ -39,5 +40,12 @@ class AuthorizationProvider extends AuthServiceProvider
         );
 
         Gate::guessPolicyNamesUsing(static fn() => PermissionPolicy::class);
+
+        Gate::define(
+            'liveQuery',
+            static function (ForestUser $user, string $query) {
+                return $user->hasLiveQueryPermission($query);
+            }
+        );
     }
 }
