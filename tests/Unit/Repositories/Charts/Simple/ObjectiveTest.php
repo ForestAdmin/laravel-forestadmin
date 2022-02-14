@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Objective;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Mockery as m;
 
 /**
@@ -17,15 +16,12 @@ use Mockery as m;
  */
 class ObjectiveTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      */
     public function testGet(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(Objective::class, [Book::first()])
+        $repository = m::mock(Objective::class, [new Book()])
             ->makePartial();
         $serialize = $repository->serialize(10);
 
