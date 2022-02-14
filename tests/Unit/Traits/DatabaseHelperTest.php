@@ -40,6 +40,8 @@ class DatabaseHelperTest extends TestCase
             'options',
             'other',
             'category_id',
+            'published_at',
+            'sold_at',
             'created_at',
             'updated_at',
         ];
