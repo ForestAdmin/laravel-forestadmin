@@ -30,7 +30,7 @@ class PieTest extends TestCase
      * @throws Exception
      * @throws \JsonException
      */
-    public function testGet(): void
+    public function testGetCount(): void
     {
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -38,20 +38,20 @@ class PieTest extends TestCase
         $book = Book::first();
 
         $params = '{
-            "type": "Value",
+            "type": "Pie",
             "collection": "Book",
-            "aggregate": "Sum",
-            "aggregate_field": "amount"
+            "group_by_field": "category:label",
+            "aggregate": "Count"
         }';
 
         $request = Request::create('/stats/book', 'POST', json_decode($params, true, 512, JSON_THROW_ON_ERROR));
         app()->instance('request', $request);
 
-        $repository = new Value($book);
+        $repository = new Pie($book);
         $get = $repository->get();
 
         $this->assertIsArray($get);
-        $this->assertEquals(['countCurrent' => $book->amount, 'countPrevious' => null], $get);
+        $this->assertEquals([['key' => $book->category->label, 'value' => 1]], $get);
     }
 
     /**
@@ -59,9 +59,29 @@ class PieTest extends TestCase
      * @throws Exception
      * @throws \JsonException
      */
-    public function testGetWithPreviousPeriod(): void
+    public function testGetSum(): void
     {
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $this->getBook()->save();
+        $book = Book::first();
 
+        $params = '{
+            "type": "Pie",
+            "collection": "Book",
+            "group_by_field": "category:label",
+            "aggregate": "Sum",
+            "aggregate_field": "id"
+        }';
+
+        $request = Request::create('/stats/book', 'POST', json_decode($params, true, 512, JSON_THROW_ON_ERROR));
+        app()->instance('request', $request);
+
+        $repository = new Pie($book);
+        $get = $repository->get();
+
+        $this->assertIsArray($get);
+        $this->assertEquals([['key' => $book->category->label, 'value' => 1]], $get);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 
+use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Value;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
@@ -28,6 +29,7 @@ class ValueTest extends TestCase
 
     /**
      * @return void
+     * @throws Exception
      * @throws \JsonException
      */
     public function testGet(): void
@@ -56,6 +58,7 @@ class ValueTest extends TestCase
 
     /**
      * @return void
+     * @throws Exception
      * @throws \JsonException
      */
     public function testGetWithPreviousPeriod(): void
@@ -110,8 +113,7 @@ class ValueTest extends TestCase
      */
     public function testSerialize(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $data = [10, 100];
         $serialize = $repository->serialize($data);
@@ -126,8 +128,7 @@ class ValueTest extends TestCase
      */
     public function testApplyDateFiltersOnPreviousPeriodTodayOperator(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->invokeProperty($repository, 'timezone', $timezone);
@@ -145,8 +146,7 @@ class ValueTest extends TestCase
     public function testApplyDateFiltersOnPreviousPeriodPreviousDaysOperator(): void
     {
         $value = 5;
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->invokeProperty($repository, 'timezone', $timezone);
@@ -164,8 +164,7 @@ class ValueTest extends TestCase
     public function testApplyDateFiltersOnPreviousPeriodPreviousDaysToDateOperator(): void
     {
         $value = 5;
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->invokeProperty($repository, 'timezone', $timezone);
@@ -182,8 +181,7 @@ class ValueTest extends TestCase
      */
     public function testApplyDateFiltersOnPreviousPeriodOtherOperators(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->invokeProperty($repository, 'timezone', $timezone);
@@ -221,8 +219,7 @@ class ValueTest extends TestCase
      */
     public function testApplyDateFiltersOnPreviousPeriodUnknownOperator(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(Value::class, [Book::first()])
+        $repository = m::mock(Value::class, [new Book()])
             ->makePartial();
         $timezone = new \DateTimeZone('Europe/Paris');
         $this->invokeProperty($repository, 'timezone', $timezone);
@@ -240,7 +237,6 @@ class ValueTest extends TestCase
     {
         $field = 'created_at';
         $operator = 'yesterday';
-        $this->getBook()->save();
         $params = [
             'type'            => 'Value',
             'collection'      => 'Book',
@@ -252,7 +248,7 @@ class ValueTest extends TestCase
         $request = Request::create('/stats/book', 'POST', $params);
         app()->instance('request', $request);
 
-        $repository = new Value(Book::first());
+        $repository = new Value(new Book());
         $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
         $result = [
             'apply'      => true,
@@ -270,7 +266,6 @@ class ValueTest extends TestCase
      */
     public function testDontAppendPreviousValue(): void
     {
-        $this->getBook()->save();
         $params = [
             'type'            => 'Value',
             'collection'      => 'Book',
@@ -281,7 +276,7 @@ class ValueTest extends TestCase
         $request = Request::create('/stats/book', 'POST', $params);
         app()->instance('request', $request);
 
-        $repository = new Value(Book::first());
+        $repository = new Value(new Book());
         $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
         $result = [
             'apply'      => false,
