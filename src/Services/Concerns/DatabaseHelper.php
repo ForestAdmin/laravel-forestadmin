@@ -36,4 +36,20 @@ trait DatabaseHelper
 
         return $columns;
     }
+
+    /**
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDatabase(): ?string
+    {
+        return $this->database;
+    }
 }
