@@ -115,7 +115,7 @@ class Value extends ChartRepository
                 $start = 'startOf' . $period;
                 $end = 'endOf' . $period;
                 if (Str::endsWith($operator, 'to_date')) {
-                    $interval = [Carbon::now($this->timezone)->$sub(2)->$start(), Carbon::now()->$sub()];
+                    $interval = [Carbon::now($this->timezone)->$sub(2)->$start(), Carbon::now($this->timezone)->$sub()];
                 } else {
                     $interval = [Carbon::now($this->timezone)->$sub(2)->$start(), Carbon::now($this->timezone)->$sub(2)->$end()];
                 }

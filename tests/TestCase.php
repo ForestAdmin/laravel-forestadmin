@@ -176,6 +176,8 @@ class TestCase extends OrchestraTestCase
                 $table->jsonb('options');
                 $table->string('other')->default('N/A');
                 $table->foreignId('category_id')->constrained()->onDelete('cascade');
+                $table->dateTime('published_at')->nullable();
+                $table->date('sold_at')->nullable()->default(date('Y-m-d'));
                 $table->timestamps();
             }
         );

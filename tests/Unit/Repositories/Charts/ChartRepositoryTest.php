@@ -73,6 +73,7 @@ class ChartRepositoryTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
     public function testGet(): void
     {
