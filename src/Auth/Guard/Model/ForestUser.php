@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Auth\Guard\Model;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class ForestUser
@@ -27,11 +28,6 @@ class ForestUser
      * @var Collection
      */
     protected Collection $smartActionPermissions;
-
-    /**
-     * @var Collection
-     */
-    protected Collection $chartPermissions;
 
     /**
      * @var array
@@ -65,7 +61,7 @@ class ForestUser
     }
 
     /**
-     * @param  string $key
+     * @param string $key
      * @return mixed
      */
     public function getAttribute($key)
@@ -175,6 +171,24 @@ class ForestUser
     }
 
     /**
+     * @param array $chart
+     * @return bool
+     */
+    public function hasSimpleChartPermission(array $chart): bool
+    {
+        $type = strtolower(Str::plural($chart['type']));
+        $chart = $this->formatChartPayload($chart);
+
+        foreach ($this->stats[$type] as $chartAllowed) {
+            if (empty(array_diff_key($chart, $chartAllowed)) && empty(array_diff($chart, $chartAllowed))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getStats(): array
@@ -190,5 +204,36 @@ class ForestUser
     {
         $this->stats = $stats;
         return $this;
+    }
+
+    /**
+     * @param array $chart
+     * @return array
+     */
+    private function formatChartPayload(array $chart): array
+    {
+        $keys = [
+            'aggregate'           => 'aggregator',
+            'aggregate_field'     => 'aggregateFieldName',
+            'collection'          => 'sourceCollectionId',
+            'filters'             => 'filter',
+            'group_by_field'      => 'groupByFieldName',
+            'group_by_date_field' => 'groupByFieldName',
+            'time_range'          => 'timeRange',
+            'relationship_field'  => 'relationshipFieldName',
+            'label_field'         => 'labelFieldName'
+        ];
+
+        foreach ($chart as $key => $value) {
+            if ($key === 'group_by_field') {
+                $value = Str::before($value, ':');
+            }
+            if (isset($keys[$key])) {
+                $chart[$keys[$key]] = $value;
+                unset($chart[$key]);
+            }
+        }
+
+        return $chart;
     }
 }
