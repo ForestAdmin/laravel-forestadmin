@@ -128,6 +128,8 @@ abstract class ChartRepository extends BaseRepository
             case HasOne::class:
                 $keys = [$relation->getRelated()->getTable() . '.' . $relation->getForeignKeyName(), $this->table . '.' . $relation->getLocalKeyName()];
                 break;
+            default:
+                throw new ForestException("Unsupported relation to this chart");
         }
 
         return [$relation->getRelated()->getTable(), $keys, $field];

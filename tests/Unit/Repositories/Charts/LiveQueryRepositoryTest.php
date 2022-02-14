@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
