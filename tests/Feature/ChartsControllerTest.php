@@ -98,7 +98,6 @@ class ChartsControllerTest extends TestCase
         $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
     }
 
-
     /**
      * @return void
      * @throws \JsonException
@@ -107,6 +106,12 @@ class ChartsControllerTest extends TestCase
     {
         $data = $this->getTestingDataLiveQueries('Value');
         DB::shouldReceive('select')->set('query', $data['payload'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payload']['query']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -122,6 +127,12 @@ class ChartsControllerTest extends TestCase
     {
         $data = $this->getTestingDataLiveQueries('Objective');
         DB::shouldReceive('select')->set('query', $data['payload'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payload']['query']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -137,6 +148,12 @@ class ChartsControllerTest extends TestCase
     {
         $data = $this->getTestingDataLiveQueries('Pie');
         DB::shouldReceive('select')->set('query', $data['payload'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payload']['query']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -152,6 +169,12 @@ class ChartsControllerTest extends TestCase
     {
         $data = $this->getTestingDataLiveQueries('Line');
         DB::shouldReceive('select')->set('query', $data['payload'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payload']['query']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -167,6 +190,12 @@ class ChartsControllerTest extends TestCase
     {
         $data = $this->getTestingDataLiveQueries('Leaderboard');
         DB::shouldReceive('select')->set('query', $data['payload'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payload']['query']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 

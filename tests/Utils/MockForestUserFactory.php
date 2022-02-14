@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\ForestUserFactory;
+use Illuminate\Support\Collection;
 use Mockery as m;
 
 /**
@@ -15,29 +16,31 @@ use Mockery as m;
 trait MockForestUserFactory
 {
     /**
-     * @param bool $allowed
+     * @param bool  $allowed
+     * @param array $permissionsOverride
      * @return void
      */
-    public function mockForestUserFactory(bool $allowed = true): void
+    public function mockForestUserFactory(bool $allowed = true, array $permissionsOverride = []): void
     {
         $factory = m::mock(ForestUserFactory::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 
         $factory->shouldReceive('getPermissions')
-            ->andReturn($this->getPermissions($allowed));
+            ->andReturn($this->getPermissions($allowed, $permissionsOverride));
 
         app()->instance(ForestUserFactory::class, $factory);
     }
 
     /**
-     * @param bool $allowed
+     * @param bool       $allowed
+     * @param array      $override
      * @return array
      */
-    public function getPermissions(bool $allowed = true): array
+    public function getPermissions(bool $allowed = true, array $override = []): array
     {
         $permissions = $allowed ? [1] : [];
-        return [
+        $permissions = collect([
             'stats'       => [
                 'queries'      => [],
                 'leaderboards' => [],
@@ -248,6 +251,8 @@ trait MockForestUserFactory
                     'user'          => ['scope' => null, 'segments' => [],],
                 ],
             ],
-        ];
+        ]);
+
+        return $permissions->mergeRecursive($override)->all();
     }
 }
