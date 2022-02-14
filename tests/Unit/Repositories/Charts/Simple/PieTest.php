@@ -97,5 +97,4 @@ class PieTest extends TestCase
         $this->assertIsArray($serialize);
         $this->assertEquals([['key' => 'foo', 'value' => 10], ['key' => 'bar', 'value' => 20]], $serialize);
     }
-
 }
