@@ -14,6 +14,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Range extends Model
 {
+    protected $fillable = [
+        'label',
+    ];
+
     /**
      * @return BelongsToMany
      */

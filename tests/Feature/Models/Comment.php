@@ -14,6 +14,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Comment extends Model
 {
+    protected $fillable = [
+        'body',
+        'user_id',
+        'book_id',
+    ];
+
     /**
      * @return BelongsTo
      */
