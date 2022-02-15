@@ -264,7 +264,7 @@ class ValueTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
-    public function testDontAppendPreviousValue(): void
+    public function testDontAppendPreviousValueWithoutFilter(): void
     {
         $params = [
             'type'            => 'Value',
@@ -282,6 +282,37 @@ class ValueTest extends TestCase
             'apply'      => false,
             'filter'     => null,
             'aggregator' => 'and',
+        ];
+
+        $this->assertIsArray($appendPreviousPeriod);
+        $this->assertEquals($result, $appendPreviousPeriod);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testDontAppendPreviousValueOnAggregatorOr(): void
+    {
+        $field = 'created_at';
+        $operator = 'yesterday';
+        $params = [
+            'type'            => 'Value',
+            'collection'      => 'Book',
+            'aggregate'       => 'Sum',
+            'aggregate_field' => 'amount',
+            'filters'         => '{"aggregator":"or","conditions":[{"field":"' . $field . '","operator":"' . $operator . '","value":null}]}',
+        ];
+
+        $request = Request::create('/stats/book', 'POST', $params);
+        app()->instance('request', $request);
+
+        $repository = new Value(new Book());
+        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
+        $result = [
+            'apply'      => false,
+            'filter'     => null,
+            'aggregator' => 'or',
         ];
 
         $this->assertIsArray($appendPreviousPeriod);

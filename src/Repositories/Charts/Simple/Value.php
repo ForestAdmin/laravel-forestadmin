@@ -140,10 +140,12 @@ class Value extends ChartRepository
 
         if (array_key_exists('filters', $this->params)) {
             [$aggregator, $filters] = $this->parseFilters($this->params['filters']);
-            foreach ($filters as $filter) {
-                if (is_array($filter) && array_key_exists('operator', $filter) && Str::startsWith($filter['operator'], ['previous_', 'today', 'yesterday'])) {
-                    $previousFilter++;
-                    $condition = $filter;
+            if ($aggregator === 'and') {
+                foreach ($filters as $filter) {
+                    if (is_array($filter) && array_key_exists('operator', $filter) && Str::startsWith($filter['operator'], ['previous_', 'today', 'yesterday'])) {
+                        $previousFilter++;
+                        $condition = $filter;
+                    }
                 }
             }
         }
