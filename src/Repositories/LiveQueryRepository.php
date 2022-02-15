@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\Concerns\RawQuery;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -49,8 +50,8 @@ abstract class LiveQueryRepository
     }
 
     /**
-     * @param $data
+     * @param Collection $data
      * @return array
      */
-    abstract public function serialize($data): array;
+    abstract public function serialize(Collection $data): array;
 }

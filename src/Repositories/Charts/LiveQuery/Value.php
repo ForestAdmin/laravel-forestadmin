@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\LiveQueryRepository;
+use Illuminate\Support\Collection;
 
 /**
  * Class Value
@@ -14,10 +15,10 @@ use ForestAdmin\LaravelForestAdmin\Repositories\LiveQueryRepository;
 class Value extends LiveQueryRepository
 {
     /**
-     * @param $data
+     * @param Collection $data
      * @return array
      */
-    public function serialize($data): array
+    public function serialize(Collection $data): array
     {
         $this->abortIf(!isset($data->first()->value), collect($data->first()), "'value'");
 
