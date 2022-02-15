@@ -52,6 +52,7 @@ class Leaderboard extends ChartRepository
 
         $query = $query->groupBy($groupBy['field'])
             ->limit($this->params['limit'])
+            ->orderBy($this->aggregate, 'DESC')
             ->get()
             ->mapWithKeys(fn($item, $key) => [Arr::get($item, $groupBy['responseField']) => $item->{$this->aggregate}])
             ->all();
