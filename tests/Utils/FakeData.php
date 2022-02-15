@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
+use Illuminate\Support\Carbon;
 
 /**
  * Class FakeData
@@ -36,6 +37,44 @@ trait FakeData
         $book->setRelation('category', $category);
 
         return $book;
+    }
+
+    /**
+     * @return void
+     */
+    public function makeBooks(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            $book = Book::create(
+                [
+                    'label'        => 'test book ' . $i + 1,
+                    'comment'      => '',
+                    'difficulty'   => 'easy',
+                    'amount'       => 1000,
+                    'options'      => [],
+                    'category_id'  => 1,
+                    'published_at' => Carbon::today()->subDays(rand(0, 1)),
+                ]
+            );
+
+            for ($j = 0; $j < $i + 1; $j++) {
+                Comment::create(
+                    [
+                        'body'    => 'Test comment',
+                        'user_id' => 1,
+                        'book_id' => $book->id,
+                    ]
+                );
+            }
+
+            for ($j = 0; $j < $i + 1; $j++) {
+                Range::create(
+                    [
+                        'label' => 'Test range',
+                    ]
+                )->books()->save($book);
+            }
+        }
     }
 
     /**

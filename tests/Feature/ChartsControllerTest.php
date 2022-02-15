@@ -11,6 +11,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -342,6 +343,88 @@ class ChartsControllerTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLine(): void
+    {
+        $this->getBook()->save();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Line');
+        //-- unset this key because, it's only present when is a liveQuery chart --//
+        $permission = [
+            'stats' => [
+                'lines' => [$data['permission']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLinePermissionDenied(): void
+    {
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Line');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLeaderboard(): void
+    {
+        $this->makeBooks();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Leaderboard');
+        //-- unset this key because, it's only present when is a liveQuery chart --//
+        $permission = [
+            'stats' => [
+                'leaderboards' => [$data['permission']],
+            ]
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLeaderboardPermissionDenied(): void
+    {
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Leaderboard');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
      * @param array $expected
      * @param array $response
      * @return void
@@ -455,35 +538,64 @@ class ChartsControllerTest extends TestCase
             'Line'        => [
                 'payloadQuery'     => [
                     'type'  => 'Line',
-                    'query' => "select count(*) as value, to_char(created_at, 'yyyy-mm-dd') as key from books group by key",
+                    'query' => "select count(*) as value, to_char(created_at, 'dd/mm/yyyy') as key from books group by key",
+                ],
+                'payload' => [
+                    'aggregate'           => 'Count',
+                    'collection'          => 'book',
+                    'group_by_date_field' => 'created_at',
+                    'time_range'          => 'Day',
+                    'type'                => 'Line',
+                ],
+                'permission' => [
+                    'type'               => 'Line',
+                    'sourceCollectionId' => 'book',
+                    'aggregator'         => 'Count',
+                    'groupByFieldName'   => 'created_at',
+                    'timeRange'          => 'Day',
                 ],
                 'queryResult' => [
-                    (object) ['value' => 10, 'key' => '2022-02-10'],
-                    (object) ['value' => 15, 'key' => '2022-02-09'],
+                    (object) ['value' => 1, 'key' => Carbon::now()->format('d/m/Y')],
                 ],
                 'expected'    => [
                     [
-                        'label'  => '2022-02-10',
-                        'values' => ['value' => 10],
-                    ],
-                    [
-                        'label'  => '2022-02-09',
-                        'values' => ['value' => 15],
+                        'label'  => Carbon::now()->format('d/m/Y'),
+                        'values' => ['value' => 1],
                     ],
                 ],
             ],
             'Leaderboard' => [
                 'payloadQuery'     => [
                     'type'  => 'Leaderboard',
-                    'query' => "select books.label as key, count(c.id) as value from books left join comments c on books.id = c.book_id GROUP BY books.label LIMIT 10",
+                    'query' => "select books.label as key, count(c.id) as value from books left join comments c on books.id = c.book_id GROUP BY books.label LIMIT 3",
+                ],
+                'payload' => [
+                    'type'               => 'Leaderboard',
+                    'collection'         => 'book',
+                    'label_field'        => 'label',
+                    'relationship_field' => 'comments',
+                    'aggregate_field'    => 'id',
+                    'limit'              => 3,
+                    'aggregate'          => 'Count',
+                ],
+                'permission' => [
+                    'type'                  => 'Leaderboard',
+                    'sourceCollectionId'    => 'book',
+                    'labelFieldName'        => 'label',
+                    'relationshipFieldName' => 'comments',
+                    'aggregateFieldName'    => 'id',
+                    'limit'                 => 3,
+                    'aggregator'            => 'Count',
                 ],
                 'queryResult' => [
-                    (object) ['value' => 2, 'key' => 'Ms. Felicita Cartwright I'],
-                    (object) ['value' => 2, 'key' => 'Antonina Lubowitz'],
+                    (object) ['value' => 10, 'key' => 'test book 10'],
+                    (object) ['value' => 9, 'key' => 'test book 9'],
+                    (object) ['value' => 8, 'key' => 'test book 8'],
                 ],
                 'expected'    => [
-                    ['value' => 2, 'key' => 'Ms. Felicita Cartwright I'],
-                    ['value' => 2, 'key' => 'Antonina Lubowitz'],
+                    ['value' => 10, 'key' => 'test book 10'],
+                    ['value' => 9, 'key' => 'test book 9'],
+                    ['value' => 8, 'key' => 'test book 8'],
                 ],
             ],
         ];

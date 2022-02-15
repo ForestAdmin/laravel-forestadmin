@@ -33,14 +33,15 @@ trait MockForestUserFactory
     }
 
     /**
-     * @param bool       $allowed
-     * @param array      $override
+     * @param bool  $allowed
+     * @param array $override
      * @return array
      */
     public function getPermissions(bool $allowed = true, array $override = []): array
     {
         $permissions = $allowed ? [1] : [];
-        $permissions = collect([
+        $permissions = collect(
+            [
             'stats'       => [
                 'queries'      => [],
                 'leaderboards' => [],
@@ -251,7 +252,8 @@ trait MockForestUserFactory
                     'user'          => ['scope' => null, 'segments' => [],],
                 ],
             ],
-        ]);
+            ]
+        );
 
         return $permissions->mergeRecursive($override)->all();
     }
