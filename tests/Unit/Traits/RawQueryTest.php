@@ -73,36 +73,4 @@ class RawQueryTest extends TestCase
         $result = $this->invokeMethod($trait, 'validateQuery');
         $this->assertNull($result);
     }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testAbortIfException(): void
-    {
-        $trait = $this->getObjectForTrait(RawQuery::class);
-        $data = collect(
-            ['key' => 'foo_key',  'item' => 'foo_value']
-        );
-
-        $this->expectException(ForestException::class);
-        $this->expectExceptionMessage('🌳🌳🌳 The result columns must be named \'key, value\' instead of \'key,item\'');
-        $this->invokeMethod($trait, 'abortIf', [true, $data, "key, value"]);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testAbortIf(): void
-    {
-        // to review
-        $trait = $this->getObjectForTrait(RawQuery::class);
-        $data = collect(
-            ['key' => 'foo_key',  'item' => 'foo_value']
-        );
-
-        $result = $this->invokeMethod($trait, 'abortIf', [false, $data, "key, item"]);
-        $this->assertNull($result);
-    }
 }

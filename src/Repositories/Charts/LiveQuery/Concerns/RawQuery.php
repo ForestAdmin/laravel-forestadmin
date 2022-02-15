@@ -38,19 +38,4 @@ trait RawQuery
             throw new ForestException('Only SELECT queries are allowed.');
         }
     }
-
-    /**
-     * @param bool       $condition
-     * @param Collection $result
-     * @param string     $keyNames
-     * @return void
-     * @throws ForestException
-     */
-    protected function abortIf(bool $condition, Collection $result, string $keyNames): void
-    {
-        if ($condition) {
-            $resultKeys = $result->keys()->implode(',');
-            throw new ForestException("The result columns must be named '$keyNames' instead of '$resultKeys'");
-        }
-    }
 }

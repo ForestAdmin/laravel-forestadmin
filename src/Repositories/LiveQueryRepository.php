@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
+use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Concerns\ChartHelper;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\Concerns\RawQuery;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
  */
 abstract class LiveQueryRepository
 {
+    use ChartHelper;
     use RawQuery;
 
     /**
