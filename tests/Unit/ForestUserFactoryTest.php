@@ -94,7 +94,7 @@ class ForestUserFactoryTest extends TestCase
     public function testGetPermissions(): void
     {
         $factory = new ForestUserFactory($this->makeForestApi());
-        $getPermissions = $this->invokeMethod($factory, 'getPermissions', [1]);
+        $getPermissions = $this->invokeMethod($factory, 'getPermissions', [1, false]);
 
         $this->assertIsArray($getPermissions);
         $this->assertArrayHasKey('collections', $getPermissions);
@@ -106,6 +106,43 @@ class ForestUserFactoryTest extends TestCase
         unset($formatResponse['data']);
 
         $this->assertIsArray(Cache::get('permissions:rendering-1'));
+        $this->assertEquals(Cache::get('permissions:rendering-1'), $formatResponse);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function testGetPermissionsForceFetch(): void
+    {
+        $factory = new ForestUserFactory($this->makeForestApi());
+        $getPermissions = $this->invokeMethod($factory, 'getPermissions', [1, false]);
+
+        $this->assertIsArray($getPermissions);
+        $this->assertArrayHasKey('collections', $getPermissions);
+        $this->assertArrayHasKey('renderings', $getPermissions);
+
+        $formatResponse = $this->getResponseFromApi();
+        $formatResponse['collections'] = $formatResponse['data']['collections'];
+        $formatResponse['renderings'] = $formatResponse['data']['renderings'];
+        unset($formatResponse['data']);
+
+        $this->assertEquals(Cache::get('permissions:rendering-1'), $formatResponse);
+
+        //--- same test but with force reloading permissions ---//
+        $factory = new ForestUserFactory($this->makeForestApi(false));
+        $getPermissions = $this->invokeMethod($factory, 'getPermissions', [1, true]);
+
+        $this->assertIsArray($getPermissions);
+        $this->assertArrayHasKey('collections', $getPermissions);
+        $this->assertArrayHasKey('renderings', $getPermissions);
+
+        $formatResponse = $this->getResponseFromApi(false);
+        $formatResponse['collections'] = $formatResponse['data']['collections'];
+        $formatResponse['renderings'] = $formatResponse['data']['renderings'];
+        unset($formatResponse['data']);
+
         $this->assertEquals(Cache::get('permissions:rendering-1'), $formatResponse);
     }
 
@@ -137,17 +174,18 @@ class ForestUserFactoryTest extends TestCase
     }
 
     /**
+     * @param bool $allowed
      * @return object
      * @throws \JsonException
      */
-    public function makeForestApi()
+    public function makeForestApi(bool $allowed = true)
     {
         $forestApiGet = $this->prophesize(ForestApiRequester::class);
         $forestApiGet
             ->get(Argument::type('string'), Argument::size(1))
             ->shouldBeCalled()
             ->willReturn(
-                new Response(200, [], json_encode($this->getResponseFromApi(), JSON_THROW_ON_ERROR))
+                new Response(200, [], json_encode($this->getResponseFromApi($allowed), JSON_THROW_ON_ERROR))
             );
 
         return $forestApiGet->reveal();
@@ -168,21 +206,23 @@ class ForestUserFactoryTest extends TestCase
     }
 
     /**
+     * @param bool $allowed
      * @return array
      */
-    public function getResponseFromApi(): array
+    public function getResponseFromApi(bool $allowed = true): array
     {
+        $permissions = $allowed ? [1] : [];
         return [
             'data'  => [
                 'collections' => [
                     'foo' => [
                         'collection' => [
-                            'browseEnabled' => [1],
-                            'readEnabled'   => [1],
-                            'editEnabled'   => [1],
-                            'addEnabled'    => [1],
-                            'deleteEnabled' => [1],
-                            'exportEnabled' => [1],
+                            'browseEnabled' => $permissions,
+                            'readEnabled'   => $permissions,
+                            'editEnabled'   => $permissions,
+                            'addEnabled'    => $permissions,
+                            'deleteEnabled' => $permissions,
+                            'exportEnabled' => $permissions,
                         ],
                         'actions'    => [
                             'demo' => [
@@ -192,12 +232,12 @@ class ForestUserFactoryTest extends TestCase
                     ],
                     'bar' => [
                         'collection' => [
-                            'browseEnabled' => [1],
-                            'readEnabled'   => [1],
-                            'editEnabled'   => [1],
-                            'addEnabled'    => [1],
-                            'deleteEnabled' => [1],
-                            'exportEnabled' => [1],
+                            'browseEnabled' => $permissions,
+                            'readEnabled'   => $permissions,
+                            'editEnabled'   => $permissions,
+                            'addEnabled'    => $permissions,
+                            'deleteEnabled' => $permissions,
+                            'exportEnabled' => $permissions,
                         ],
                         'actions'    => [],
                     ],
