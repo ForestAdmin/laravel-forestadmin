@@ -48,7 +48,7 @@ class Value extends ChartRepository
             $previousPeriodQuery->whereBetween(
                 $condition['column'],
                 $this->applyDateFiltersOnPreviousPeriod($appendPreviousPeriod['filter']['operator'], $appendPreviousPeriod['filter']['value']),
-                $this->appendPreviousPeriod()['aggregator']
+                $appendPreviousPeriod['aggregator']
             );
 
             $previousPeriodQuery = $previousPeriodQuery->{$this->aggregate}($this->aggregateField);

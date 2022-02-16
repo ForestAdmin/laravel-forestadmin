@@ -169,7 +169,7 @@ class ForestUserTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
-    public function testFormatChartPaylod(): void
+    public function testFormatChartPayload(): void
     {
         $forestUser = new ForestUser([]);
         $chartPayload = [

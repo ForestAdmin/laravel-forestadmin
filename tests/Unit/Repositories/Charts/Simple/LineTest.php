@@ -176,7 +176,7 @@ class LineTest extends TestCase
                 "collection": "Book",
                 "group_by_date_field": "created_at",
                 "aggregate": "Count",
-		        "time_range": "' . $type . '"
+                "time_range": "' . $type . '"
             }';
             $request = Request::create('/stats/book', 'POST', json_decode($params, true, 512, JSON_THROW_ON_ERROR));
             app()->instance('request', $request);
