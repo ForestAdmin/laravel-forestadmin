@@ -22,7 +22,7 @@ class RawQueryTest extends TestCase
     public function testValidateQueryEmptyQueryException(): void
     {
         $trait = $this->getObjectForTrait(RawQuery::class);
-        $this->setProtectedProperty($trait, 'rawQuery', '');
+        $this->invokeProperty($trait, 'rawQuery', '');
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('🌳🌳🌳 You cannot execute an empty SQL query.');
@@ -37,7 +37,7 @@ class RawQueryTest extends TestCase
     {
         $query = 'SELECT * FROM books; SELECT * FROM categories;';
         $trait = $this->getObjectForTrait(RawQuery::class);
-        $this->setProtectedProperty($trait, 'rawQuery', $query);
+        $this->invokeProperty($trait, 'rawQuery', $query);
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('🌳🌳🌳 You cannot chain SQL queries.');
@@ -52,7 +52,7 @@ class RawQueryTest extends TestCase
     {
         $query = 'INSERT INTO books (label, category_id)VALUES (foo, 1);';
         $trait = $this->getObjectForTrait(RawQuery::class);
-        $this->setProtectedProperty($trait, 'rawQuery', $query);
+        $this->invokeProperty($trait, 'rawQuery', $query);
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('🌳🌳🌳 Only SELECT queries are allowed.');
@@ -68,7 +68,7 @@ class RawQueryTest extends TestCase
         // to review
         $query = 'SELECT * FROM books';
         $trait = $this->getObjectForTrait(RawQuery::class);
-        $this->setProtectedProperty($trait, 'rawQuery', $query);
+        $this->invokeProperty($trait, 'rawQuery', $query);
 
         $result = $this->invokeMethod($trait, 'validateQuery');
         $this->assertNull($result);

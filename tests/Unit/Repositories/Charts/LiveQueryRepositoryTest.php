@@ -64,9 +64,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -92,9 +92,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -127,9 +127,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -158,9 +158,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -199,9 +199,9 @@ class LiveQueryRepositoryTest extends TestCase
         $expected = $queryResult;
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -239,9 +239,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -288,9 +288,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -323,9 +323,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -360,9 +360,9 @@ class LiveQueryRepositoryTest extends TestCase
         $expected = $queryResult;
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);
@@ -396,9 +396,9 @@ class LiveQueryRepositoryTest extends TestCase
         ];
 
         $liveQueryRepository = m::mock('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $type)->makePartial();
-        $this->setProtectedProperty($liveQueryRepository, 'type', $type);
-        $this->setProtectedProperty($liveQueryRepository, 'rawQuery', $query);
-        $this->setProtectedProperty($liveQueryRepository, 'recordId', null);
+        $this->invokeProperty($liveQueryRepository, 'type', $type);
+        $this->invokeProperty($liveQueryRepository, 'rawQuery', $query);
+        $this->invokeProperty($liveQueryRepository, 'recordId', null);
         $liveQueryRepository->shouldAllowMockingProtectedMethods()
             ->shouldReceive('validateQuery')
             ->andReturn(null);

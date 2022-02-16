@@ -49,29 +49,11 @@ class TestCase extends OrchestraTestCase
         $property = $reflection->getProperty($propertyName);
         $property->setAccessible(true);
 
-        if ($setData) {
+        if (!is_null($setData)) {
             $property->setValue($object, $setData);
         }
 
         return $property->getValue($object);
-    }
-
-    /**
-     * Sets a protected property on a given object via reflection
-     *
-     * @param object $object
-     * @param string $property
-     * @param        $value
-     *
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function setProtectedProperty(object &$object, string $property, $value): void
-    {
-        $reflection = new \ReflectionClass(get_class($object));
-        $reflection_property = $reflection->getProperty($property);
-        $reflection_property->setAccessible(true);
-        $reflection_property->setValue($object, $value);
     }
 
     /**

@@ -28,7 +28,7 @@ abstract class LiveQueryRepository
     /**
      * @var string|null
      */
-    protected ?string $recordId;
+    protected ?string $recordId = null;
 
     /**
      * Construct LiveQuery
