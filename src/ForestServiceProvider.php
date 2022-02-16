@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
+use ForestAdmin\LaravelForestAdmin\Services\ChartApiResponse;
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
 use Illuminate\Contracts\Http\Kernel;
@@ -39,6 +40,7 @@ class ForestServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
         $kernel->pushMiddleware(ForestCors::class);
 
+        $this->app->bind('chart-api', fn() => new ChartApiResponse());
         $this->app->bind('json-api', fn() => new JsonApiResponse());
         $this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection());
     }
