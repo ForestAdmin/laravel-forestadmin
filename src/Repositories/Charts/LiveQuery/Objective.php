@@ -23,7 +23,7 @@ class Objective extends LiveQueryRepository
         $this->abortIf(!isset($data->first()->value, $data->first()->objective), collect($data->first()), "'value', 'objective'");
 
         return [
-            'value' => $data->first()->value,
+            'value'     => $data->first()->value,
             'objective' => $data->first()->objective,
         ];
     }

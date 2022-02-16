@@ -3,7 +3,6 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\Concerns;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
