@@ -5,6 +5,8 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
@@ -440,20 +442,6 @@ class ChartsControllerTest extends TestCase
         $this->assertEquals($expected, $response['data']['attributes']['value']);
     }
 
-    /*
-      $keys = [
-            'aggregate'           => 'aggregator',
-            'aggregate_field'     => 'aggregateFieldName',
-            'collection'          => 'sourceCollectionId',
-            'filters'             => 'filter',
-            'group_by_field'      => 'groupByFieldName',
-            'group_by_date_field' => 'groupByFieldName',
-            'time_range'          => 'timeRange',
-            'relationship_field'  => 'relationshipFieldName',
-            'label_field'         => 'labelFieldName'
-        ];
-     */
-
     /**
      * @param string $type
      * @return array[]
@@ -601,5 +589,43 @@ class ChartsControllerTest extends TestCase
         ];
 
         return $testingData[$type];
+    }
+
+    /**
+     * @return void
+     */
+    public function makeBooks(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            $book = Book::create(
+                [
+                    'label'        => 'test book ' . $i + 1,
+                    'comment'      => '',
+                    'difficulty'   => 'easy',
+                    'amount'       => 1000,
+                    'options'      => [],
+                    'category_id'  => 1,
+                    'published_at' => Carbon::today()->subDays(rand(0, 1)),
+                ]
+            );
+
+            for ($j = 0; $j < $i + 1; $j++) {
+                Comment::create(
+                    [
+                        'body'    => 'Test comment',
+                        'user_id' => 1,
+                        'book_id' => $book->id,
+                    ]
+                );
+            }
+
+            for ($j = 0; $j < $i + 1; $j++) {
+                Range::create(
+                    [
+                        'label' => 'Test range',
+                    ]
+                )->books()->save($book);
+            }
+        }
     }
 }
