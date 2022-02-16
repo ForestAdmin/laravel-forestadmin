@@ -204,7 +204,7 @@ class ForestUser
         if (!$this->hasChart($type, $chart)) {
             app(ForestUserFactory::class)->makePermissionToUser($this, $this->getAttribute('rendering_id'), true);
 
-            return $this->hasSimpleChartPermission($chart);
+            return $this->hasChart($type, $chart);
         }
 
         return true;
