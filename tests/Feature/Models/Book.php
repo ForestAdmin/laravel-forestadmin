@@ -34,6 +34,7 @@ class Book extends Model
         'amount',
         'options',
         'category_id',
+        'published_at',
     ];
 
     /**

@@ -62,7 +62,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
 
             $this->assertIsArray($queryResult->getQuery()->wheres);
@@ -356,7 +356,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
 
             $expected = $results[$value['type']][0];
@@ -409,7 +409,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -623,7 +623,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -677,7 +677,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -731,7 +731,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -785,7 +785,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -839,7 +839,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -893,7 +893,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -953,7 +953,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -1013,7 +1013,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];
@@ -1073,7 +1073,7 @@ class HasFiltersDateOperatorsTest extends TestCase
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
             $expected = $results[$value['type']][0];
             $actual = $queryResult->getQuery()->wheres[0];

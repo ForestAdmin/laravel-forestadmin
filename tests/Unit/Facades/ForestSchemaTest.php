@@ -25,7 +25,6 @@ class ForestSchemaTest extends TestCase
      */
     public function testRender(): void
     {
-
         $response = ['comments'];
         $forestSchema = m::mock(ForestSchemaInstrospection::class)
             ->shouldReceive('getRelatedData')

@@ -2,7 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Auth\Guard\Model;
 
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\ForestUserFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class ForestUser
@@ -60,7 +62,7 @@ class ForestUser
     }
 
     /**
-     * @param  string $key
+     * @param string $key
      * @return mixed
      */
     public function getAttribute($key)
@@ -108,7 +110,13 @@ class ForestUser
      */
     public function hasPermission(string $key, string $action): bool
     {
-        return isset($this->getPermissions()[$key]) && in_array($action, $this->getPermissions()[$key], true);
+        if (!(isset($this->getPermissions()[$key]) && in_array($action, $this->getPermissions()[$key], true))) {
+            app(ForestUserFactory::class)->makePermissionToUser($this, $this->getAttribute('rendering_id'), true);
+
+            return isset($this->getPermissions()[$key]) && in_array($action, $this->getPermissions()[$key], true);
+        }
+
+        return true;
     }
 
     /**
@@ -155,6 +163,70 @@ class ForestUser
     }
 
     /**
+     * @param string $query
+     * @return bool
+     */
+    public function hasLiveQueryPermission(string $query): bool
+    {
+        if (!$this->hasQuery($query)) {
+            app(ForestUserFactory::class)->makePermissionToUser($this, $this->getAttribute('rendering_id'), true);
+
+            return $this->hasQuery($query);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $query
+     * @return bool
+     */
+    public function hasQuery(string $query): bool
+    {
+        foreach ($this->stats['queries'] as $queryAllowed) {
+            if (trim($queryAllowed) === trim($query)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $chart
+     * @return bool
+     */
+    public function hasSimpleChartPermission(array $chart): bool
+    {
+        $type = strtolower(Str::plural($chart['type']));
+        $chart = $this->formatChartPayload($chart);
+
+        if (!$this->hasChart($type, $chart)) {
+            app(ForestUserFactory::class)->makePermissionToUser($this, $this->getAttribute('rendering_id'), true);
+
+            return $this->hasChart($type, $chart);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $type
+     * @param array  $chart
+     * @return bool
+     */
+    public function hasChart(string $type, array $chart): bool
+    {
+        foreach ($this->stats[$type] as $chartAllowed) {
+            if (empty(array_diff_key($chart, $chartAllowed)) && empty(array_diff($chart, $chartAllowed))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getStats(): array
@@ -170,5 +242,40 @@ class ForestUser
     {
         $this->stats = $stats;
         return $this;
+    }
+
+    /**
+     * @param array $chart
+     * @return array
+     */
+    private function formatChartPayload(array $chart): array
+    {
+        $keys = [
+            'aggregate'           => 'aggregator',
+            'aggregate_field'     => 'aggregateFieldName',
+            'collection'          => 'sourceCollectionId',
+            'filters'             => 'filter',
+            'group_by_field'      => 'groupByFieldName',
+            'group_by_date_field' => 'groupByFieldName',
+            'time_range'          => 'timeRange',
+            'relationship_field'  => 'relationshipFieldName',
+            'label_field'         => 'labelFieldName'
+        ];
+
+        foreach ($chart as $key => $value) {
+            if (is_null($value)) {
+                unset($chart[$key]);
+            } else {
+                if ($key === 'group_by_field') {
+                    $value = Str::before($value, ':');
+                }
+                if (isset($keys[$key])) {
+                    $chart[$keys[$key]] = $value;
+                    unset($chart[$key]);
+                }
+            }
+        }
+
+        return $chart;
     }
 }

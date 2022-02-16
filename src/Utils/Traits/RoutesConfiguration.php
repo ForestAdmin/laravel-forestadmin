@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Utils\Traits;
 
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\ChartsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\RelationshipsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ResourcesController;
 
@@ -27,6 +28,8 @@ trait RoutesConfiguration
         'forest.relationships.associate'  => RelationshipsController::class,
         'forest.relationships.update'     => RelationshipsController::class,
         'forest.relationships.dissociate' => RelationshipsController::class,
+        'forest.stats.index'              => ChartsController::class,
+        'forest.stats.live_query'         => ChartsController::class,
     ];
 
     /**

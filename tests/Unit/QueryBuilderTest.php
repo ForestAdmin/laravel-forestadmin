@@ -125,24 +125,6 @@ class QueryBuilderTest extends TestCase
      * @throws Exception
      * @throws SchemaException
      */
-    public function testGetColumns(): void
-    {
-        $model = $this->getLaravelModel();
-        $queryBuilder = m::mock(QueryBuilder::class, [$model, []])
-            ->makePartial();
-        $columns = $queryBuilder->getColumns($model);
-
-        $this->assertEquals(['id', 'foo', 'bar', 'uuid'], array_keys($columns));
-        $this->assertEquals(Type::getType('bigint'), $columns['id']->getType());
-        $this->assertEquals(Type::getType('string'), $columns['foo']->getType());
-        $this->assertEquals(Type::getType('string'), $columns['bar']->getType());
-    }
-
-    /**
-     * @return void
-     * @throws Exception
-     * @throws SchemaException
-     */
     public function testHandleSearchFieldOnNumber(): void
     {
         $field = 'id';

@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\DatabaseHelper;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
@@ -27,6 +28,7 @@ use Ramsey\Uuid\Uuid;
 class QueryBuilder
 {
     use ArrayHelper;
+    use DatabaseHelper;
     use HasFilters;
     use HasIncludes;
     use HasSearch;
@@ -42,16 +44,6 @@ class QueryBuilder
      * @var array
      */
     protected array $params;
-
-    /**
-     * @var string
-     */
-    protected string $table;
-
-    /**
-     * @var string|null
-     */
-    protected ?string $database = null;
 
     /**
      * @param Model      $model
@@ -171,19 +163,6 @@ class QueryBuilder
         }
 
         return $this->getIncludes();
-    }
-
-    /**
-     * @param Model $model
-     * @return array
-     * @throws Exception
-     */
-    public function getColumns(Model $model): array
-    {
-        $connexion = $model->getConnection()->getDoctrineSchemaManager();
-        $columns = $connexion->listTableColumns($model->getTable(), $this->database);
-
-        return $columns;
     }
 
     /**

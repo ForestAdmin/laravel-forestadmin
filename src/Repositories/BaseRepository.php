@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
-use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasIncludes;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 abstract class BaseRepository
 {
     use Relationships;
-    use HasIncludes;
     use ArrayHelper;
 
     /**

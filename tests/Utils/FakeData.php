@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
+use Illuminate\Support\Carbon;
 
 /**
  * Class FakeData

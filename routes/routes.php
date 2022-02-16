@@ -14,13 +14,16 @@ Route::group(
         Route::get('/', [ApiMapsController::class, 'index']);
         Route::post('authentication', [AuthController::class, 'login'])->name('forest.auth.login');
         Route::get('authentication/callback', [AuthController::class, 'callback'])->name('forest.auth.callback');
-        //Route::get('custom-route', fn() => view('welcome'));
 
         Route::group(
             [
                 'middleware' => [ForestAuthorization::class]
             ],
             function () {
+                // STATS
+                Route::post('/stats/{collection}', DispatchGateway::class)->name('forest.stats.index');
+                Route::post('/stats', DispatchGateway::class)->name('forest.stats.live_query');
+
                 // CRUD
                 Route::get('/{collection}', DispatchGateway::class)->name('forest.collection.index');
                 Route::get('/{collection}/count', DispatchGateway::class)->name('forest.collection.count');

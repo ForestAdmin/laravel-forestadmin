@@ -39,11 +39,12 @@ class ForestUserFactory
     /**
      * @param ForestUser $forestUser
      * @param int        $renderingId
+     * @param bool       $forceFetch
      * @return void
      */
-    public function makePermissionToUser(ForestUser $forestUser, int $renderingId): void
+    public function makePermissionToUser(ForestUser $forestUser, int $renderingId, bool $forceFetch = false): void
     {
-        $permissions = $this->getPermissions($renderingId);
+        $permissions = $this->getPermissions($renderingId, $forceFetch);
         $forestUser->setStats($permissions['stats']);
 
         if (array_key_exists('collections', $permissions)) {
@@ -67,12 +68,17 @@ class ForestUserFactory
     }
 
     /**
-     * @param int $renderingId
+     * @param int  $renderingId
+     * @param bool $forceFetch
      * @return array
      */
-    protected function getPermissions(int $renderingId): array
+    protected function getPermissions(int $renderingId, bool $forceFetch): array
     {
         $cacheKey = 'permissions:rendering-' . $renderingId;
+
+        if ($forceFetch) {
+            Cache::forget($cacheKey);
+        }
 
         return Cache::remember(
             $cacheKey,

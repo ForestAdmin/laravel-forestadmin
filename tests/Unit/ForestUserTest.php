@@ -164,4 +164,31 @@ class ForestUserTest extends TestCase
 
         $this->assertEquals($expected, $forestUser->getSmartActionPermissions());
     }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testFormatChartPayload(): void
+    {
+        $forestUser = new ForestUser([]);
+        $chartPayload = [
+            'type'            => 'Value',
+            'collection'      => 'book',
+            'query'           => null,
+            'aggregate'       => 'Count',
+            'filters'         => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}"
+        ];
+        $chartPayloadFormated = [
+            'type'               => 'Value',
+            'sourceCollectionId' => 'book',
+            'aggregator'         => 'Count',
+            'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}"
+        ];
+
+        $result = $this->invokeMethod($forestUser, 'formatChartPayload', [$chartPayload]);
+
+        $this->assertIsArray($result);
+        $this->assertEquals($chartPayloadFormated, $result);
+    }
 }
