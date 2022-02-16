@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Concerns\ChartHelper;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\Concerns\RawQuery;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Class LiveQueryRepository
@@ -25,12 +26,18 @@ abstract class LiveQueryRepository
     protected string $type;
 
     /**
+     * @var string|null
+     */
+    protected ?string $recordId;
+
+    /**
      * Construct LiveQuery
      */
     public function __construct()
     {
         $this->rawQuery = trim(request()->input('query'));
         $this->type = request()->input('type');
+        $this->recordId = request()->input('record_id');
     }
 
     /**
@@ -40,11 +47,9 @@ abstract class LiveQueryRepository
     {
         $this->validateQuery();
 
-        /*
-         if @params['record_id']
-            raw_query.gsub!('?', @params['record_id'].to_s)
-         end
-         */
+        if ($this->recordId) {
+            $this->rawQuery = Str::replace('?', $this->recordId, $this->rawQuery);
+        }
 
         $result = DB::select($this->rawQuery);
 
