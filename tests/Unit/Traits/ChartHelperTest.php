@@ -19,6 +19,36 @@ class ChartHelperTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
+    public function testAbortIfOnCollection(): void
+    {
+        $trait = $this->getObjectForTrait(ChartHelper::class);
+        $data = collect(
+            ['key' => 'foo_key',  'item' => 'foo_value']
+        );
+
+        $result = $this->invokeMethod($trait, 'abortIf', [false, $data, "key, item"]);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAbortIfOnArray(): void
+    {
+        $trait = $this->getObjectForTrait(ChartHelper::class);
+        $data = ['key' => 'foo_key',  'item' => 'foo_value'];
+
+        $result = $this->invokeMethod($trait, 'abortIf', [false, $data, "key, item"]);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
     public function testAbortIfException(): void
     {
         $trait = $this->getObjectForTrait(ChartHelper::class);
@@ -28,21 +58,7 @@ class ChartHelperTest extends TestCase
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('🌳🌳🌳 The result columns must be named \'key, value\' instead of \'key,item\'');
+
         $this->invokeMethod($trait, 'abortIf', [true, $data, "key, value"]);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testAbortIf(): void
-    {
-        $trait = $this->getObjectForTrait(ChartHelper::class);
-        $data = collect(
-            ['key' => 'foo_key',  'item' => 'foo_value']
-        );
-
-        $result = $this->invokeMethod($trait, 'abortIf', [false, $data, "key, item"]);
-        $this->assertNull($result);
     }
 }

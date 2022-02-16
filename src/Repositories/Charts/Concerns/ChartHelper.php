@@ -15,14 +15,18 @@ use Illuminate\Support\Collection;
 trait ChartHelper
 {
     /**
-     * @param bool       $condition
-     * @param Collection $result
-     * @param string     $keyNames
+     * @param bool             $condition
+     * @param Collection|array $result
+     * @param string           $keyNames
      * @return void
      * @throws ForestException
      */
-    protected function abortIf(bool $condition, Collection $result, string $keyNames): void
+    protected function abortIf(bool $condition, $result, string $keyNames): void
     {
+        if (is_array($result)) {
+            $result = collect($result);
+        }
+
         if ($condition) {
             $resultKeys = $result->keys()->implode(',');
             throw new ForestException("The result columns must be named '$keyNames' instead of '$resultKeys'");
