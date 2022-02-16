@@ -6,7 +6,6 @@ use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Concerns\ChartHelper;
 use ForestAdmin\LaravelForestAdmin\Transformers\ChartTransformer;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
 
 /**
