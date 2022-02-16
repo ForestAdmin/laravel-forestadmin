@@ -264,6 +264,35 @@ class ValueTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
+    public function testAppendPreviousValueWithMoreThanOneFilter(): void
+    {
+        $params = [
+            'type'            => 'Value',
+            'collection'      => 'Book',
+            'aggregate'       => 'Sum',
+            'aggregate_field' => 'amount',
+            'filters'         => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"yesterday","value":null}, {"field":"created_at","operator":"today","value":null}]}',
+        ];
+
+        $request = Request::create('/stats/book', 'POST', $params);
+        app()->instance('request', $request);
+
+        $repository = new Value(new Book());
+        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
+        $result = [
+            'apply'      => false,
+            'filter'     => null,
+            'aggregator' => 'and',
+        ];
+
+        $this->assertIsArray($appendPreviousPeriod);
+        $this->assertEquals($result, $appendPreviousPeriod);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
     public function testDontAppendPreviousValueWithoutFilter(): void
     {
         $params = [
