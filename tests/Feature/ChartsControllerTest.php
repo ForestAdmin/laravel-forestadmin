@@ -133,6 +133,7 @@ class ChartsControllerTest extends TestCase
         $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payloadQuery']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertChartResponse($data['expected'], $response);
     }
@@ -313,7 +314,6 @@ class ChartsControllerTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Pie');
-        //-- unset this key because, it's only present when is a liveQuery chart --//
         $permission = [
             'stats' => [
                 'pies' => [$data['permission']],
@@ -354,7 +354,6 @@ class ChartsControllerTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Line');
-        //-- unset this key because, it's only present when is a liveQuery chart --//
         $permission = [
             'stats' => [
                 'lines' => [$data['permission']],
@@ -395,7 +394,6 @@ class ChartsControllerTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Leaderboard');
-        //-- unset this key because, it's only present when is a liveQuery chart --//
         $permission = [
             'stats' => [
                 'leaderboards' => [$data['permission']],
