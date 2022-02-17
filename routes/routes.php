@@ -24,6 +24,9 @@ Route::group(
                 Route::post('/stats/{collection}', DispatchGateway::class)->name('forest.stats.index');
                 Route::post('/stats', DispatchGateway::class)->name('forest.stats.live_query');
 
+                // SCOPES
+                Route::post('/scope-cache-invalidation', DispatchGateway::class)->name('forest.scopes.index');
+
                 // CRUD
                 Route::get('/{collection}', DispatchGateway::class)->name('forest.collection.index');
                 Route::get('/{collection}/count', DispatchGateway::class)->name('forest.collection.count');
