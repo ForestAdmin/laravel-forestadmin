@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
@@ -24,6 +25,11 @@ class ScopeManager
     use FormatGuzzle;
 
     public const TTL = 60 * 60 * 24;
+
+    /**
+     * @var ForestUser
+     */
+    private ForestUser $user;
 
     /**
      * @var ForestApiRequester
