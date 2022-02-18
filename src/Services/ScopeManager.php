@@ -23,7 +23,7 @@ class ScopeManager
 {
     use FormatGuzzle;
 
-    public const TTL = 60 * 5;
+    public const TTL = 60 * 60 * 24;
 
     /**
      * @var ForestApiRequester
@@ -54,6 +54,14 @@ class ScopeManager
     public function getCacheKey(): string
     {
         return 'scope:rendering-' . $this->user->getAttribute('rendering_id');
+    }
+
+    /**
+     * @return void
+     */
+    public function forgetCache(): void
+    {
+        Cache::forget($this->getCacheKey());
     }
 
     /**

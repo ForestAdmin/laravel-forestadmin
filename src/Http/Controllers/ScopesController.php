@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
+use ForestAdmin\LaravelForestAdmin\Services\ScopeManager;
 use Illuminate\Http\Response;
 
 /**
@@ -18,6 +19,8 @@ class ScopesController extends ForestController
      */
     public function index()
     {
+        app(ScopeManager::class)->forgetCache();
+
         return response()->noContent();
     }
 }
