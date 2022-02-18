@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests;
 
 use ForestAdmin\LaravelForestAdmin\ForestServiceProvider;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +19,13 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
  */
 class TestCase extends OrchestraTestCase
 {
+    /**
+     * Indicates whether the default seeder should run before each test.
+     *
+     * @var bool
+     */
+    protected $seed = true;
+
     /**
      * Call protected/private method of a class.
      * @param object $object
@@ -74,6 +82,8 @@ class TestCase extends OrchestraTestCase
         $db->setAsGlobal();
         $db->bootEloquent();
         $this->migrate();
+
+        $this->seed(DatabaseSeeder::class);
     }
 
     /**

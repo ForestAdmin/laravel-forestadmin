@@ -6,13 +6,12 @@ use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -30,7 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResourcesControllerTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
@@ -47,7 +45,7 @@ class ResourcesControllerTest extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
+        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
     }
 
     /**
@@ -101,7 +99,6 @@ class ResourcesControllerTest extends TestCase
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
-
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
@@ -187,7 +184,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -250,7 +246,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $params = [
             'fields'   => ['book' => 'id,label'],
             'filename' => 'books',
@@ -295,7 +290,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -382,7 +376,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $params = [
             'data' => [
                 'attributes'    => [
@@ -529,7 +522,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $book = Book::first();
         $params = [
             'data' => [
@@ -619,7 +611,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $this->getBook()->save();
         $book = Book::first();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -657,11 +648,12 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $book = $this->getBook();
+        $count = Book::count();
         $call = $this->get('/forest/book/count');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals($book->count(), $data['count']);
+        $this->assertEquals($count, $data['count']);
     }
 
     /**
@@ -672,7 +664,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        $book = $this->getBook();
         $call = $this->getJson('/forest/book/count');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -735,9 +726,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
-        for ($i = 0; $i < 19; $i++) {
-            $this->getBook()->save();
-        }
         $params = [
             'data' => [
                 'attributes' => [
@@ -782,6 +770,7 @@ class ResourcesControllerTest extends TestCase
     public function testDestroyBulkException(): void
     {
         $this->makeScopeManager($this->forestUser);
+        Book::destroy([1,2,3,4,5]);
         $params = [
             'data' => [
                 'attributes' => [
@@ -849,37 +838,13 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label'], 'search' => 'bar', 'searchExtended' => 1];
+        $category = Category::first();
+        $params = ['fields' => ['book' => 'id,label'], 'search' => $category->label, 'searchExtended' => 1];
         App::shouldReceive('basePath')->andReturn(null);
-        $fakeCategorySchema = [
-            "collections" => [
-                [
-                    "name"   => "category",
-                    "fields" => [
-                        [
-                            "field"         => "label",
-                            "type"          => "String",
-                            "default_value" => null,
-                            "enums"         => null,
-                            "integration"   => null,
-                            "is_filterable" => true,
-                            "is_read_only"  => false,
-                            "is_required"   => false,
-                            "is_sortable"   => true,
-                            "is_virtual"    => false,
-                            "is_searchable" => null,
-                            "reference"     => null,
-                            "inverse_of"    => null,
-                            "widget"        => null,
-                            "validations"   => [],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        File::shouldReceive('get')->andReturn(json_encode($fakeCategorySchema, JSON_THROW_ON_ERROR));
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $book = Book::first();
+        $book = Book::where('category_id', $category->id)->first();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
@@ -920,11 +885,12 @@ class ResourcesControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $books = Book::orderBy('id', 'ASC')->get();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals(Book::first()->id, $data['data'][0]['id']);
-        $this->assertEquals(Book::all()->last()->id, $data['data'][1]['id']);
+        $this->assertEquals($books->first()->id, $data['data'][0]['id']);
+        $this->assertEquals($books->last()->id, $data['data'][$books->count() - 1]['id']);
     }
 
     /**
@@ -942,11 +908,13 @@ class ResourcesControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $books = Book::orderBy('id', 'DESC')->get();
+
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals(Book::all()->last()->id, $data['data'][0]['id']);
-        $this->assertEquals(Book::first()->id, $data['data'][1]['id']);
+        $this->assertEquals($books->first()->id, $data['data'][0]['id']);
+        $this->assertEquals($books->last()->id, $data['data'][$books->count() - 1]['id']);
     }
 
     /**
@@ -1004,10 +972,7 @@ class ResourcesControllerTest extends TestCase
             $this->getBook()->save();
         }
         $book = Book::first();
-        $book->label = 'my favorite book';
-        $book->save();
-
-        $params = ['fields' => ['book' => 'id,label'], 'filters' => '{"field":"label","operator":"equal","value":"my favorite book"}'];
+        $params = ['fields' => ['book' => 'id,label'], 'filters' => '{"field":"label","operator":"equal","value":"' . $book->label . '"}'];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
@@ -1016,7 +981,7 @@ class ResourcesControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertCount(1, $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals('my favorite book', $data['data'][0]['attributes']['label']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
     }
 
     /**
@@ -1030,12 +995,9 @@ class ResourcesControllerTest extends TestCase
             $this->getBook()->save();
         }
         $book = Book::first();
-        $book->difficulty = 'hard';
-        $book->save();
-
         $params = [
             'fields'  => ['book' => 'id,label,difficulty'],
-            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}',
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"' . $book->label . '"},{"field":"difficulty","operator":"equal","value":"' . $book->difficulty . '"}]}',
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -1044,7 +1006,8 @@ class ResourcesControllerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertCount(1, $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals('hard', $data['data'][0]['attributes']['difficulty']);
+        $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
     }
 
     /**
