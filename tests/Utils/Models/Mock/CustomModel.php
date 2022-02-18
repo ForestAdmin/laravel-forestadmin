@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock;
 
 use Illuminate\Database\Eloquent\Model;
 

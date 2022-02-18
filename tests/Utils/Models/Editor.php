@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
@@ -8,19 +8,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Category
+ * Class Editor
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Category extends Model
+class Editor extends Model
 {
     use ForestCollection;
 
     protected $fillable = [
-        'label',
-        'product_id',
+        'name',
+        'book_id',
     ];
 
     /**

@@ -1,20 +1,16 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Editor
+ * Class Bookstore
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Editor extends Model
+class Bookstore extends Model
 {
-    protected $fillable = [
-        'name',
-        'book_id',
-    ];
 }

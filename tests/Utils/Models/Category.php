@@ -1,33 +1,35 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * Class Sequel
+ * Class Category
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Sequel extends Model
+class Category extends Model
 {
     use HasFactory;
 
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'label',
-        'sequelable_type',
-        'sequelable_id',
+        'product_id',
     ];
 
     /**
-     * @return MorphTo
+     * @return CategoryFactory
      */
-    public function sequelable(): MorphTo
+    protected static function newFactory()
     {
-        return $this->morphTo();
+        return new CategoryFactory();
     }
 }

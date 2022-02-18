@@ -1,16 +1,16 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Bookstore
+ * Class Company
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Bookstore extends Model
+class Company extends Model
 {
 }
