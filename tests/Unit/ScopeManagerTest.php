@@ -2,13 +2,16 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
-
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Services\ScopeManager;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -43,8 +46,121 @@ class ScopeManagerTest extends TestCase
      * @throws \JsonException
      * @throws \ReflectionException
      */
+    public function testGetScopes(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager($this->makeForestApi());
+        $this->invokeProperty($scopeManager, 'user', $forestUser);
+        $result = $this->invokeMethod($scopeManager, 'getScopes');
+        $expected = collect(
+            [
+                'book' => [
+                    'filters' => [
+                        'aggregator' => 'and',
+                        'conditions' => [
+                            0 => [
+                                'field'    => 'active',
+                                'operator' => 'present',
+                                'value'    => null,
+                            ],
+                            1 => [
+                                'field'    => 'label',
+                                'operator' => 'contains',
+                                'value'    => 'John',
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals($expected, $result);
+        $this->assertInstanceOf(Collection::class, Cache::get('scope:rendering-1'));
+        $this->assertEquals(Cache::get('scope:rendering-1'), $expected);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testFormatConditions(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager(new ForestApiRequester());
+
+        $this->invokeProperty($scopeManager, 'user', $forestUser);
+        $result = $this->invokeMethod($scopeManager, 'formatConditions', [$this->getResponseFromApi()]);
+        $expected = collect(
+            [
+                'book' => [
+                    'filters' => [
+                        'aggregator' => 'and',
+                        'conditions' => [
+                            0 => [
+                                'field'    => 'active',
+                                'operator' => 'present',
+                                'value'    => null,
+                            ],
+                            1 => [
+                                'field'    => 'label',
+                                'operator' => 'contains',
+                                'value'    => 'John',
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
     public function testFetchScopes(): void
     {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
         $scopeManager = new ScopeManager($this->makeForestApi());
         $fetchScopes = $this->invokeMethod($scopeManager, 'fetchScopes', [1]);
 
@@ -60,8 +176,21 @@ class ScopeManagerTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(ErrorMessages::UNEXPECTED);
-
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
         $scopeManager = new ScopeManager($this->makeForestApiThrowException());
+
         $this->invokeMethod($scopeManager, 'fetchScopes', [1]);
     }
 
