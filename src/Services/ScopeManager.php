@@ -51,7 +51,7 @@ class ScopeManager
      */
     public function getScope(string $collection): array
     {
-        return $this->getScopes()->get($collection);
+        return $this->getScopes()->get($collection) ?? [];
     }
 
     /**
@@ -97,7 +97,7 @@ class ScopeManager
         $conditions = new Collection();
         foreach ($scopes as $collection => $scope) {
             $filters = [
-                'filter' => [
+                'filters' => [
                     'aggregator' => Arr::get($scope, 'scope.filter.aggregator'),
                     'conditions' => [],
                 ],
@@ -106,7 +106,7 @@ class ScopeManager
                 if (Str::startsWith($condition['value'], '$currentUser')) {
                     $condition['value'] = Arr::get($scope, 'scope.dynamicScopesValues.users.' . $this->user->getKey())[$condition['value']];
                 }
-                $filters['filter']['conditions'][] = $condition;
+                $filters['filters']['conditions'][] = $condition;
             }
             $conditions->put($collection, $filters);
         }
