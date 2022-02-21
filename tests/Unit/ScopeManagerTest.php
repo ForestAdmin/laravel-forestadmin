@@ -46,6 +46,134 @@ class ScopeManagerTest extends TestCase
      * @throws \JsonException
      * @throws \ReflectionException
      */
+    public function testGetScope(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager($this->makeForestApi());
+        $this->invokeMethod($scopeManager, 'getScopes');
+        $result = $this->invokeMethod($scopeManager, 'getScope', ['book']);
+        $expected = [
+            'filters' => [
+                'aggregator' => 'and',
+                'conditions' => [
+                    0 => [
+                        'field'    => 'active',
+                        'operator' => 'present',
+                        'value'    => null,
+                    ],
+                    1 => [
+                        'field'    => 'label',
+                        'operator' => 'contains',
+                        'value'    => 'John',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function testGetScopeWithUnknownCollection(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager($this->makeForestApi());
+        $this->invokeMethod($scopeManager, 'getScopes');
+        $result = $this->invokeMethod($scopeManager, 'getScope', ['foo']);
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function testGetCacheKey(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager(new ForestApiRequester());
+        $result = $this->invokeMethod($scopeManager, 'getCacheKey');
+        $expected = 'scope:rendering-' . $forestUser->getAttribute('rendering_id');
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function testForgetCache(): void
+    {
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'team'         => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        Auth::shouldReceive('guard->user')->andReturn($forestUser);
+        $scopeManager = new ScopeManager($this->makeForestApi());
+        $this->invokeMethod($scopeManager, 'getScopes');
+        $this->invokeMethod($scopeManager, 'forgetCache');
+
+        $this->assertNull(Cache::get('scope:rendering-1'));
+    }
+
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
     public function testGetScopes(): void
     {
         $forestUser = new ForestUser(
@@ -62,7 +190,6 @@ class ScopeManagerTest extends TestCase
         );
         Auth::shouldReceive('guard->user')->andReturn($forestUser);
         $scopeManager = new ScopeManager($this->makeForestApi());
-        $this->invokeProperty($scopeManager, 'user', $forestUser);
         $result = $this->invokeMethod($scopeManager, 'getScopes');
         $expected = collect(
             [
@@ -112,8 +239,6 @@ class ScopeManagerTest extends TestCase
         );
         Auth::shouldReceive('guard->user')->andReturn($forestUser);
         $scopeManager = new ScopeManager(new ForestApiRequester());
-
-        $this->invokeProperty($scopeManager, 'user', $forestUser);
         $result = $this->invokeMethod($scopeManager, 'formatConditions', [$this->getResponseFromApi()]);
         $expected = collect(
             [
@@ -233,7 +358,7 @@ class ScopeManagerTest extends TestCase
         return [
             'book' => [
                 'scope' => [
-                    'filter'              => [
+                    'filter'             => [
                         'aggregator' => 'and',
                         'conditions' => [
                             [
@@ -256,7 +381,7 @@ class ScopeManagerTest extends TestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }
