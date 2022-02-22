@@ -3,15 +3,14 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\ForestUserFactory;
-use Illuminate\Support\Collection;
 use Mockery as m;
 
 /**
- * Class MockClientHttp
+ * Trait MockForestUserFactory
  *
- * @package Laravel-forestadmin
- * @license GNU https://www.gnu.org/licenses/licenses.html
- * @link    https://github.com/ForestAdmin/laravel-forestadmin
+ * @package  Laravel-forestadmin
+ * @license  GNU https://www.gnu.org/licences/licences.html
+ * @link     https://github.com/ForestAdmin/laravel-forestadmin
  */
 trait MockForestUserFactory
 {

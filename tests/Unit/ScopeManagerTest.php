@@ -165,7 +165,7 @@ class ScopeManagerTest extends TestCase
         $this->invokeMethod($scopeManager, 'getScopes');
         $this->invokeMethod($scopeManager, 'forgetCache');
 
-        $this->assertNull(Cache::get('scope:rendering-1'));
+        $this->assertNull(Cache::get($scopeManager->getCacheKey()));
     }
 
 
@@ -216,7 +216,7 @@ class ScopeManagerTest extends TestCase
         $this->assertInstanceOf(Collection::class, $result);
         $this->assertEquals($expected, $result);
         $this->assertInstanceOf(Collection::class, Cache::get('scope:rendering-1'));
-        $this->assertEquals(Cache::get('scope:rendering-1'), $expected);
+        $this->assertEquals(Cache::get($scopeManager->getCacheKey()), $expected);
     }
 
     /**
