@@ -115,9 +115,29 @@ trait HasFilters
         [$aggregator, $filters] = $this->parseFilters($payload);
         $this->setAggregator($aggregator);
 
-        foreach ($filters as $filter) {
-            $this->handleFilter($query, $filter);
-        }
+        $query->where(function($q) use ($filters) {
+            foreach ($filters as $filter) {
+                $this->handleFilter($q, $filter);
+            }
+        });
+    }
+
+    /**
+     * @param Builder $query
+     * @param array   $filters
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    protected function appendScope(Builder $query, array $filters)
+    {
+        $this->setAggregator($filters['aggregator']);
+
+        $query->where(function($q) use ($filters) {
+            foreach ($filters['conditions'] as $filter) {
+                $this->handleFilter($q, $filter);
+            }
+        });
     }
 
     /**
@@ -125,6 +145,7 @@ trait HasFilters
      * @param array   $filter
      * @return void
      * @throws Exception
+     * @throws \Exception
      */
     protected function handleFilter(Builder $query, array $filter): void
     {
