@@ -713,6 +713,170 @@ class QueryBuilderPreviousPeriodTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testDateFiltersOperatorUnknown(): void
+    {
+        $operator = 'foo';
+        $timezone = new \DateTimeZone('UTC');
+        $data = $this->getData();
+
+        foreach ($data as $value) {
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
+                ->makePartial();
+            $queryBuilder->setAggregator('and');
+            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+            $queryResult = $this->invokeMethod(
+                $queryBuilder,
+                'dateFilters',
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
+            );
+
+            $this->assertIsArray($queryResult->getQuery()->wheres);
+            $this->assertEmpty($queryResult->getQuery()->wheres);
+        }
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnNotCoveredOperator(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnCoveredOperatorWithTwoFilters(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"created_at","operator":"yesterday","value":""}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnCoveredOperatorWithOrAggregator(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"or","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"created_at","operator":"yesterday","value":""}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'or'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodWithTwoFilters(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"label","operator":"equal","value":"foo"}]}',
+        ];
+        $expected = [
+            'apply' => true,
+            'filter' => [
+                'field'    => 'created_at',
+                'operator' => 'today',
+                'value'    => '',
+            ],
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOneFilter(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"field":"created_at","operator":"today","value":""}',
+        ];
+        $expected = [
+            'apply' => true,
+            'filter' => [
+                'field'    => 'created_at',
+                'operator' => 'today',
+                'value'    => '',
+            ],
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @param array|null  $types
      * @param string|null $overrideValue
      * @return array
