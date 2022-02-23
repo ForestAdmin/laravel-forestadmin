@@ -4,11 +4,13 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\SchemaException;
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -24,6 +26,31 @@ use Mockery as m;
 class ResourceGetterTest extends TestCase
 {
     use FakeData;
+    use ScopeManagerFactory;
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        //--- push instance of ScopeManager in App ---//
+        $this->makeScopeManager($forestUser);
+    }
 
     /**
      * @return void

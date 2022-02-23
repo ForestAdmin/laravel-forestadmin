@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
@@ -14,6 +15,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -35,6 +37,31 @@ class ChartRepositoryTest extends TestCase
     use FakeData;
     use FakeSchema;
     use ProphecyTrait;
+    use ScopeManagerFactory;
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        //--- push instance of ScopeManager in App ---//
+        $this->makeScopeManager($forestUser);
+    }
 
     /**
      * @return void

@@ -8,11 +8,13 @@ use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Services\ScopeManager;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use League\Fractal\Scope;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -27,11 +29,7 @@ class ScopesControllerTest extends TestCase
 {
     use ProphecyTrait;
     use MockForestUserFactory;
-
-    /**
-     * @var ForestUser
-     */
-    private ForestUser $forestUser;
+    use ScopeManagerFactory;
 
     /**
      * @param Application $app
@@ -45,12 +43,13 @@ class ScopesControllerTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->forestUser = new ForestUser(
+        $forestUser = new ForestUser(
             [
                 'id'           => 1,
                 'email'        => 'john.doe@forestadmin.com',
@@ -70,13 +69,22 @@ class ScopesControllerTest extends TestCase
                     'two_factor_authentication_enabled' => false,
                     'two_factor_authentication_active'  => false,
                 ],
-                $this->forestUser->getAttributes()
+                $forestUser->getAttributes()
             ),
-            $this->forestUser->getAttribute('rendering_id')
+            $forestUser->getAttribute('rendering_id')
         );
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
+
+        Auth::shouldReceive(
+            [
+                'guard->check' => true,
+                'guard->user'  => $forestUser
+            ]
+        );
+
+        $this->makeScopeManager($forestUser, $this->getScopesFromApi());
     }
 
 
@@ -87,14 +95,7 @@ class ScopesControllerTest extends TestCase
      */
     public function testIndex(): void
     {
-        Auth::shouldReceive(
-            [
-                'guard->check' => true,
-                'guard->user'  => $this->forestUser
-            ]
-        );
-
-        $scopeManager = new ScopeManager($this->makeForestApi());
+        $scopeManager = app(ScopeManager::class);
 
         //--- first put some data into the cache ---//
         $this->invokeMethod($scopeManager, 'getScopes');
@@ -119,6 +120,7 @@ class ScopesControllerTest extends TestCase
                 ],
             ]
         );
+
         $this->assertInstanceOf(Collection::class, Cache::get('scope:rendering-1'));
         $this->assertEquals(Cache::get($scopeManager->getCacheKey()), $expected);
 
@@ -129,27 +131,11 @@ class ScopesControllerTest extends TestCase
         $this->assertEmpty(Cache::get($scopeManager->getCacheKey()));
     }
 
-    /**
-     * @return object
-     * @throws \JsonException
-     */
-    public function makeForestApi(): object
-    {
-        $forestApiGet = $this->prophesize(ForestApiRequester::class);
-        $forestApiGet
-            ->get(Argument::type('string'), Argument::size(1))
-            ->shouldBeCalled()
-            ->willReturn(
-                new Response(200, [], json_encode($this->getResponseFromApi(), JSON_THROW_ON_ERROR))
-            );
-
-        return $forestApiGet->reveal();
-    }
 
     /**
      * @return array
      */
-    public function getResponseFromApi(): array
+    public function getScopesFromApi(): array
     {
         return [
             'book' => [
@@ -179,33 +165,5 @@ class ScopesControllerTest extends TestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getScopes(): Collection
-    {
-        return collect(
-            [
-                'book' => [
-                    'filters' => [
-                        'aggregator' => 'and',
-                        'conditions' => [
-                            [
-                                'field'    => 'active',
-                                'operator' => 'present',
-                                'value'    => null,
-                            ],
-                            [
-                                'field'    => 'label',
-                                'operator' => 'contains',
-                                'value'    => 'John',
-                            ],
-                        ],
-                    ],
-                ],
-            ]
-        );
     }
 }
