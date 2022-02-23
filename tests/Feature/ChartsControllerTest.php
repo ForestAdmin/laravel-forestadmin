@@ -35,6 +35,11 @@ class ChartsControllerTest extends TestCase
     use ScopeManagerFactory;
 
     /**
+     * @var ForestUser
+     */
+    private ForestUser $forestUser;
+
+    /**
      * @param Application $app
      * @return void
      */
@@ -52,7 +57,7 @@ class ChartsControllerTest extends TestCase
     {
         parent::setUp();
 
-        $forestUser = new ForestUser(
+        $this->forestUser = new ForestUser(
             [
                 'id'           => 1,
                 'email'        => 'john.doe@forestadmin.com',
@@ -72,14 +77,13 @@ class ChartsControllerTest extends TestCase
                     'two_factor_authentication_enabled' => false,
                     'two_factor_authentication_active'  => false,
                 ],
-                $forestUser->getAttributes()
+                $this->forestUser->getAttributes()
             ),
-            $forestUser->getAttribute('rendering_id')
+            $this->forestUser->getAttribute('rendering_id')
         );
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
-        $this->makeScopeManager($forestUser);
     }
 
     /**
@@ -227,6 +231,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexValue(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -267,6 +272,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexObjective(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -309,6 +315,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexPie(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -349,6 +356,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLine(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -389,6 +397,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLeaderboard(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->makeBooks();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

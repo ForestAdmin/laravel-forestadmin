@@ -3,11 +3,13 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Value;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
@@ -26,6 +28,31 @@ class ValueTest extends TestCase
 {
     use FakeData;
     use FakeSchema;
+    use ScopeManagerFactory;
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        //--- push instance of ScopeManager in App ---//
+        $this->makeScopeManager($forestUser);
+    }
 
     /**
      * @return void
@@ -120,231 +147,5 @@ class ValueTest extends TestCase
 
         $this->assertIsArray($serialize);
         $this->assertEquals(['countCurrent' => $data[0], 'countPrevious' => $data[1]], $serialize);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testApplyDateFiltersOnPreviousPeriodTodayOperator(): void
-    {
-        $repository = m::mock(Value::class, [new Book()])
-            ->makePartial();
-        $timezone = new \DateTimeZone('Europe/Paris');
-        $this->invokeProperty($repository, 'timezone', $timezone);
-        $interval = $repository->applyDateFiltersOnPreviousPeriod('today');
-
-        $this->assertIsArray($interval);
-        $this->assertEquals(Carbon::now($timezone)->subDay()->startOfDay(), $interval[0]);
-        $this->assertEquals(Carbon::now($timezone)->subDay()->endOfDay(), $interval[1]);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testApplyDateFiltersOnPreviousPeriodPreviousDaysOperator(): void
-    {
-        $value = 5;
-        $repository = m::mock(Value::class, [new Book()])
-            ->makePartial();
-        $timezone = new \DateTimeZone('Europe/Paris');
-        $this->invokeProperty($repository, 'timezone', $timezone);
-        $interval = $repository->applyDateFiltersOnPreviousPeriod('previous_x_days', $value);
-
-        $this->assertIsArray($interval);
-        $this->assertEquals(Carbon::now($timezone)->subDays($value * 2)->startOfDay(), $interval[0]);
-        $this->assertEquals(Carbon::now($timezone)->subDays(2)->endOfDay(), $interval[1]);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testApplyDateFiltersOnPreviousPeriodPreviousDaysToDateOperator(): void
-    {
-        $value = 5;
-        $repository = m::mock(Value::class, [new Book()])
-            ->makePartial();
-        $timezone = new \DateTimeZone('Europe/Paris');
-        $this->invokeProperty($repository, 'timezone', $timezone);
-        $interval = $repository->applyDateFiltersOnPreviousPeriod('previous_x_days_to_date', $value);
-
-        $this->assertIsArray($interval);
-        $this->assertEquals(Carbon::now($timezone)->subDays($value * 2)->startOfDay(), $interval[0]);
-        $this->assertEquals(Carbon::now($timezone)->subDay()->endOfDay(), $interval[1]);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testApplyDateFiltersOnPreviousPeriodOtherOperators(): void
-    {
-        $repository = m::mock(Value::class, [new Book()])
-            ->makePartial();
-        $timezone = new \DateTimeZone('Europe/Paris');
-        $this->invokeProperty($repository, 'timezone', $timezone);
-
-        $operators = ['yesterday',
-                      'previous_week',
-                      'previous_month',
-                      'previous_quarter',
-                      'previous_year',
-                      'previous_week_to_date',
-                      'previous_month_to_date',
-                      'previous_quarter_to_date',
-                      'previous_year_to_date',
-        ];
-        foreach ($operators as $operator) {
-            $period = $operator === 'yesterday' ? 'Day' : Str::ucfirst(Str::of($operator)->explode('_')->get(1));
-            $sub = 'sub' . $period . 's';
-            $start = 'startOf' . $period;
-            $end = 'endOf' . $period;
-            $interval = $repository->applyDateFiltersOnPreviousPeriod($operator);
-
-            $this->assertIsArray($interval);
-            $this->assertEquals(Carbon::now($timezone)->$sub(2)->$start(), $interval[0]);
-            if (Str::endsWith($operator, 'to_date')) {
-                $this->assertEquals(Carbon::now($timezone)->$sub()->format('Y-m-d H:i:s'), $interval[1]->format('Y-m-d H:i:s'));
-            } else {
-                $this->assertEquals(Carbon::now($timezone)->$sub(2)->$end(), $interval[1]);
-            }
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testApplyDateFiltersOnPreviousPeriodUnknownOperator(): void
-    {
-        $repository = m::mock(Value::class, [new Book()])
-            ->makePartial();
-        $timezone = new \DateTimeZone('Europe/Paris');
-        $this->invokeProperty($repository, 'timezone', $timezone);
-        $interval = $repository->applyDateFiltersOnPreviousPeriod('foo');
-
-        $this->assertIsArray($interval);
-        $this->assertEmpty($interval);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testAppendPreviousValue(): void
-    {
-        $field = 'created_at';
-        $operator = 'yesterday';
-        $params = [
-            'type'            => 'Value',
-            'collection'      => 'Book',
-            'aggregate'       => 'Sum',
-            'aggregate_field' => 'amount',
-            'filters'         => '{"aggregator":"and","conditions":[{"field":"' . $field . '","operator":"' . $operator . '","value":null}]}',
-        ];
-
-        $request = Request::create('/stats/book', 'POST', $params);
-        app()->instance('request', $request);
-
-        $repository = new Value(new Book());
-        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
-        $result = [
-            'apply'      => true,
-            'filter'     => ['field' => 'created_at', 'operator' => 'yesterday', 'value' => null],
-            'aggregator' => 'and',
-        ];
-
-        $this->assertIsArray($appendPreviousPeriod);
-        $this->assertEquals($result, $appendPreviousPeriod);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testAppendPreviousValueWithMoreThanOneFilter(): void
-    {
-        $params = [
-            'type'            => 'Value',
-            'collection'      => 'Book',
-            'aggregate'       => 'Sum',
-            'aggregate_field' => 'amount',
-            'filters'         => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"yesterday","value":null}, {"field":"created_at","operator":"today","value":null}]}',
-        ];
-
-        $request = Request::create('/stats/book', 'POST', $params);
-        app()->instance('request', $request);
-
-        $repository = new Value(new Book());
-        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
-        $result = [
-            'apply'      => false,
-            'filter'     => null,
-            'aggregator' => 'and',
-        ];
-
-        $this->assertIsArray($appendPreviousPeriod);
-        $this->assertEquals($result, $appendPreviousPeriod);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDontAppendPreviousValueWithoutFilter(): void
-    {
-        $params = [
-            'type'            => 'Value',
-            'collection'      => 'Book',
-            'aggregate'       => 'Sum',
-            'aggregate_field' => 'amount',
-        ];
-
-        $request = Request::create('/stats/book', 'POST', $params);
-        app()->instance('request', $request);
-
-        $repository = new Value(new Book());
-        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
-        $result = [
-            'apply'      => false,
-            'filter'     => null,
-            'aggregator' => 'and',
-        ];
-
-        $this->assertIsArray($appendPreviousPeriod);
-        $this->assertEquals($result, $appendPreviousPeriod);
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDontAppendPreviousValueOnAggregatorOr(): void
-    {
-        $field = 'created_at';
-        $operator = 'yesterday';
-        $params = [
-            'type'            => 'Value',
-            'collection'      => 'Book',
-            'aggregate'       => 'Sum',
-            'aggregate_field' => 'amount',
-            'filters'         => '{"aggregator":"or","conditions":[{"field":"' . $field . '","operator":"' . $operator . '","value":null}]}',
-        ];
-
-        $request = Request::create('/stats/book', 'POST', $params);
-        app()->instance('request', $request);
-
-        $repository = new Value(new Book());
-        $appendPreviousPeriod = $this->invokeMethod($repository, 'appendPreviousPeriod');
-        $result = [
-            'apply'      => false,
-            'filter'     => null,
-            'aggregator' => 'or',
-        ];
-
-        $this->assertIsArray($appendPreviousPeriod);
-        $this->assertEquals($result, $appendPreviousPeriod);
     }
 }
