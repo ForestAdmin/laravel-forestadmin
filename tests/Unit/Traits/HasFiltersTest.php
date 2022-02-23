@@ -119,7 +119,7 @@ class HasFiltersTest extends TestCase
         $orOperator = 'or';
         $trait = $this->getObjectForTrait(HasFilters::class);
 
-        $this->invokeMethod($trait, 'setAggregator', [null]);
+        $this->invokeMethod($trait, 'setAggregator', [$defaultOperator]);
         $this->assertEquals($defaultOperator, $this->invokeProperty($trait, 'aggregator'));
 
         $this->invokeMethod($trait, 'setAggregator', [$orOperator]);
@@ -260,7 +260,7 @@ class HasFiltersTest extends TestCase
         $trait = $this->getObjectForTrait(HasFilters::class);
         $json = '{"field":"label","operator":"equal","value":"test"}';
         $expected = [
-            null,
+            'and',
             [
                 [
                     'field'    => 'label',
