@@ -110,7 +110,7 @@ trait HasFilters
      * @throws Exception
      * @throws \JsonException
      */
-    protected function appendFilters(Builder $query, string $payload)
+    protected function appendFilters(Builder $query, string $payload): void
     {
         [$aggregator, $filters] = $this->parseFilters($payload);
         $this->setAggregator($aggregator);
@@ -127,9 +127,8 @@ trait HasFilters
      * @param array   $filters
      * @return void
      * @throws Exception
-     * @throws \JsonException
      */
-    protected function appendScope(Builder $query, array $filters)
+    protected function appendScope(Builder $query, array $filters): void
     {
         $this->setAggregator($filters['aggregator']);
 
