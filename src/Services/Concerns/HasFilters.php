@@ -351,7 +351,7 @@ trait HasFilters
             $aggregator = $dataToArray['aggregator'];
             $filters = $dataToArray['conditions'];
         } else {
-            $aggregator = null;
+            $aggregator = 'and';
             $filters[] = $dataToArray;
         }
 
@@ -419,12 +419,11 @@ trait HasFilters
     }
 
     /**
-     * @param string|null $aggregator
+     * @param string $aggregator
      * @return $this
      */
-    public function setAggregator(?string $aggregator): self
+    public function setAggregator(string $aggregator): self
     {
-        $aggregator = $aggregator ?? 'and';
         if (!in_array($aggregator, $this->aggregators, true)) {
             throw new ForestException("Unsupported operator: $aggregator");
         }
