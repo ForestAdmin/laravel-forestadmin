@@ -112,6 +112,34 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testIndexWithScope(): void
+    {
+        $this->makeScopeManager($this->forestUser, $this->getScopesFromApi());
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->difficulty = 'hard';
+        $book->save();
+
+        $params = ['fields' => ['book' => 'id,label,difficulty']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testIndexPermissionDenied(): void
     {
         $this->makeScopeManager($this->forestUser);
@@ -911,10 +939,9 @@ class ResourcesControllerTest extends TestCase
     }
 
     /**
-     * @param array $scopes
      * @return array
      */
-    public function getScopesFromApi(array $scopes = []): array
+    public function getScopesFromApi(): array
     {
         return [
             'book' => [
@@ -923,13 +950,13 @@ class ResourcesControllerTest extends TestCase
                         'aggregator' => 'and',
                         'conditions' => [
                             [
-                                'field'    => 'active',
-                                'operator' => 'present',
-                                'value'    => null,
+                                'field'    => 'difficulty',
+                                'operator' => 'equal',
+                                'value'    => 'hard',
                             ],
                             [
                                 'field'    => 'label',
-                                'operator' => 'contains',
+                                'operator' => 'equal',
                                 'value'    => '$currentUser.firstName',
                             ],
                         ],
@@ -937,7 +964,7 @@ class ResourcesControllerTest extends TestCase
                     'dynamicScopesValues' => [
                         'users' => [
                             '1' => [
-                                '$currentUser.firstName' => 'John',
+                                '$currentUser.firstName' => 'foo',
                             ],
                         ],
                     ],
