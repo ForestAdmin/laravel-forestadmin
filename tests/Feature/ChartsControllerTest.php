@@ -2,8 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
-use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
@@ -11,15 +11,13 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -34,11 +32,12 @@ class ChartsControllerTest extends TestCase
     use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
+    use ScopeManagerFactory;
 
     /**
-     * @var ForestResourceOwner
+     * @var ForestUser
      */
-    private ForestResourceOwner $forestResourceOwner;
+    private ForestUser $forestUser;
 
     /**
      * @param Application $app
@@ -52,34 +51,38 @@ class ChartsControllerTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->forestResourceOwner = new ForestResourceOwner(
+        $this->forestUser = new ForestUser(
             [
-                'type'                              => 'users',
-                'id'                                => '1',
-                'first_name'                        => 'John',
-                'last_name'                         => 'Doe',
-                'email'                             => 'jdoe@forestadmin.com',
-                'teams'                             => [
-                    0 => 'Operations',
-                ],
-                'tags'                              => [
-                    0 => [
-                        'key'   => 'demo',
-                        'value' => '1234',
-                    ],
-                ],
-                'two_factor_authentication_enabled' => false,
-                'two_factor_authentication_active'  => false,
-            ],
-            1234
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
         );
-        $this->withHeader('Authorization', 'Bearer ' . $this->forestResourceOwner->makeJwt());
 
+        $forestResourceOwner = new ForestResourceOwner(
+            array_merge(
+                [
+                    'type'                              => 'users',
+                    'two_factor_authentication_enabled' => false,
+                    'two_factor_authentication_active'  => false,
+                ],
+                $this->forestUser->getAttributes()
+            ),
+            $this->forestUser->getAttribute('rendering_id')
+        );
+
+        $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
     }
 
@@ -228,6 +231,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexValue(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -268,6 +272,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexObjective(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -310,6 +315,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexPie(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -350,6 +356,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLine(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -390,6 +397,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLeaderboard(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->makeBooks();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

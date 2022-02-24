@@ -110,14 +110,33 @@ trait HasFilters
      * @throws Exception
      * @throws \JsonException
      */
-    protected function appendFilters(Builder $query, string $payload)
+    protected function appendFilters(Builder $query, string $payload): void
     {
         [$aggregator, $filters] = $this->parseFilters($payload);
         $this->setAggregator($aggregator);
 
-        foreach ($filters as $filter) {
-            $this->handleFilter($query, $filter);
-        }
+        $query->where(function($q) use ($filters) {
+            foreach ($filters as $filter) {
+                $this->handleFilter($q, $filter);
+            }
+        });
+    }
+
+    /**
+     * @param Builder $query
+     * @param array   $filters
+     * @return void
+     * @throws Exception
+     */
+    protected function appendScope(Builder $query, array $filters): void
+    {
+        $this->setAggregator($filters['aggregator']);
+
+        $query->where(function($q) use ($filters) {
+            foreach ($filters['conditions'] as $filter) {
+                $this->handleFilter($q, $filter);
+            }
+        });
     }
 
     /**
@@ -125,6 +144,7 @@ trait HasFilters
      * @param array   $filter
      * @return void
      * @throws Exception
+     * @throws \Exception
      */
     protected function handleFilter(Builder $query, array $filter): void
     {
@@ -331,7 +351,7 @@ trait HasFilters
             $aggregator = $dataToArray['aggregator'];
             $filters = $dataToArray['conditions'];
         } else {
-            $aggregator = null;
+            $aggregator = 'and';
             $filters[] = $dataToArray;
         }
 
@@ -399,12 +419,11 @@ trait HasFilters
     }
 
     /**
-     * @param string|null $aggregator
+     * @param string $aggregator
      * @return $this
      */
-    public function setAggregator(?string $aggregator): self
+    public function setAggregator(string $aggregator): self
     {
-        $aggregator = $aggregator ?? 'and';
         if (!in_array($aggregator, $this->aggregators, true)) {
             throw new ForestException("Unsupported operator: $aggregator");
         }

@@ -2,12 +2,14 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
@@ -22,6 +24,31 @@ use Mockery as m;
 class HasFiltersTest extends TestCase
 {
     use FakeSchema;
+    use ScopeManagerFactory;
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $forestUser = new ForestUser(
+            [
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
+        );
+        //--- push instance of ScopeManager in App ---//
+        $this->makeScopeManager($forestUser);
+    }
 
     /**
      * @return void
@@ -92,7 +119,7 @@ class HasFiltersTest extends TestCase
         $orOperator = 'or';
         $trait = $this->getObjectForTrait(HasFilters::class);
 
-        $this->invokeMethod($trait, 'setAggregator', [null]);
+        $this->invokeMethod($trait, 'setAggregator', [$defaultOperator]);
         $this->assertEquals($defaultOperator, $this->invokeProperty($trait, 'aggregator'));
 
         $this->invokeMethod($trait, 'setAggregator', [$orOperator]);
@@ -233,7 +260,7 @@ class HasFiltersTest extends TestCase
         $trait = $this->getObjectForTrait(HasFilters::class);
         $json = '{"field":"label","operator":"equal","value":"test"}';
         $expected = [
-            null,
+            'and',
             [
                 [
                     'field'    => 'label',

@@ -1,24 +1,24 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 
 use Carbon\Carbon;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
+use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Concerns\QueryBuilderPreviousPeriod;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Mockery as m;
 
 /**
- * Class HasFiltersDateOperatorsTest
+ * Class QueryBuilderPreviousPeriodTest
  *
  * @package  Laravel-forestadmin
  * @license  GNU https://www.gnu.org/licences/licences.html
  * @link     https://github.com/ForestAdmin/laravel-forestadmin
  */
-class HasFiltersDateOperatorsTest extends TestCase
+class QueryBuilderPreviousPeriodTest extends TestCase
 {
     use ScopeManagerFactory;
 
@@ -61,151 +61,7 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfDay(),
-                        (new Carbon('now', $timezone))->endOfDay(),
-                    ],
-                    'boolean' => 'and',
-                    'not'     => false,
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'    => 'between',
-                    'column'  => 'published_at',
-                    'values'  => [
-                        (new Carbon('now', $timezone))->startOfDay(),
-                        (new Carbon('now', $timezone))->endOfDay(),
-                    ],
-                    'boolean' => 'and',
-                    'not'     => false,
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
-            );
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersBeforeOperator(): void
-    {
-        $operator = 'before';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData();
-        $results = [
-            'Date'     => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '<',
-                    'value'    => new Carbon($data['Date']['value'], $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '<',
-                    'value'    => new Carbon($data['Dateonly']['value'], $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersAfterOperator(): void
-    {
-        $operator = 'after';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData();
-        $results = [
-            'Date'     => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '>',
-                    'value'    => new Carbon($data['Date']['value'], $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '>',
-                    'value'    => new Carbon($data['Dateonly']['value'], $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersPreviousXDaysOperator(): void
-    {
-        $operator = 'previous_x_days';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date', 'Dateonly'], 3);
-        $results = [
-            'Date'     => [
-                [
-                    'type'    => 'between',
-                    'column'  => 'created_at',
-                    'values'  => [
-                        (new Carbon('now', $timezone))->subDays($data['Date']['value'])->startOfDay(),
+                        (new Carbon('now', $timezone))->subDay()->startOfDay(),
                         (new Carbon('now', $timezone))->subDay()->endOfDay(),
                     ],
                     'boolean' => 'and',
@@ -217,7 +73,7 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subDays($data['Dateonly']['value'])->startOfDay(),
+                        (new Carbon('now', $timezone))->subDay()->startOfDay(),
                         (new Carbon('now', $timezone))->subDay()->endOfDay(),
                     ],
                     'boolean' => 'and',
@@ -227,14 +83,14 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
             $queryResult = $this->invokeMethod(
                 $queryBuilder,
                 'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
             );
 
             $this->assertIsArray($queryResult->getQuery()->wheres);
@@ -246,35 +102,9 @@ class HasFiltersDateOperatorsTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
-    public function testDateFiltersPreviousXDaysException(): void
+    public function testDateFiltersPreviousXdaysOperator(): void
     {
         $operator = 'previous_x_days';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date']);
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-
-            $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The value \'' . $data['Date']['value'] . '\' should be an Integer');
-            $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersPreviousXDaysToDateOperator(): void
-    {
-        $operator = 'previous_x_days_to_date';
         $timezone = new \DateTimeZone('UTC');
         $data = $this->getData(['Date', 'Dateonly'], 3);
         $results = [
@@ -283,8 +113,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subDays($data['Date']['value'])->startOfDay(),
-                        (new Carbon('now', $timezone))->endOfDay(),
+                        (new Carbon('now', $timezone))->subDays($data['Date']['value'] * 2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->endOfDay(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -295,8 +125,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subDays($data['Dateonly']['value'])->startOfDay(),
-                        (new Carbon('now', $timezone))->endOfDay(),
+                        (new Carbon('now', $timezone))->subDays($data['Dateonly']['value'] * 2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->endOfDay(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -305,7 +135,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -324,165 +154,40 @@ class HasFiltersDateOperatorsTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
-    public function testDateFiltersPreviousXDaysToDateException(): void
+    public function testDateFiltersPreviousXdaysToDateOperator(): void
     {
         $operator = 'previous_x_days_to_date';
         $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date']);
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-
-            $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The value \'' . $data['Date']['value'] . '\' should be an Integer');
-            $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersPastOperator(): void
-    {
-        $operator = 'past';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData();
-        $results = [
-            'Date'     => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '<=',
-                    'value'    => new Carbon('now', $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '<=',
-                    'value'    => new Carbon('now', $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
-            );
-
-            $expected = $results[$value['type']][0];
-            $actual = $queryResult->getQuery()->wheres[0];
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($expected['type'], $actual['type'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['column'], $actual['column'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['operator'], $actual['operator'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['boolean'], $actual['boolean'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['value']->format('Y-m-d H:i'), $actual['value']->format('Y-m-d H:i'), 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersFutureOperator(): void
-    {
-        $operator = 'future';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData();
-        $results = [
-            'Date'     => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '>=',
-                    'value'    => new Carbon('now', $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '>=',
-                    'value'    => new Carbon('now', $timezone),
-                    'boolean'  => 'and',
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
-            );
-            $expected = $results[$value['type']][0];
-            $actual = $queryResult->getQuery()->wheres[0];
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($expected['type'], $actual['type'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['column'], $actual['column'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['operator'], $actual['operator'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['boolean'], $actual['boolean'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['value']->format('Y-m-d H:i'), $actual['value']->format('Y-m-d H:i'), 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersBeforeXHoursAgoOperator(): void
-    {
-        $operator = 'before_x_hours_ago';
-        $timezone = new \DateTimeZone('UTC');
         $data = $this->getData(['Date', 'Dateonly'], 3);
         $results = [
             'Date'     => [
                 [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '<',
-                    'value'    => (new Carbon('now', $timezone))->subHours($data['Date']['value']),
-                    'boolean'  => 'and',
+                    'type'    => 'between',
+                    'column'  => 'created_at',
+                    'values'  => [
+                        (new Carbon('now', $timezone))->subDays($data['Date']['value'] * 2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDay()->endOfDay(),
+                    ],
+                    'boolean' => 'and',
+                    'not'     => false,
                 ],
             ],
             'Dateonly' => [
                 [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '<',
-                    'value'    => (new Carbon('now', $timezone))->subHours($data['Date']['value']),
-                    'boolean'  => 'and',
+                    'type'    => 'between',
+                    'column'  => 'published_at',
+                    'values'  => [
+                        (new Carbon('now', $timezone))->subDays($data['Dateonly']['value'] * 2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDay()->endOfDay(),
+                    ],
+                    'boolean' => 'and',
+                    'not'     => false,
                 ],
             ],
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -491,119 +196,9 @@ class HasFiltersDateOperatorsTest extends TestCase
                 'dateFilters',
                 [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
             );
-            $expected = $results[$value['type']][0];
-            $actual = $queryResult->getQuery()->wheres[0];
 
             $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($expected['type'], $actual['type'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['column'], $actual['column'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['operator'], $actual['operator'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['boolean'], $actual['boolean'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['value']->format('Y-m-d H:i'), $actual['value']->format('Y-m-d H:i'), 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersBeforeXHoursAgoException(): void
-    {
-        $operator = 'before_x_hours_ago';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date']);
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-
-            $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The value \'' . $data['Date']['value'] . '\' should be an Integer');
-            $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFiltersAfterXHoursAgoOperator(): void
-    {
-        $operator = 'after_x_hours_ago';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date', 'Dateonly'], 3);
-        $results = [
-            'Date'     => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'created_at',
-                    'operator' => '>',
-                    'value'    => (new Carbon('now', $timezone))->subHours($data['Date']['value']),
-                    'boolean'  => 'and',
-                ],
-            ],
-            'Dateonly' => [
-                [
-                    'type'     => 'Basic',
-                    'column'   => 'published_at',
-                    'operator' => '>',
-                    'value'    => (new Carbon('now', $timezone))->subHours($data['Date']['value']),
-                    'boolean'  => 'and',
-                ],
-            ],
-        ];
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-            $queryResult = $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
-            $expected = $results[$value['type']][0];
-            $actual = $queryResult->getQuery()->wheres[0];
-
-            $this->assertIsArray($queryResult->getQuery()->wheres);
-            $this->assertEquals($expected['type'], $actual['type'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['column'], $actual['column'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['operator'], $actual['operator'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['boolean'], $actual['boolean'], 'error on type ' . $value['type']);
-            $this->assertEquals($expected['value']->format('Y-m-d H:i'), $actual['value']->format('Y-m-d H:i'), 'error on type ' . $value['type']);
-        }
-    }
-
-    /**
-     * @return void
-     * @throws \ReflectionException
-     */
-    public function testDateFilterAfterXHoursAgoException(): void
-    {
-        $operator = 'before_x_hours_ago';
-        $timezone = new \DateTimeZone('UTC');
-        $data = $this->getData(['Date']);
-
-        foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
-                ->makePartial();
-            $queryBuilder->setAggregator('and');
-            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
-
-            $this->expectException(ForestException::class);
-            $this->expectExceptionMessage('🌳🌳🌳 The value \'' . $data['Date']['value'] . '\' should be an Integer');
-            $this->invokeMethod(
-                $queryBuilder,
-                'dateFilters',
-                [$queryBuilder->query(), $value['field'], $operator, $value['value'], $value['type']]
-            );
+            $this->assertEquals($results[$value['type']], $queryResult->getQuery()->wheres, 'error on type ' . $value['type']);
         }
     }
 
@@ -622,8 +217,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subDay()->startOfDay(),
-                        (new Carbon('now', $timezone))->subDay()->endOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->endOfDay(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -634,8 +229,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subDay()->startOfDay(),
-                        (new Carbon('now', $timezone))->subDay()->endOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->startOfDay(),
+                        (new Carbon('now', $timezone))->subDays(2)->endOfDay(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -644,7 +239,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -676,8 +271,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subWeek()->startOfWeek(),
-                        (new Carbon('now', $timezone))->subWeek()->endOfWeek(),
+                        (new Carbon('now', $timezone))->subWeeks(2)->startOfWeek(),
+                        (new Carbon('now', $timezone))->subWeeks(2)->endOfWeek(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -688,8 +283,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subWeek()->startOfWeek(),
-                        (new Carbon('now', $timezone))->subWeek()->endOfWeek(),
+                        (new Carbon('now', $timezone))->subWeeks(2)->startOfWeek(),
+                        (new Carbon('now', $timezone))->subWeeks(2)->endOfWeek(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -698,7 +293,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -730,8 +325,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subMonth()->startOfMonth(),
-                        (new Carbon('now', $timezone))->subMonth()->endOfMonth(),
+                        (new Carbon('now', $timezone))->subMonths(2)->startOfMonth(),
+                        (new Carbon('now', $timezone))->subMonths(2)->endOfMonth(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -742,8 +337,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subMonth()->startOfMonth(),
-                        (new Carbon('now', $timezone))->subMonth()->endOfMonth(),
+                        (new Carbon('now', $timezone))->subMonths(2)->startOfMonth(),
+                        (new Carbon('now', $timezone))->subMonths(2)->endOfMonth(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -752,7 +347,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -784,8 +379,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subQuarter()->startOfQuarter(),
-                        (new Carbon('now', $timezone))->subQuarter()->endOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarters(2)->startOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarters(2)->endOfQuarter(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -796,8 +391,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subQuarter()->startOfQuarter(),
-                        (new Carbon('now', $timezone))->subQuarter()->endOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarters(2)->startOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarters(2)->endOfQuarter(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -806,7 +401,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -838,8 +433,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subYear()->startOfYear(),
-                        (new Carbon('now', $timezone))->subYear()->endOfYear(),
+                        (new Carbon('now', $timezone))->subYears(2)->startOfYear(),
+                        (new Carbon('now', $timezone))->subYears(2)->endOfYear(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -850,8 +445,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->subYear()->startOfYear(),
-                        (new Carbon('now', $timezone))->subYear()->endOfYear(),
+                        (new Carbon('now', $timezone))->subYears(2)->startOfYear(),
+                        (new Carbon('now', $timezone))->subYears(2)->endOfYear(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -860,7 +455,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -892,8 +487,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfWeek(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subWeeks(2)->startOfWeek(),
+                        (new Carbon('now', $timezone))->subWeek(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -904,8 +499,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfWeek(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subWeeks(2)->startOfWeek(),
+                        (new Carbon('now', $timezone))->subWeek(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -914,7 +509,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -952,8 +547,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfMonth(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subMonths(2)->startOfMonth(),
+                        (new Carbon('now', $timezone))->subMonth(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -964,8 +559,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfMonth(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subMonths(2)->startOfMonth(),
+                        (new Carbon('now', $timezone))->subMonth(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -974,7 +569,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -1012,8 +607,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfQuarter(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subQuarters(2)->startOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarter(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -1024,8 +619,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfQuarter(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subQuarters(2)->startOfQuarter(),
+                        (new Carbon('now', $timezone))->subQuarter(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -1034,7 +629,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -1072,8 +667,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'created_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfYear(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subYears(2)->startOfYear(),
+                        (new Carbon('now', $timezone))->subYear(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -1084,8 +679,8 @@ class HasFiltersDateOperatorsTest extends TestCase
                     'type'    => 'between',
                     'column'  => 'published_at',
                     'values'  => [
-                        (new Carbon('now', $timezone))->startOfYear(),
-                        (new Carbon('now', $timezone)),
+                        (new Carbon('now', $timezone))->subYears(2)->startOfYear(),
+                        (new Carbon('now', $timezone))->subYear(),
                     ],
                     'boolean' => 'and',
                     'not'     => false,
@@ -1094,7 +689,7 @@ class HasFiltersDateOperatorsTest extends TestCase
         ];
 
         foreach ($data as $value) {
-            $queryBuilder = m::mock(QueryBuilder::class, [new Book(), []])
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
                 ->makePartial();
             $queryBuilder->setAggregator('and');
             $this->invokeProperty($queryBuilder, 'timezone', $timezone);
@@ -1115,6 +710,170 @@ class HasFiltersDateOperatorsTest extends TestCase
             $this->assertEquals($expected['values'][0], $actual['values'][0], 'error on type ' . $value['type']);
             $this->assertEquals($expected['values'][1]->format('Y-m-d H:i'), $actual['values'][1]->format('Y-m-d H:i'), 'error on type ' . $value['type']);
         }
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testDateFiltersOperatorUnknown(): void
+    {
+        $operator = 'foo';
+        $timezone = new \DateTimeZone('UTC');
+        $data = $this->getData();
+
+        foreach ($data as $value) {
+            $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), []])
+                ->makePartial();
+            $queryBuilder->setAggregator('and');
+            $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+            $queryResult = $this->invokeMethod(
+                $queryBuilder,
+                'dateFilters',
+                [$queryBuilder->query(), $value['field'], $operator, null, $value['type']]
+            );
+
+            $this->assertIsArray($queryResult->getQuery()->wheres);
+            $this->assertEmpty($queryResult->getQuery()->wheres);
+        }
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnNotCoveredOperator(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"foo"},{"field":"difficulty","operator":"equal","value":"hard"}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnCoveredOperatorWithTwoFilters(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"created_at","operator":"yesterday","value":""}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOnCoveredOperatorWithOrAggregator(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"or","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"created_at","operator":"yesterday","value":""}]}',
+        ];
+        $expected = [
+            'apply' => false,
+            'filter' => null,
+            'aggregator' => 'or'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodWithTwoFilters(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"aggregator":"and","conditions":[{"field":"created_at","operator":"today","value":""},{"field":"label","operator":"equal","value":"foo"}]}',
+        ];
+        $expected = [
+            'apply' => true,
+            'filter' => [
+                'field'    => 'created_at',
+                'operator' => 'today',
+                'value'    => '',
+            ],
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testAppendPreviousPeriodOneFilter(): void
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $params = [
+            'filters' => '{"field":"created_at","operator":"today","value":""}',
+        ];
+        $expected = [
+            'apply' => true,
+            'filter' => [
+                'field'    => 'created_at',
+                'operator' => 'today',
+                'value'    => '',
+            ],
+            'aggregator' => 'and'
+        ];
+
+        $queryBuilder = m::mock(QueryBuilderPreviousPeriod::class, [new Book(), $params])
+            ->makePartial();
+        $queryBuilder->setAggregator('and');
+        $this->invokeProperty($queryBuilder, 'timezone', $timezone);
+        $result = $this->invokeMethod($queryBuilder, 'appendPreviousPeriod');
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
+use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
@@ -9,6 +10,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -30,11 +32,12 @@ class ResourcesControllerTest extends TestCase
     use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
+    use ScopeManagerFactory;
 
     /**
-     * @var ForestResourceOwner
+     * @var ForestUser
      */
-    private ForestResourceOwner $forestResourceOwner;
+    private ForestUser $forestUser;
 
     /**
      * @param Application $app
@@ -48,34 +51,38 @@ class ResourcesControllerTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->forestResourceOwner = new ForestResourceOwner(
+        $this->forestUser = new ForestUser(
             [
-                'type'                              => 'users',
-                'id'                                => '1',
-                'first_name'                        => 'John',
-                'last_name'                         => 'Doe',
-                'email'                             => 'jdoe@forestadmin.com',
-                'teams'                             => [
-                    0 => 'Operations',
-                ],
-                'tags'                              => [
-                    0 => [
-                        'key'   => 'demo',
-                        'value' => '1234',
-                    ],
-                ],
-                'two_factor_authentication_enabled' => false,
-                'two_factor_authentication_active'  => false,
-            ],
-            1234
+                'id'           => 1,
+                'email'        => 'john.doe@forestadmin.com',
+                'first_name'   => 'John',
+                'last_name'    => 'Doe',
+                'rendering_id' => 1,
+                'tags'         => [],
+                'teams'        => 'Operations',
+                'exp'          => 1643825269,
+            ]
         );
-        $this->withHeader('Authorization', 'Bearer ' . $this->forestResourceOwner->makeJwt());
 
+        $forestResourceOwner = new ForestResourceOwner(
+            array_merge(
+                [
+                    'type'                              => 'users',
+                    'two_factor_authentication_enabled' => false,
+                    'two_factor_authentication_active'  => false,
+                ],
+                $this->forestUser->getAttributes()
+            ),
+            $this->forestUser->getAttribute('rendering_id')
+        );
+
+        $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
     }
 
@@ -85,6 +92,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testIndex(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
@@ -104,8 +112,37 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testIndexWithScope(): void
+    {
+        $this->makeScopeManager($this->forestUser, $this->getScopesFromApi());
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->difficulty = 'hard';
+        $book->save();
+
+        $params = ['fields' => ['book' => 'id,label,difficulty']];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $book = Book::first();
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
+        $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testIndexPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
@@ -143,6 +180,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testExport(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = [
             'fields'   => ['book' => 'id,label'],
@@ -173,6 +211,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testExportPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $params = [
@@ -196,6 +235,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testShow(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
@@ -216,6 +256,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testShowPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label']];
@@ -235,6 +276,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testShowException(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label']];
         $call = $this->get('/forest/book/9999?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -250,6 +292,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testStore(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = [
             'data' => [
@@ -300,6 +343,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testStorePermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $params = [
@@ -340,6 +384,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testStoreException(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = [
             'data' => [
@@ -365,6 +410,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testUpdate(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $book = Book::first();
         $params = [
@@ -416,6 +462,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testUpdatePermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $book = Book::first();
@@ -458,6 +505,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testUpdateException(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $book = Book::first();
         $params = [
@@ -485,6 +533,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroy(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $book = Book::first();
 
@@ -503,6 +552,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroyPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $this->getBook()->save();
         $book = Book::first();
@@ -522,8 +572,8 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroyException(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
-
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->delete('/forest/book/9999');
@@ -540,6 +590,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testCount(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $book = $this->getBook();
         $call = $this->get('/forest/book/count');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -554,6 +605,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testCountPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $book = $this->getBook();
         $call = $this->getJson('/forest/book/count');
@@ -570,6 +622,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroyBulk(): void
     {
+        $this->makeScopeManager($this->forestUser);
         for ($i = 0; $i < 19; $i++) {
             $this->getBook()->save();
         }
@@ -615,6 +668,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroyBulkPermissionDenied(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         for ($i = 0; $i < 19; $i++) {
             $this->getBook()->save();
@@ -662,6 +716,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testDestroyBulkException(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $params = [
             'data' => [
                 'attributes' => [
@@ -705,6 +760,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testSearchWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label'], 'search' => '1'];
         App::shouldReceive('basePath')->andReturn(null);
@@ -725,6 +781,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testSearchExtendedWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label'], 'search' => 'bar', 'searchExtended' => 1];
         App::shouldReceive('basePath')->andReturn(null);
@@ -771,6 +828,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testSearchWithQueryBuilderNoResult(): void
     {
+        $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
         $params = ['fields' => ['book' => 'id,label'], 'search' => '9999'];
         App::shouldReceive('basePath')->andReturn(null);
@@ -788,6 +846,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testSortAscWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         for ($i = 0; $i < 2; $i++) {
             $this->getBook()->save();
         }
@@ -809,6 +868,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testSortDescWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         for ($i = 0; $i < 2; $i++) {
             $this->getBook()->save();
         }
@@ -830,6 +890,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testFiltersWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         for ($i = 0; $i < 2; $i++) {
             $this->getBook()->save();
         }
@@ -855,6 +916,7 @@ class ResourcesControllerTest extends TestCase
      */
     public function testFiltersAggregatorWithQueryBuilder(): void
     {
+        $this->makeScopeManager($this->forestUser);
         for ($i = 0; $i < 2; $i++) {
             $this->getBook()->save();
         }
@@ -874,5 +936,40 @@ class ResourcesControllerTest extends TestCase
         $this->assertCount(1, $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals('hard', $data['data'][0]['attributes']['difficulty']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getScopesFromApi(): array
+    {
+        return [
+            'book' => [
+                'scope' => [
+                    'filter'             => [
+                        'aggregator' => 'and',
+                        'conditions' => [
+                            [
+                                'field'    => 'difficulty',
+                                'operator' => 'equal',
+                                'value'    => 'hard',
+                            ],
+                            [
+                                'field'    => 'label',
+                                'operator' => 'equal',
+                                'value'    => '$currentUser.firstName',
+                            ],
+                        ],
+                    ],
+                    'dynamicScopesValues' => [
+                        'users' => [
+                            '1' => [
+                                '$currentUser.firstName' => 'foo',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

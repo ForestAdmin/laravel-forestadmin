@@ -57,6 +57,7 @@ class QueryBuilder
         if (strpos($this->table, '.')) {
             [$this->database, $this->table] = explode('.', $this->table);
         }
+        $this->timezone = new \DateTimeZone($this->params['timezone'] ?? config('app.timezone'));
     }
 
     /**
@@ -85,6 +86,11 @@ class QueryBuilder
         $fields = $this->handleFields($this->model, $queryFields);
         $query->select($fields);
 
+        $scope = app(ScopeManager::class)->getScope($name);
+        if (array_key_exists('filters', $scope)) {
+            $this->appendScope($query, $scope['filters']);
+        }
+
         if ($includes = $this->handleWith($this->model, $fieldsParams)) {
             $this->appendRelations($query, $includes);
         }
@@ -95,7 +101,6 @@ class QueryBuilder
         }
 
         if (array_key_exists('filters', $this->params)) {
-            $this->timezone = new \DateTimeZone($this->params['timezone'] ?? config('app.timezone'));
             $this->appendFilters($query, $this->params['filters']);
         }
 
