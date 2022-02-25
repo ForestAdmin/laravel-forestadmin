@@ -39,16 +39,6 @@ class ResourcesControllerTest extends TestCase
     private ForestUser $forestUser;
 
     /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
-    }
-
-    /**
      * @return void
      * @throws \JsonException
      */

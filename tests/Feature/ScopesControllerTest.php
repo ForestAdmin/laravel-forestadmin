@@ -32,16 +32,6 @@ class ScopesControllerTest extends TestCase
     use ScopeManagerFactory;
 
     /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
-
-    /**
      * @return void
      * @throws \JsonException
      */
