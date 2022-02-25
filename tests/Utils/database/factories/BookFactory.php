@@ -29,7 +29,7 @@ class BookFactory extends Factory
     public function definition()
     {
         return [
-            'label'             => $this->faker->name(),
+            'label'             => $this->faker->randomElement(['foo', $this->faker->name()]),
             'comment'           => $this->faker->sentence(),
             'difficulty'        => $this->faker->randomElement(['easy', 'hard']),
             'amount'            => $this->faker->randomFloat(2),
