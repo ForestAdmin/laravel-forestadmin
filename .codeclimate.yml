@@ -47,6 +47,7 @@ exclude_patterns:
   - "db/"
   - "**/node_modules/"
   - "script/"
+  - "src/Commands/"
   - "src/Exceptions/"
   - "src/Utils/ErrorMessages.php"
   - "**/spec/"
