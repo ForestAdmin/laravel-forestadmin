@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin;
 
+use ForestAdmin\LaravelForestAdmin\Commands\ForestInstall;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
@@ -29,6 +30,14 @@ class ForestServiceProvider extends ServiceProvider
     {
         $this->app->register(EventProvider::class);
         $this->app->register(AuthorizationProvider::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands(
+                [
+                    ForestInstall::class,
+                ]
+            );
+        }
 
         $this->publishes(
             [
