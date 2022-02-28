@@ -28,4 +28,12 @@ trait ForestCollection
     {
         return [];
     }
+
+    /**
+     * @return array
+     */
+    public function smartActions(): array
+    {
+        return [];
+    }
 }
