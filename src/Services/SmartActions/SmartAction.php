@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
+use Illuminate\Support\Collection;
+
 /**
  * Class SmartAction
  *
@@ -14,12 +16,12 @@ class SmartAction
     /**
      * @var string
      */
-    protected string $name;
+    protected string $model;
 
     /**
      * @var string
      */
-    protected string $type;
+    protected string $name;
 
     /**
      * @var string
@@ -27,37 +29,83 @@ class SmartAction
     protected string $endpoint;
 
     /**
-     * @var array
+     * @var string
      */
-    protected array $fields;
+    protected string $type;
+
+    /**
+     * @var Collection
+     */
+    protected Collection $fields;
 
     /**
      * @var bool
      */
-    protected bool $download;
+    protected bool $download = false;
 
     /**
-     * @var string
+     * @var array
      */
-    protected string $model;
+    protected array $hooks = [];
 
     /**
      * @param string $model
      * @param string $name
      * @param string $endpoint
-     * @param array  $fields
      * @param string $type
-     * @param bool   $download
-     * @return $this
      */
-    public function __construct(string $model, string $name, string $endpoint, array $fields = [], string $type = 'bulk', bool $download = false)
+    public function __construct(string $model, string $name, string $endpoint, string $type)
     {
         $this->model = $model;
         $this->name = $name;
         $this->endpoint = $endpoint;
-        $this->fields = $fields;
         $this->type = $type;
-        $this->download = $download;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addField(): SmartAction
+    {
+        // LOGIC ADD FIELD
+        //$field = app()->make('....');
+
+        $field = 1; // a virer
+
+        $this->fields->put($field);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return SmartAction
+     */
+    public function download(bool $value = false): SmartAction
+    {
+        $this->download = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $load
+     * @param mixed $change
+     * @return $this
+     */
+    public function hooks($load = false, $change = false): SmartAction
+    {
+        $this->hooks = compact('load', 'change');
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getFields(): Collection
+    {
+        return $this->fields;
     }
 
     /**
@@ -72,6 +120,7 @@ class SmartAction
             'fields'   => collect($this->fields)->map(fn($item) => $item->serialize())->all(),
             'type'     => $this->type,
             'download' => $this->download,
+            'hooks'    => $this->hooks,
         ];
     }
 }
