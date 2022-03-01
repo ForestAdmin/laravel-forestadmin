@@ -69,7 +69,7 @@ class SmartAction
             'id'       => $this->model . '.' . $this->name,
             'name'     => $this->name,
             'endpoint' => $this->endpoint,
-            'fields'   => $this->fields,
+            'fields'   => collect($this->fields)->map(fn($item) => $item->serialize())->all(),
             'type'     => $this->type,
             'download' => $this->download,
         ];
