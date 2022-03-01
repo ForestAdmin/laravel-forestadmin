@@ -12,6 +12,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -129,13 +130,17 @@ class Schema
         $included = [];
 
         foreach ($schema['collections'] as $collection) {
+            $collectionActions = $collection['actions'];
+            unset($collection['actions']);
+            $included[] = $this->getActionsByCollection($collectionActions, true);
+
             $data[] = [
                 'id'            => $collection['name'],
                 'type'          => 'collections',
                 'attributes'    => $collection,
                 'relationships' => [
                     'actions'  => [
-                        'data' => []
+                        'data' => $this->getActionsByCollection($collectionActions)
                     ],
                     'segments' => [
                         'data' => []
@@ -146,9 +151,32 @@ class Schema
 
         return [
             'data'     => $data,
-            'included' => $included,
+            'included' => array_merge(...$included),
             'meta'     => $schema['meta'],
         ];
+    }
+
+    /**
+     * @param array $data
+     * @param bool  $withAttributes
+     * @return array
+     */
+    private function getActionsByCollection(array $data, bool $withAttributes = false): array
+    {
+        $actions = [];
+
+        foreach ($data as $value) {
+            $action = [
+                'id'   => $value['id'],
+                'type' => 'actions',
+            ];
+            if ($withAttributes) {
+                $action['attributes'] = $value;
+            }
+            $actions[] = $action;
+        }
+
+        return $actions;
     }
 
     /**

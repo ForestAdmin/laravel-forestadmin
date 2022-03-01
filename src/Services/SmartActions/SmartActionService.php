@@ -37,6 +37,12 @@ class SmartActionService
     protected bool $download;
 
     /**
+     * @var string
+     */
+    protected string $model;
+
+    /**
+     * @param string $model
      * @param string $name
      * @param string $endpoint
      * @param array  $fields
@@ -44,8 +50,9 @@ class SmartActionService
      * @param bool   $download
      * @return $this
      */
-    public function create(string $name, string $endpoint, array $fields = [], string $type = 'bulk', bool $download = false): self
+    public function create(string $model, string $name, string $endpoint, array $fields = [], string $type = 'bulk', bool $download = false): self
     {
+        $this->model = $model;
         $this->name = $name;
         $this->endpoint = $endpoint;
         $this->fields = $fields;
@@ -61,6 +68,7 @@ class SmartActionService
     public function serialize(): array
     {
         return [
+            'id'       => $this->model . '.' . $this->name,
             'name'     => $this->name,
             'endpoint' => $this->endpoint,
             'fields'   => $this->fields,
