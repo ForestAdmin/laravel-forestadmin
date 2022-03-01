@@ -24,46 +24,54 @@ class Field
     /**
      * @var bool
      */
-    protected bool $is_required = false;
+    protected bool $is_required;
 
     /**
      * @var bool
      */
-    protected bool $is_read_only = false;
+    protected bool $is_read_only;
 
     /**
      * @var string|null
      */
-    protected ?string $default_value = null;
+    protected ?string $default_value;
 
     /**
      * @var string|null
      */
-    protected ?string $description = null;
+    protected ?string $description;
 
     /**
      * @var string|null
      */
-    protected ?string $reference = null;
+    protected ?string $reference;
 
     /**
      * @var string|null
      */
-    protected ?string $hook = null;
+    protected ?string $hook;
 
     /**
      * @var array|null
      */
-    protected ?array $enums = null;
+    protected ?array $enums;
 
     /**
-     * @param string $field
-     * @param string $type
+     * @param array $attributes
      */
-    public function __construct(string $field, string $type)
+    public function __construct(array $attributes)
     {
-        $this->field = $field;
-        $this->type = $type;
+        $this->field = $attributes['field'];
+        $this->type = $attributes['type'];
+        $this->is_required = $attributes['is_required'] ?? false;
+        $this->is_read_only = $attributes['is_read_only'] ?? false;
+        $this->default_value = $attributes['default_value'] ?? null;
+        $this->reference = $attributes['reference'] ?? null;
+        $this->description = $attributes['description'] ?? null;
+        $this->hook = $attributes['hook'] ?? null;
+
+        //--- required only if type === 'Enum' ---//
+        $this->enums = $attributes['enums'] ?? null;
     }
 
     /**
@@ -82,82 +90,5 @@ class Field
             'hook'          => $this->hook,
             'enums'         => $this->enums,
         ];
-    }
-
-    /**
-     * @param bool $value
-     * @return Field
-     */
-    public function required(bool $value = false): Field
-    {
-        $this->is_required = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $value
-     * @return Field
-     */
-    public function readOnly(bool $value = false): Field
-    {
-        $this->is_read_only = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $value
-     * @return $this
-     */
-    public function default(?string $value = null): Field
-    {
-        $this->default_value = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $value
-     * @return $this
-     */
-    public function reference(?string $value = null): Field
-    {
-        $this->reference = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $value
-     * @return $this
-     */
-    public function description(?string $value = null): Field
-    {
-        $this->description = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $value
-     * @return $this
-     */
-    public function hook(?string $value = null): Field
-    {
-        $this->hook = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param array|null $value
-     * @return $this
-     */
-    public function enums(?array $value = null): Field
-    {
-        $this->enums = $value;
-
-        return $this;
     }
 }

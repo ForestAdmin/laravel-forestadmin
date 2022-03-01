@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class SmartAction
@@ -60,19 +61,17 @@ class SmartAction
         $this->name = $name;
         $this->endpoint = $endpoint;
         $this->type = $type;
+        $this->fields = collect();
     }
 
     /**
+     * @param array $attributes
      * @return $this
      */
-    public function addField(): SmartAction
+    public function addField(array $attributes): SmartAction
     {
-        // LOGIC ADD FIELD
-        //$field = app()->make('....');
-
-        $field = 1; // a virer
-
-        $this->fields->put($field);
+        $field = App::makeWith(Field::class, ['attributes' => $attributes]);
+        $this->fields->push($field);
 
         return $this;
     }
@@ -101,14 +100,6 @@ class SmartAction
     }
 
     /**
-     * @return Collection
-     */
-    public function getFields(): Collection
-    {
-        return $this->fields;
-    }
-
-    /**
      * @return array
      */
     public function serialize(): array
@@ -117,7 +108,7 @@ class SmartAction
             'id'       => $this->model . '.' . $this->name,
             'name'     => $this->name,
             'endpoint' => $this->endpoint,
-            'fields'   => collect($this->fields)->map(fn($item) => $item->serialize())->all(),
+            'fields'   => $this->fields->map(fn($item) => $item->serialize())->all(),
             'type'     => $this->type,
             'download' => $this->download,
             'hooks'    => $this->hooks,
