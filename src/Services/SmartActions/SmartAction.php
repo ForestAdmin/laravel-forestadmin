@@ -3,13 +3,13 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
 /**
- * Class SmartActionService
+ * Class SmartAction
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class SmartActionService
+class SmartAction
 {
     /**
      * @var string
@@ -50,7 +50,7 @@ class SmartActionService
      * @param bool   $download
      * @return $this
      */
-    public function create(string $model, string $name, string $endpoint, array $fields = [], string $type = 'bulk', bool $download = false): self
+    public function __construct(string $model, string $name, string $endpoint, array $fields = [], string $type = 'bulk', bool $download = false)
     {
         $this->model = $model;
         $this->name = $name;
@@ -58,8 +58,6 @@ class SmartActionService
         $this->fields = $fields;
         $this->type = $type;
         $this->download = $download;
-
-        return $this;
     }
 
     /**
