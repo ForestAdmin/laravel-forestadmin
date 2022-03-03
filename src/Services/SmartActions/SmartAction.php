@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
 /**
  * Class SmartAction
@@ -27,11 +28,6 @@ class SmartAction
     /**
      * @var string
      */
-    protected string $endpoint;
-
-    /**
-     * @var string
-     */
     protected string $type;
 
     /**
@@ -47,21 +43,43 @@ class SmartAction
     /**
      * @var array
      */
-    protected array $hooks = [];
+    protected array $hooks;
 
     /**
-     * @param string $model
-     * @param string $name
-     * @param string $endpoint
-     * @param string $type
+     * @var \Closure
      */
-    public function __construct(string $model, string $name, string $endpoint, string $type)
+    protected \Closure $execute;
+
+    /**
+     * @param string   $model
+     * @param string   $name
+     * @param string   $type
+     * @param \Closure $execute
+     */
+    public function __construct(string $model, string $name, string $type, \Closure $execute)
     {
         $this->model = $model;
         $this->name = $name;
-        $this->endpoint = $endpoint;
         $this->type = $type;
+        $this->execute = $execute;
         $this->fields = collect();
+        $this->hooks();
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey(): string
+    {
+        return Str::slug($this->name);
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getExecute(): \Closure
+    {
+        return $this->execute;
     }
 
     /**
@@ -92,7 +110,7 @@ class SmartAction
      * @param mixed $change
      * @return $this
      */
-    public function hooks($load = false, $change = false): SmartAction
+    public function hooks($load = false, array $change = []): SmartAction
     {
         $this->hooks = compact('load', 'change');
 
@@ -107,8 +125,8 @@ class SmartAction
         return [
             'id'       => $this->model . '.' . $this->name,
             'name'     => $this->name,
-            'endpoint' => $this->endpoint,
             'fields'   => $this->fields->map(fn($item) => $item->serialize())->all(),
+            'endpoint' => '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey(),
             'type'     => $this->type,
             'download' => $this->download,
             'hooks'    => $this->hooks,

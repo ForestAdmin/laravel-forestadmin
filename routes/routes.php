@@ -3,6 +3,7 @@
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ApiMapsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\AuthController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\DispatchGateway;
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\SmartActionController;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestAuthorization;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,11 @@ Route::group(
                 Route::put('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.update');
                 Route::delete('/{collection}/{id}/relationships/{association_name}', DispatchGateway::class)->name('forest.relationships.dissociate');
                 Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
+
+                // SMART ACTIONS
+                Route::post('/smart-actions/{action}', SmartActionController::class);
+                Route::post('/smart-actions/{action}/hooks/load', SmartActionController::class);
+                Route::post('/smart-actions/{action}/hooks/change', SmartActionController::class);
             }
         );
     }

@@ -2,6 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
+use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use Illuminate\Support\Collection;
+
 /**
  * Class ForestCollection
  *
@@ -30,10 +33,21 @@ trait ForestCollection
     }
 
     /**
-     * @return array
+     * @return Collection
      */
-    public function smartActions(): array
+    public function smartActions(): Collection
     {
-        return [];
+        return collect();
+    }
+
+    /**
+     * @param string $name
+     * @return SmartAction
+     */
+    public function getSmartAction(string $name): SmartAction
+    {
+        return $this->smartActions()->first(
+            fn ($item) => $item->getKey() === $name
+        );
     }
 }
