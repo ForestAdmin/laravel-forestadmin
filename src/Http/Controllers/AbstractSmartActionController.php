@@ -28,7 +28,7 @@ use Psr\Container\NotFoundExceptionInterface;
  * @license  GNU https://www.gnu.org/licences/licences.html
  * @link     https://github.com/ForestAdmin/laravel-forestadmin
  */
-class SmartActionController extends ForestController
+abstract class AbstractSmartActionController extends ForestController
 {
     /**
      * @var mixed $collection
@@ -36,17 +36,21 @@ class SmartActionController extends ForestController
     protected mixed $collection;
 
     /**
-     * ForestController construct
+     * SmartActionController construct
      *
-     * @param $collection
      * @throws AuthorizationException
      */
-    public function __construct($collection)
+    public function __construct()
     {
-        $this->collection = $collection;
+        $this->collection = app($this->getCollection());
 
         $this->middleware(ForestAuthorization::class);
     }
+
+    /**
+     * @return string
+     */
+    abstract public function getCollection(): string;
 
     /**
      * @param $method
@@ -56,7 +60,7 @@ class SmartActionController extends ForestController
      */
     public function callAction($method, $parameters)
     {
-        // todo format method name 
+        // todo format method name
         $this->authorize('smartAction', $this->collection);
 
         return parent::callAction($method, $parameters);
