@@ -79,6 +79,7 @@ jobs:
         id: semantic
         with:
           semantic_version: 17.3.0
+          dry_run: true,
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GIT_AUTHOR_EMAIL: ${{ secrets.GIT_AUTHOR_EMAIL }}

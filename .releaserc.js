@@ -15,6 +15,13 @@ module.exports = {
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
     [
+      "@semantic-release/exec",
+      {
+        prepareCmd:
+          'sed -i \'s/"version": ".*"/"version": "${nextRelease.version}"/g\' composer.json; sed -i \'s/"version": ".*"/"version": "${nextRelease.version}"/g\' package.json;',
+      },
+    ],
+    [
       "@semantic-release/git",
       {
         assets: ["composer.json", "CHANGELOG.md"],
