@@ -85,8 +85,8 @@ class SmartActionController extends ForestController
             [
                 'fields' => array_values(
                     $this->smartAction
-                    ->getChange(request()->input('data.attributes.changed_field'))
-                    ->call($this->smartAction->mergeRequestFields(request()->input('data.attributes.fields')))
+                        ->getChange(request()->input('data.attributes.changed_field'))
+                        ->call($this->smartAction->mergeRequestFields(request()->input('data.attributes.fields')))
                 )
             ]
         );

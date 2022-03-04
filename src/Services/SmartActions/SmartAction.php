@@ -91,10 +91,10 @@ class SmartAction
     public function getFields(): array
     {
         return $this->fields->mapWithKeys(
-           function ($item) {
-               $data = $item->serialize();
-               return [$data['field'] => $data];
-           }
+            function ($item) {
+                $data = $item->serialize();
+                return [$data['field'] => $data];
+            }
         )->all();
     }
 
