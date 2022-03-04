@@ -90,6 +90,36 @@ class Field
         $this->value = $value;
     }
 
+    /**
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHook()
+    {
+        return $this->hook;
+    }
+
+    /**
+     * @param array $data
+     * @return Field
+     */
+    public function merge(array $data): Field
+    {
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->{$key} = $value;
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return array

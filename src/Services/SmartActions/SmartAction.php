@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
 
 /**
  * Class SmartAction
@@ -47,11 +48,6 @@ class SmartAction
     protected array $hooks;
 
     /**
-     * @var array
-     */
-    protected array $change = [];
-
-    /**
      * @var Closure
      */
     protected Closure $execute;
@@ -59,7 +55,12 @@ class SmartAction
     /**
      * @var Closure|null
      */
-    private ?Closure $load = null;
+    protected ?Closure $load = null;
+
+    /**
+     * @var array
+     */
+    protected array $change = [];
 
     /**
      * @param string  $model
@@ -74,7 +75,6 @@ class SmartAction
         $this->type = $type;
         $this->execute = $execute;
         $this->fields = collect();
-        $this->hooks();
     }
 
     /**
@@ -86,11 +86,25 @@ class SmartAction
     }
 
     /**
-     * @return Collection
+     * @return array
      */
-    public function getFields(): Collection
+    public function getFields(): array
     {
-        return $this->fields;
+        return $this->fields->mapWithKeys(
+           function ($item) {
+               $data = $item->serialize();
+               return [$data['field'] => $data];
+           }
+        )->all();
+    }
+
+    /**
+     * @param string $key
+     * @return Field
+     */
+    public function getField(string $key): Field
+    {
+        return $this->fields->first(fn ($field) => $field->getField() === $key);
     }
 
     /**
@@ -115,8 +129,9 @@ class SmartAction
      */
     public function getChange(string $key): Closure
     {
+        $field = $this->getField($key);
         try {
-            return $this->change[$key];
+            return $this->change[$field->getHook()];
         } catch (\Exception $exception) {
             // todo throw exception
         }
@@ -173,9 +188,25 @@ class SmartAction
     public function hooks(): array
     {
         return [
-            'load'   => !is_null($this->load),
-            'change' => $this->change,
+            'load'   => $this->load !== null,
+            'change' => array_keys($this->change),
         ];
+    }
+
+    /**
+     * @param array $fields
+     * @return SmartAction
+     */
+    public function mergeRequestFields(array $fields): SmartAction
+    {
+        $this->fields->map(
+            function ($item) use ($fields) {
+                $fieldKey = array_search($item->getField(), array_column($fields, 'field'), true);
+                $item->merge($fields[$fieldKey]);
+            }
+        );
+
+        return $this;
     }
 
     /**

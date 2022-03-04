@@ -41,8 +41,8 @@ class SmartActionController extends ForestController
         $this->model = Schema::getModel($collection);
         $this->smartAction = $this->model->getSmartAction($name);
 
-        if ($route->parameter('hook')) {
-            return $this->executeLoadHook();
+        if ($type = $route->parameter('hook')) {
+            return $type === 'load' ? $this->executeLoadHook() : $this->executeChangeHook();
         } else {
             return $this->executeAction();
         }
@@ -62,14 +62,33 @@ class SmartActionController extends ForestController
 
     /**
      * @return JsonResponse
-     * @throws BindingResolutionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function executeLoadHook(): JsonResponse
     {
         return response()->json(
-            ['fields' => $this->smartAction->getLoad()->call($this->smartAction)->map(fn($item) => $item->serialize())->all()]
+            [
+                'fields' => array_values(
+                    $this->smartAction
+                        ->getLoad()
+                        ->call($this->smartAction)
+                )
+            ]
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function executeChangeHook(): JsonResponse
+    {
+        return response()->json(
+            [
+                'fields' => array_values(
+                    $this->smartAction
+                    ->getChange(request()->input('data.attributes.changed_field'))
+                    ->call($this->smartAction->mergeRequestFields(request()->input('data.attributes.fields')))
+                )
+            ]
         );
     }
 }
