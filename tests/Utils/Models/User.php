@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     /**
      * @var array
@@ -40,6 +42,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return UserFactory
+     */
+    protected static function newFactory()
+    {
+        return new UserFactory();
+    }
 
     /**
      * @return HasMany

@@ -20,6 +20,8 @@ class Movie extends Model
     use HasFactory;
     use ForestCollection;
 
+
+
     protected $fillable = [
         'body',
         'book_id',
