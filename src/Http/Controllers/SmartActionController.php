@@ -11,7 +11,6 @@ use Illuminate\Routing\Route;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-
 /**
  * Class SmartActionController
  *

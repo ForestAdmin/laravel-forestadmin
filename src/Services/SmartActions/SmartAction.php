@@ -62,9 +62,9 @@ class SmartAction
     private ?Closure $load = null;
 
     /**
-     * @param string   $model
-     * @param string   $name
-     * @param string   $type
+     * @param string  $model
+     * @param string  $name
+     * @param string  $type
      * @param Closure $execute
      */
     public function __construct(string $model, string $name, string $type, Closure $execute)
@@ -85,6 +85,9 @@ class SmartAction
         return Str::slug($this->name);
     }
 
+    /**
+     * @return Collection
+     */
     public function getFields(): Collection
     {
         return $this->fields;
