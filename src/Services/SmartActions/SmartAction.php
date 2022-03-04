@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
@@ -46,17 +47,27 @@ class SmartAction
     protected array $hooks;
 
     /**
-     * @var \Closure
+     * @var array
      */
-    protected \Closure $execute;
+    protected array $change = [];
+
+    /**
+     * @var Closure
+     */
+    protected Closure $execute;
+
+    /**
+     * @var Closure|null
+     */
+    private ?Closure $load = null;
 
     /**
      * @param string   $model
      * @param string   $name
      * @param string   $type
-     * @param \Closure $execute
+     * @param Closure $execute
      */
-    public function __construct(string $model, string $name, string $type, \Closure $execute)
+    public function __construct(string $model, string $name, string $type, Closure $execute)
     {
         $this->model = $model;
         $this->name = $name;
@@ -74,12 +85,38 @@ class SmartAction
         return Str::slug($this->name);
     }
 
+    public function getFields(): Collection
+    {
+        return $this->fields;
+    }
+
     /**
-     * @return \Closure
+     * @return Closure
      */
-    public function getExecute(): \Closure
+    public function getExecute(): Closure
     {
         return $this->execute;
+    }
+
+    /**
+     * @return Closure
+     */
+    public function getLoad(): Closure
+    {
+        return $this->load;
+    }
+
+    /**
+     * @param string $key
+     * @return Closure
+     */
+    public function getChange(string $key): Closure
+    {
+        try {
+            return $this->change[$key];
+        } catch (\Exception $exception) {
+            // todo throw exception
+        }
     }
 
     /**
@@ -106,15 +143,36 @@ class SmartAction
     }
 
     /**
-     * @param mixed $load
-     * @param mixed $change
-     * @return $this
+     * @param Closure|null $closure
+     * @return void
      */
-    public function hooks($load = false, array $change = []): SmartAction
+    public function load(Closure $closure = null): SmartAction
     {
-        $this->hooks = compact('load', 'change');
+        $this->load = $closure;
 
         return $this;
+    }
+
+    /**
+     * @param array $closures
+     * @return $this
+     */
+    public function change(array $closures = []): SmartAction
+    {
+        $this->change = $closures;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function hooks(): array
+    {
+        return [
+            'load'   => !is_null($this->load),
+            'change' => $this->change,
+        ];
     }
 
     /**
@@ -129,7 +187,7 @@ class SmartAction
             'endpoint' => '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey(),
             'type'     => $this->type,
             'download' => $this->download,
-            'hooks'    => $this->hooks,
+            'hooks'    => $this->hooks(),
         ];
     }
 }

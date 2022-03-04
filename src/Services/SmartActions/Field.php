@@ -57,6 +57,11 @@ class Field
     protected ?array $enums;
 
     /**
+     * @var mixed|null
+     */
+    protected mixed $value;
+
+    /**
      * @param array $attributes
      */
     public function __construct(array $attributes)
@@ -69,10 +74,20 @@ class Field
         $this->reference = $attributes['reference'] ?? null;
         $this->description = $attributes['description'] ?? null;
         $this->hook = $attributes['hook'] ?? null;
+        $this->value = $attributes['value'] ?? null;
 
         //--- required only if type === 'Enum' ---//
         $this->enums = $attributes['enums'] ?? null;
     }
+
+    /**
+     * @param mixed|null $value
+     */
+    public function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
 
     /**
      * @return array
@@ -89,6 +104,7 @@ class Field
             'description'   => $this->description,
             'hook'          => $this->hook,
             'enums'         => $this->enums,
+            'value'         => $this->value,
         ];
     }
 }

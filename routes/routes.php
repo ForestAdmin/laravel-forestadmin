@@ -46,8 +46,7 @@ Route::group(
 
                 // SMART ACTIONS
                 Route::post('/smart-actions/{action}', SmartActionController::class);
-                Route::post('/smart-actions/{action}/hooks/load', SmartActionController::class);
-                Route::post('/smart-actions/{action}/hooks/change', SmartActionController::class);
+                Route::post('/smart-actions/{action}/hooks/{hook}', SmartActionController::class);
             }
         );
     }

@@ -4,9 +4,12 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Route;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 
 /**
@@ -39,7 +42,11 @@ class SmartActionController extends ForestController
         $this->model = Schema::getModel($collection);
         $this->smartAction = $this->model->getSmartAction($name);
 
-        return $this->executeAction();
+        if ($route->parameter('hook')) {
+            return $this->executeLoadHook();
+        } else {
+            return $this->executeAction();
+        }
     }
 
     /**
@@ -52,6 +59,18 @@ class SmartActionController extends ForestController
         return response()->json(
             call_user_func($this->smartAction->getExecute())
         );
+    }
 
+    /**
+     * @return JsonResponse
+     * @throws BindingResolutionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function executeLoadHook(): JsonResponse
+    {
+        return response()->json(
+            ['fields' => $this->smartAction->getLoad()->call($this->smartAction)->map(fn($item) => $item->serialize())->all()]
+        );
     }
 }
