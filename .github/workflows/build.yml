@@ -9,41 +9,44 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          php: [ "8.0", "8.1" ]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.0'
-          coverage: xdebug
-          tools: composer, cs2pr
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: ${{ matrix.php }}
+            coverage: xdebug
+            tools: composer, cs2pr
 
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        - name: Get Composer cache directory
+          id: composer-cache
+          run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      - name: Setup cache
-        uses: pat-s/always-upload-cache@v1.1.4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+        - name: Setup cache
+          uses: pat-s/always-upload-cache@v1.1.4
+          with:
+            path: ${{ steps.composer-cache.outputs.dir }}
+            key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+            restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        - name: Install dependencies
+          run: composer install --prefer-dist --no-progress
 
-      - name: Detect coding standard violations
-        run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
+        - name: Detect coding standard violations
+          run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
 
-      - name: PHPUnit tests
-        run: vendor/bin/phpunit --coverage-clover /tmp/clover.xml
+        - name: PHPUnit tests
+          run: vendor/bin/phpunit --coverage-clover /tmp/clover.xml
 
-      - name: Send coverage
-        uses: paambaati/codeclimate-action@v2.7.4
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          coverageLocations: /tmp/clover.xml:clover
+        - name: Send coverage
+          uses: paambaati/codeclimate-action@v2.7.4
+          env:
+            CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          with:
+            coverageLocations: /tmp/clover.xml:clover
