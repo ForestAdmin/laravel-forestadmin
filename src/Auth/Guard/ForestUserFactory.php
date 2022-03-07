@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * Class ForestUserFactory
@@ -56,7 +57,7 @@ class ForestUserFactory
                         foreach ($permissions['collections'][$collection][$type] as $key => $value) {
                             $value = $type === 'actions' ? $value['triggerEnabled'] : $value;
                             if ($value === true || (is_array($value) && in_array($forestUser->getKey(), $value, true))) {
-                                $actions[] = $key;
+                                $actions[] = $type === 'actions' ? Str::slug($key) : $key;
                             }
                         }
                         $method = $type === 'collection' ? 'addPermission' : 'addSmartActionPermission';

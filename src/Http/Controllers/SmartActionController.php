@@ -4,10 +4,12 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -21,9 +23,9 @@ use Psr\Container\NotFoundExceptionInterface;
 class SmartActionController extends ForestController
 {
     /**
-     * @var Model $model
+     * @var Model $collection
      */
-    protected Model $model;
+    protected Model $collection;
 
     /**
      * @var SmartAction
@@ -38,8 +40,8 @@ class SmartActionController extends ForestController
     public function __invoke(Route $route)
     {
         [$collection, $name] = explode('_', $route->parameter('action'));
-        $this->model = Schema::getModel($collection);
-        $this->smartAction = $this->model->getSmartAction($name);
+        $this->collection = Schema::getModel($collection);
+        $this->smartAction = $this->collection->getSmartAction($name);
 
         if ($type = $route->parameter('hook')) {
             return $type === 'load' ? $this->executeLoadHook() : $this->executeChangeHook();
@@ -50,10 +52,11 @@ class SmartActionController extends ForestController
 
     /**
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function executeAction(): JsonResponse
     {
-        //$this->authorize('smartAction', $this->collection);
+        $this->authorize('smartAction', [$this->collection, Str::slug($this->smartAction->getKey())]);
 
         return response()->json(
             call_user_func($this->smartAction->getExecute())
