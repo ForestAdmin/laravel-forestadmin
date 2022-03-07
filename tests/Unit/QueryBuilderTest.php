@@ -266,8 +266,11 @@ class QueryBuilderTest extends TestCase
             );
 
         $grammar = $this->prophesize(Grammar::class);
-        $grammar->getBitOperators()
-            ->willReturn([]);
+        if (method_exists(Grammar::class, 'getBitwiseOperators')) {
+            $grammar->getBitwiseOperators()->willReturn([]);
+        } else {
+            $grammar->getBitOperators()->willReturn([]);
+        }
         $connection = $this->prophesize(Connection::class);
         $connection->getTablePrefix()
             ->shouldBeCalled()
