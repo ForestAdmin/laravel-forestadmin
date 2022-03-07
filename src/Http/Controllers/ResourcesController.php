@@ -55,7 +55,7 @@ class ResourcesController extends ForestController
             $this->name = Str::replaceLast('.csv', '', $this->name);
             $this->requestFormat = 'csv';
         }
-        $this->model = Schema::getModel(ucfirst($this->name));
+        $this->model = $this->getModel(ucfirst($this->name));
     }
 
     /**

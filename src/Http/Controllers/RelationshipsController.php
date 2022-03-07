@@ -57,7 +57,7 @@ class RelationshipsController extends Controller
     public function __construct()
     {
         [$collection, $parentId, $relation] = array_values(request()->route()->parameters());
-        $this->model = Schema::getModel(ucfirst($collection));
+        $this->model = $this->getModel(ucfirst($collection));
         $this->name = (class_basename($this->model));
         $this->relationship = $relation;
         $this->relationName = (class_basename($this->model->$relation()->getRelated()));
