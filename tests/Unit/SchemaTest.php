@@ -75,7 +75,7 @@ class SchemaTest extends TestCase
      */
     public function testGenerate(): void
     {
-        App::shouldReceive('basePath')
+        App::partialMock()->shouldReceive('basePath')
             ->andReturn(__DIR__ . '/../Feature/Models');
         $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
         File::shouldReceive('put')->andReturn(true);

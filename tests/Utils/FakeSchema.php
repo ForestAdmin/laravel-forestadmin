@@ -21,8 +21,8 @@ trait FakeSchema
         $schema = [
             "collections" => [
                 [
-                    "name"   => "book",
-                    "fields" => [
+                    "name"    => "book",
+                    "fields"  => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -97,7 +97,7 @@ trait FakeSchema
                             "default_value" => null,
                             "enums"         => [
                                 "easy",
-                                "hard"
+                                "hard",
                             ],
                             "integration"   => null,
                             "is_filterable" => true,
@@ -147,10 +147,36 @@ trait FakeSchema
                             "relationship"  => "HasOne",
                         ],
                     ],
+                    "actions" => [
+                        [
+                            "id"       => "Book.smart action single",
+                            "name"     => "smart action single",
+                            "fields"   => [],
+                            "endpoint" => "\/forest\/smart-actions\/book_smart-action-single",
+                            "type"     => "single",
+                            "download" => false,
+                            "hooks"    => [
+                                "load"   => false,
+                                "change" => [],
+                            ],
+                        ],
+                        [
+                            "id"       => "Book.smart action bulk",
+                            "name"     => "smart action bulk",
+                            "fields"   => [],
+                            "endpoint" => "\/forest\/smart-actions\/book_smart-action-bulk",
+                            "type"     => "bulk",
+                            "download" => false,
+                            "hooks"    => [
+                                "load"   => false,
+                                "change" => [],
+                            ],
+                        ],
+                    ],
                 ],
                 [
-                    "name"                   => "editor",
-                    "fields"                 => [
+                    "name"   => "editor",
+                    "fields" => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -198,7 +224,7 @@ trait FakeSchema
                             "inverse_of"    => null,
                             "widget"        => null,
                             "validations"   => [],
-                        ]
+                        ],
                     ],
                 ],
             ],

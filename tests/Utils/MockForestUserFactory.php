@@ -85,7 +85,10 @@ trait MockForestUserFactory
                         'deleteEnabled' => $permissions,
                         'exportEnabled' => $permissions,
                     ],
-                    'actions'    => [],
+                    'actions'    => [
+                        'smart action single' => ['triggerEnabled' => $permissions],
+                        'smart action bulk' => ['triggerEnabled' => $permissions],
+                    ],
                 ],
                 'bookstore'     => [
                     'collection' => [
