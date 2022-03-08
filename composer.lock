@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ee4ee8d18ddff19f5a41d0e56ef43b8",
+    "content-hash": "378fbee612fc83911a483af1ff63eef9",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1999,16 +1999,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.83.4",
+            "version": "v8.83.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "97a549f1a83cfb32dab1eecab4c4d40a984a72b5"
+                "reference": "b4ed222a188cca74ca9062296e525d26ae54a0ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/97a549f1a83cfb32dab1eecab4c4d40a984a72b5",
-                "reference": "97a549f1a83cfb32dab1eecab4c4d40a984a72b5",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b4ed222a188cca74ca9062296e525d26ae54a0ce",
+                "reference": "b4ed222a188cca74ca9062296e525d26ae54a0ce",
                 "shasum": ""
             },
             "require": {
@@ -2168,7 +2168,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-03-08T16:12:54+00:00"
+            "time": "2022-03-03T15:14:29+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -8306,16 +8306,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.18",
+            "version": "9.5.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1b5856028273bfd855e60a887278857d872ec67a"
+                "reference": "5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1b5856028273bfd855e60a887278857d872ec67a",
-                "reference": "1b5856028273bfd855e60a887278857d872ec67a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f",
+                "reference": "5c5abcfaa2cbd44b2203995d7a339ef910fe0c8f",
                 "shasum": ""
             },
             "require": {
@@ -8393,7 +8393,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.18"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.17"
             },
             "funding": [
                 {
@@ -8405,7 +8405,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-08T06:52:28+00:00"
+            "time": "2022-03-05T16:54:31+00:00"
         },
         {
             "name": "pimple/pimple",

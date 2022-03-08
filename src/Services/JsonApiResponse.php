@@ -3,13 +3,13 @@
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
+use ForestAdmin\LaravelForestAdmin\Services\Fractal\Manager;
 use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
-use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Psr\Container\ContainerExceptionInterface;
