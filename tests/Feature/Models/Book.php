@@ -50,8 +50,10 @@ class Book extends Model
      */
     public function smartActions(): Collection
     {
-        return collect([
-            App::makeWith(SmartAction::class,
+        return collect(
+            [
+            App::makeWith(
+                SmartAction::class,
                 [
                     'model'   => class_basename($this),
                     'name'    => 'smart action bulk',
@@ -62,7 +64,8 @@ class Book extends Model
                     },
                 ]
             ),
-            App::makeWith(SmartAction::class,
+            App::makeWith(
+                SmartAction::class,
                 [
                     'model'   => class_basename($this),
                     'name'    => 'smart action single',
@@ -76,7 +79,7 @@ class Book extends Model
                 ->addField(['field' => 'token', 'type' => 'string', 'is_required' => true])
                 ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])
                 ->load(
-                    function() {
+                    function () {
                         $fields = $this->getFields();
                         $fields['token']['value'] = 'default';
 
@@ -93,7 +96,8 @@ class Book extends Model
                         }
                     ]
                 ),
-        ]);
+            ]
+        );
     }
 
     /**
