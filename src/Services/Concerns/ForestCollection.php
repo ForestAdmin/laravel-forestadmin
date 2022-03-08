@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
 use Illuminate\Support\Collection;
 
@@ -46,8 +47,14 @@ trait ForestCollection
      */
     public function getSmartAction(string $name): SmartAction
     {
-        return $this->smartActions()->first(
+        $smartAction = $this->smartActions()->first(
             fn ($item) => $item->getKey() === $name
         );
+
+        if (null !== $smartAction) {
+            return $smartAction;
+        } else {
+            throw new ForestException("There is no smart-action $name");
+        }
     }
 }
