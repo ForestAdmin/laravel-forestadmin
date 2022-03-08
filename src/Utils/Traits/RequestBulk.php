@@ -17,7 +17,7 @@ trait RequestBulk
      */
     public function getIdsFromBulkRequest(): array
     {
-        $model = Schema::getModel(ucfirst(request()->input('data.attributes.collection_name')));
+        $model = $this->getModel(ucfirst(request()->input('data.attributes.collection_name')));
         $request = request()->only('data.attributes.ids', 'data.attributes.all_records', 'data.attributes.all_records_ids_excluded');
         [$ids, $allRecords, $idsExcluded] = array_values($request['data']['attributes']);
 
