@@ -81,6 +81,7 @@ class SmartActionController extends ForestController
 
     /**
      * @return JsonResponse
+     * @throws \Exception
      */
     public function executeChangeHook(): JsonResponse
     {

@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
 use Closure;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
@@ -101,10 +102,16 @@ class SmartAction
     /**
      * @param string $key
      * @return Field
+     * @throws \Exception
      */
     public function getField(string $key): Field
     {
-        return $this->fields->first(fn ($field) => $field->getField() === $key);
+        $field = $this->fields->first(fn ($field) => $field->getField() === $key);
+        if (null !== $field) {
+            return $field;
+        } else {
+            throw new ForestException("There is no field $key in your smart-action");
+        }
     }
 
     /**
@@ -116,9 +123,9 @@ class SmartAction
     }
 
     /**
-     * @return Closure
+     * @return Closure|null
      */
-    public function getLoad(): Closure
+    public function getLoad()
     {
         return $this->load;
     }
@@ -126,14 +133,15 @@ class SmartAction
     /**
      * @param string $key
      * @return Closure
+     * @throws \Exception
      */
     public function getChange(string $key): Closure
     {
         $field = $this->getField($key);
         try {
             return $this->change[$field->getHook()];
-        } catch (\Exception $exception) {
-            // todo throw exception
+        } catch (\Exception $e) {
+            throw new ForestException("There is no hook on the field $key");
         }
     }
 
@@ -205,6 +213,7 @@ class SmartAction
                 $item->merge($fields[$fieldKey]);
             }
         );
+
 
         return $this;
     }
