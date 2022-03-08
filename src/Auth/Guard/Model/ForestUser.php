@@ -159,7 +159,7 @@ class ForestUser
      */
     public function hasSmartActionPermission(string $key, string $action): bool
     {
-        return in_array($action, $this->getSmartActionPermissions()[$key], true);
+        return in_array($action, $this->getSmartActionPermissions()->get($key, []), true);
     }
 
     /**
