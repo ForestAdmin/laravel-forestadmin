@@ -214,7 +214,6 @@ class SmartAction
             }
         );
 
-
         return $this;
     }
 

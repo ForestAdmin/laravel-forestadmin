@@ -8,8 +8,6 @@ use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Support\Facades\App;
 
-//use Mockery as m;
-
 /**
  * Class SmartActionTest
  *
@@ -164,9 +162,60 @@ class SmartActionTest extends TestCase
         $smartAction = $this->buildSmartAction();
         $smartAction->mergeRequestFields(
             [
-               ['field' => 'foo', 'type' => 'string', 'is_required' => false, 'hook' => 'onFooChange']
+                ['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange', 'value' => 'foo data'],
+                ['field' => 'bar', 'type' => 'string', 'is_required' => true],
             ]
         );
+        $field = $smartAction->getField('foo');
+
+        $this->assertEquals('foo data', $this->invokeProperty($field, 'value'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testSerialize(): void
+    {
+        $serialize = $this->buildSmartAction()->serialize();
+        $result = [
+            'id'       => 'SmartActionTest.smart action',
+            'name'     => 'smart action',
+            'fields'   => [
+                [
+                    'field'         => 'foo',
+                    'type'          => 'string',
+                    'is_required'   => true,
+                    'is_read_only'  => false,
+                    'default_value' => null,
+                    'reference'     => null,
+                    'description'   => null,
+                    'hook'          => 'onFooChange',
+                    'enums'         => null,
+                    'value'         => null,
+                ],
+                [
+                    'field'         => 'bar',
+                    'type'          => 'string',
+                    'is_required'   => true,
+                    'is_read_only'  => false,
+                    'default_value' => null,
+                    'reference'     => null,
+                    'description'   => null,
+                    'hook'          => null,
+                    'enums'         => null,
+                    'value'         => null,
+                ],
+            ],
+            'endpoint' => '/forest/smart-actions/smartactiontest_smart-action',
+            'type'     => 'single',
+            'download' => false,
+            'hooks'    => [
+                'load'   => true,
+                'change' => ['onFooChange'],
+            ],
+        ];
+
+        $this->assertEquals($result, $serialize);
     }
 
     /**
@@ -200,7 +249,7 @@ class SmartActionTest extends TestCase
                         $fields['foo']['value'] = 'Test onChange Foo';
 
                         return $fields;
-                    }
+                    },
                 ]
             )
             ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])
