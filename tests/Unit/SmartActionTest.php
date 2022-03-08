@@ -17,10 +17,6 @@ use Illuminate\Support\Facades\App;
  */
 class SmartActionTest extends TestCase
 {
-    /*use ProphecyTrait;
-    use FakeData;
-    use ScopeManagerFactory;*/
-
     /**
      * @return void
      */

@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+
 /**
  * Class Field
  *
@@ -56,7 +58,7 @@ class Field
      */
     protected ?array $enums;
 
-    /**
+    /**::
      * @var mixed|null
      */
     protected mixed $value;
@@ -78,16 +80,10 @@ class Field
 
         //--- required only if type === 'Enum' ---//
         $this->enums = $attributes['enums'] ?? null;
-    }
 
-    /**
-     * @param mixed|null $value
-     *
-     * @return void
-     */
-    public function setValue($value): void
-    {
-        $this->value = $value;
+        if ($this->type === 'Enum') {
+            $this->validEnum();
+        }
     }
 
     /**
@@ -119,6 +115,18 @@ class Field
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function validEnum(): bool
+    {
+        if (!is_array($this->enums)) {
+            throw new ForestException('You must add enums choices on your field ' . $this->field);
+        }
+
+        return true;
     }
 
     /**
