@@ -16,14 +16,9 @@ use League\Fractal\Serializer\JsonApiSerializer as FractalJsonApiSerializer;
 class JsonApiSerializer extends FractalJsonApiSerializer
 {
     /**
-     * Serialize an item.
-     *
-     * @param string $resourceKey
-     * @param array $data
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function item($resourceKey, array $data)
+    public function item(string $resourceKey, array $data): array
     {
         $id = $this->getIdFromData($data);
 
@@ -56,7 +51,7 @@ class JsonApiSerializer extends FractalJsonApiSerializer
     /**
      * {@inheritdoc}
      */
-    public function injectAvailableIncludeData($data, $availableIncludes)
+    public function injectAvailableIncludeData(array $data, array $availableIncludes): array
     {
         if (!$this->shouldIncludeLinks()) {
             return $data;
@@ -79,13 +74,9 @@ class JsonApiSerializer extends FractalJsonApiSerializer
     }
 
     /**
-     * Serialize the meta.
-     *
-     * @param array $meta
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function meta(array $meta)
+    public function meta(array $meta): array
     {
         if (empty($meta)) {
             return [];
@@ -102,7 +93,7 @@ class JsonApiSerializer extends FractalJsonApiSerializer
      * @param array $resource         The resource to add relationship links to
      * @param string $relationshipKey The resource key of the relationship
      */
-    protected function addRelationshipLinks($resource, $relationshipKey)
+    private function addRelationshipLinks(array $resource, string $relationshipKey): array
     {
         if (!isset($resource['relationships']) || !isset($resource['relationships'][$relationshipKey])) {
             $resource['relationships'][$relationshipKey] = [];

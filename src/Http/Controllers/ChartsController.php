@@ -44,7 +44,7 @@ class ChartsController extends ForestController
         $this->authorize('simple-charts', [request()->except('timezone')]);
 
         $name = request()->route()->parameter('collection');
-        $model = Schema::getModel(ucfirst($name));
+        $model = $this->getModel(ucfirst($name));
         $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\\' . $this->type)($model);
 
         return response()->json(

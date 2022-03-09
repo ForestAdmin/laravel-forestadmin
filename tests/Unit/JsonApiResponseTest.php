@@ -74,7 +74,7 @@ class JsonApiResponseTest extends TestCase
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('included', $render);
-        $this->assertSame($data, $render['data'][0]);
+        $this->assertEquals($data, $render['data'][0]);
     }
 
     /**
@@ -97,7 +97,7 @@ class JsonApiResponseTest extends TestCase
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('included', $render);
-        $this->assertSame($data, $render['data'][0]);
+        $this->assertEquals($data, $render['data'][0]);
     }
 
 
@@ -164,17 +164,17 @@ class JsonApiResponseTest extends TestCase
 
         return [
             'type'          => 'Book',
-            'id'            => (string)$book1->id,
+            'id'            => (string) $book1->id,
             'attributes'    => [
                 'label'       => $book1->label,
                 'comment'     => $book1->comment,
-                'category_id' => (string)$category->id,
+                'category_id' => (string) $category->id,
             ],
             'relationships' => [
                 'category' => [
                     'data' => [
                         'type' => class_basename($category),
-                        'id'   => (string)$category->id,
+                        'id'   => (string) $category->id,
                     ],
                 ],
                 'comments' => [
