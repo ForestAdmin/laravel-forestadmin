@@ -50,8 +50,8 @@ class ForestServiceProvider extends ServiceProvider
         $kernel->pushMiddleware(ForestCors::class);
 
         $this->app->bind('chart-api', fn() => new ChartApiResponse());
-        $this->app->bind('json-api', fn() => new JsonApiResponse());
         $this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection());
+        $this->app->bind('json-api', fn() => new JsonApiResponse());
     }
 
     /**
@@ -65,7 +65,7 @@ class ForestServiceProvider extends ServiceProvider
             [
                 'auth.guards.forest' => array_merge(
                     [
-                        'driver'   => 'forest-token',
+                        'driver' => 'forest-token',
                     ],
                     config('auth.guards.forest', [])
                 ),

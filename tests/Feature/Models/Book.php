@@ -2,6 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
+use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class Book
@@ -22,6 +27,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  */
 class Book extends Model
 {
+    use ForestCollection;
+    use RequestBulk;
+
     protected $casts = [
         'options' => 'array',
         'active'  => 'boolean',
@@ -36,6 +44,61 @@ class Book extends Model
         'category_id',
         'published_at',
     ];
+
+    /**
+     * @return Collection
+     */
+    public function smartActions(): Collection
+    {
+        return collect(
+            [
+            App::makeWith(
+                SmartAction::class,
+                [
+                    'model'   => class_basename($this),
+                    'name'    => 'smart action bulk',
+                    'type'    => 'bulk',
+                    'execute' => function () {
+                        $ids = $this->getIdsFromBulkRequest();
+                        return ['success' => "ids => " . implode(',', $ids)];
+                    },
+                ]
+            ),
+            App::makeWith(
+                SmartAction::class,
+                [
+                    'model'   => class_basename($this),
+                    'name'    => 'smart action single',
+                    'type'    => 'single',
+                    'execute' => function () {
+
+                        return ['success' => "Test working!"];
+                    },
+                ]
+            )
+                ->addField(['field' => 'token', 'type' => 'string', 'is_required' => true])
+                ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])
+                ->load(
+                    function () {
+                        $fields = $this->getFields();
+                        $fields['token']['value'] = 'default';
+
+                        return $fields;
+                    }
+                )
+                ->change(
+                    [
+                        'onFooChange' => function () {
+                            $fields = $this->getFields();
+                            $fields['token']['value'] = 'Test onChange Foo';
+
+                            return $fields;
+                        }
+                    ]
+                ),
+            ]
+        );
+    }
 
     /**
      * @return BelongsTo

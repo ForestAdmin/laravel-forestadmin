@@ -113,6 +113,7 @@ class ForestModel
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
+            'actions'                => $this->getSmartActions(),
         ];
     }
 
@@ -134,6 +135,21 @@ class ForestModel
         }
 
         return $fields->values()->toArray();
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function getSmartActions(): array
+    {
+        $schemaSmartActions = [];
+        $smartActions = method_exists($this->model, 'smartActions') ? $this->model->smartActions() : [];
+        foreach ($smartActions as $smartAction) {
+            $schemaSmartActions[] = $smartAction->serialize();
+        }
+
+        return $schemaSmartActions;
     }
 
     /**

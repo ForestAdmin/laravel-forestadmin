@@ -78,6 +78,17 @@ class PermissionPolicy
     }
 
     /**
+     * @param ForestUser $forestUser
+     * @param            $collection
+     * @param            $action
+     * @return bool
+     */
+    public function smartAction(ForestUser $forestUser, $collection, $action)
+    {
+        return $forestUser->hasSmartActionPermission($this->getCollectionName($collection), $action);
+    }
+
+    /**
      * @param mixed $collection
      * @return string
      */

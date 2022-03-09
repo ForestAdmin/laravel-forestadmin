@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
+use ForestAdmin\LaravelForestAdmin\Transformers\ChartTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as BaseCollection;
