@@ -24,7 +24,12 @@ module.exports = {
     [
       "@semantic-release/git",
       {
-        assets: ["CHANGELOG.md", "composer.json", "package.json"],
+        assets: [
+          "CHANGELOG.md",
+          "composer.json",
+          "package.json",
+          "src/Schema/Schema.php",
+        ],
       },
     ],
     "@semantic-release/github",
