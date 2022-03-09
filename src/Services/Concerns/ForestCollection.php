@@ -35,6 +35,7 @@ trait ForestCollection
 
     /**
      * @return Collection
+     * @codeCoverageIgnore
      */
     public function smartActions(): Collection
     {

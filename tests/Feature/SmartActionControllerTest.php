@@ -110,7 +110,7 @@ class SmartActionControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
-    public function testSmartActionGlobal(): void
+    public function testSmartActionBulk(): void
     {
         $this->makeScopeManager($this->forestUser);
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
@@ -128,6 +128,37 @@ class SmartActionControllerTest extends TestCase
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
             'success' => 'ids => 1,2,3'
+        ];
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSmartActionBulkAllRecords(): void
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $this->getBook()->save();
+        }
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $payload = [
+            'data' => [
+                'attributes'    => [
+                    'ids' => [],
+                    'all_records' => true,
+                    'all_records_ids_excluded' => [2]
+                ],
+            ],
+        ];
+        $call = $this->postJson('/forest/smart-actions/book_smart-action-bulk', $payload);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $expected = [
+            'success' => 'ids => 1,3'
         ];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
