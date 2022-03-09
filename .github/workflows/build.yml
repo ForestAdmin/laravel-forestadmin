@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ "8.0", "8.1" ]
+        php: ["8.0", "8.1"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,11 +21,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-<<<<<<< HEAD
           php-version: ${{ matrix.php }}
-=======
-          php-version: "8.0"
->>>>>>> a740169 (chore: enable semantic-release on the repositoy)
           coverage: xdebug
           tools: composer, cs2pr
 
@@ -67,7 +63,7 @@ jobs:
           persist-credentials: false # GITHUB_TOKEN must not be set for the semantic release
       - uses: actions/setup-node@v2
         with:
-          node-version: 14.17.6
+          node-version: 12.13.0
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"

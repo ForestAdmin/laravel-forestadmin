@@ -18,7 +18,7 @@ module.exports = {
       "@semantic-release/exec",
       {
         prepareCmd:
-          'sed -i `s/"version": ".*"/"version": "${nextRelease.version}"/g\' composer.json; sed -i \'s/"version": ".*"/"version": "${nextRelease.version}"/g\' package.json;',
+          'sed -i "s/LIANA_VERSION = \'.*\'/LIANA_VERSION = \'${nextRelease.version}\'/g" src/Schema/Schema.php; sed -i \'s/"version": ".*"/"version": "${nextRelease.version}"/g\' composer.json; sed -i \'s/"version": ".*"/"version": "${nextRelease.version}"/g\' package.json;',
       },
     ],
     [
