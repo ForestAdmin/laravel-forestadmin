@@ -1,3 +1,10 @@
+# [1.0.0-beta.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2022-03-10)
+
+
+### Bug Fixes
+
+* fix dependency psr/simple-cache on installation ([#24](https://github.com/ForestAdmin/laravel-forestadmin/issues/24)) ([3d55fb2](https://github.com/ForestAdmin/laravel-forestadmin/commit/3d55fb230cec5653bd670181604834cbfa1708df))
+
 # [1.0.0-beta.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2022-03-09)
 
 # 1.0.0-beta.1 (2022-03-09)
