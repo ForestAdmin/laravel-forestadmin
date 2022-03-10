@@ -19,11 +19,12 @@
     "doctrine/dbal": "^3.1",
     "ext-json": "*",
     "firebase/php-jwt": "^6.0",
+    "galbar/jsonpath": "^2.0",
     "guzzlehttp/guzzle": "^7.4",
     "league/fractal": "^0.20",
     "league/oauth2-client": "^2.6",
     "maatwebsite/excel": "^3.1",
-    "galbar/jsonpath": "^2.0",
+    "psr/simple-cache": "^1.0",
     "ramsey/uuid": "^4.2"
   },
   "require-dev": {
