@@ -58,10 +58,10 @@ class Field
      */
     protected ?array $enums;
 
-    /**::
-     * @var mixed|null
+    /**
+     * @var mixed
      */
-    protected ?mixed $value;
+    protected $value;
 
     /**
      * @param array $attributes
