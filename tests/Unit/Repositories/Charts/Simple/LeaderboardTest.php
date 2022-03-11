@@ -63,7 +63,7 @@ class LeaderboardTest extends TestCase
      */
     public function testGetCountHasMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $this->makeBooks();
 
@@ -106,7 +106,7 @@ class LeaderboardTest extends TestCase
      */
     public function testGetCountBelongsToMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $this->makeBooks();
 
@@ -149,7 +149,7 @@ class LeaderboardTest extends TestCase
      */
     public function testGetSumHasMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $this->makeBooks();
 
@@ -194,7 +194,7 @@ class LeaderboardTest extends TestCase
      */
     public function testGetSumBelongsToMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $this->makeBooks();
 
@@ -239,7 +239,7 @@ class LeaderboardTest extends TestCase
      */
     public function testGetException(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $this->makeBooks();
 
@@ -285,7 +285,7 @@ class LeaderboardTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $book = Book::create(
                 [
-                    'label'        => 'test book ' . $i + 1,
+                    'label'        => 'test book ' . ($i + 1),
                     'comment'      => '',
                     'difficulty'   => 'easy',
                     'amount'       => 1000,
