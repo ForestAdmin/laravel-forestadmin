@@ -61,7 +61,7 @@ class Field
     /**::
      * @var mixed|null
      */
-    protected mixed $value;
+    protected ?mixed $value;
 
     /**
      * @param array $attributes
