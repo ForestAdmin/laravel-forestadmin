@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Laracsv\Export;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -59,9 +60,11 @@ class ResourcesController extends ForestController
     }
 
     /**
-     * @return CollectionExport|JsonResponse
-     * @throws Exception
+     * @return JsonResponse|Response
      * @throws AuthorizationException
+     * @throws Exception
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \League\Csv\Exception
      */
     public function index()
     {
@@ -71,10 +74,20 @@ class ResourcesController extends ForestController
         $repository = new ResourceGetter($this->model);
 
         if ($this->requestFormat === 'csv') {
-            return new CollectionExport(
+            $filename = request()->input('filename', $this->name) . '.csv';
+            $csvExporter = new Export();
+            $export = $csvExporter->build(
                 $repository->all(false),
-                request()->input('filename', $this->name),
-                request()->input('header')
+                explode(',', request()->input('header'))
+            )->getReader()->toString();
+
+            return response(
+                $export,
+                200,
+                [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                ]
             );
         } else {
             return response()->json(

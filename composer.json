@@ -23,9 +23,9 @@
     "guzzlehttp/guzzle": "^7.4",
     "league/fractal": "^0.20",
     "league/oauth2-client": "^2.6",
-    "maatwebsite/excel": "^3.1",
     "psr/simple-cache": "^1.0",
-    "ramsey/uuid": "^4.2"
+    "ramsey/uuid": "^4.2",
+    "usmanhalalit/laracsv": "^2.1"
   },
   "require-dev": {
     "orchestra/testbench": "^6.19",

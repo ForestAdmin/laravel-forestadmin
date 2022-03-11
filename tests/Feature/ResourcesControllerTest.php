@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -189,20 +188,14 @@ class ResourcesControllerTest extends TestCase
         ];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        Excel::fake();
 
         $call = $this->get('/forest/book.csv?' . http_build_query($params));
-        $book = Book::first();
+        $data = str_getcsv($call->getContent(), "\n");
+        $book = Book::select('id', 'label')->first();
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $call->baseResponse);
-        Excel::assertDownloaded(
-            $params['filename'] . '.csv',
-            static function (CollectionExport $export) use ($book) {
-                return $export->collection()->count() === 1
-                && $export->collection()->first() instanceof Book
-                && $export->collection()->first()->label === $book->label;
-            }
-        );
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $call->baseResponse);
+        $this->assertEquals($params['header'], $data[0]);
+        $this->assertEquals(implode(',', $book->toArray()), $data[1]);
     }
 
     /**
