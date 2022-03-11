@@ -98,7 +98,6 @@ class ChartsControllerTest extends TestCase
         DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
         $call = $this->postJson('/forest/stats', $data['payloadQuery']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $call->baseResponse->getStatusCode());
         $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
@@ -233,7 +232,7 @@ class ChartsControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Value');
         $permission = [
@@ -255,7 +254,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexValuePermissionDenied(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Value');
         $call = $this->postJson('/forest/stats/book', $data['payload']);
@@ -274,7 +273,7 @@ class ChartsControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Objective');
         //-- unset this key because, it's only present when is a liveQuery chart --//
@@ -298,7 +297,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexObjectivePermissionDenied(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Objective');
         $call = $this->postJson('/forest/stats/book', $data['payload']);
@@ -317,7 +316,7 @@ class ChartsControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Pie');
         $permission = [
@@ -339,7 +338,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexPiePermissionDenied(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Pie');
         $call = $this->postJson('/forest/stats/book', $data['payload']);
@@ -358,7 +357,7 @@ class ChartsControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->getBook()->save();
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Line');
         $permission = [
@@ -380,7 +379,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLinePermissionDenied(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Line');
         $call = $this->postJson('/forest/stats/book', $data['payload']);
@@ -399,7 +398,7 @@ class ChartsControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $this->makeBooks();
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Leaderboard');
         $permission = [
@@ -421,7 +420,7 @@ class ChartsControllerTest extends TestCase
      */
     public function testIndexLeaderboardPermissionDenied(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Leaderboard');
         $call = $this->postJson('/forest/stats/book', $data['payload']);
@@ -605,7 +604,7 @@ class ChartsControllerTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $book = Book::create(
                 [
-                    'label'        => 'test book ' . $i + 1,
+                    'label'        => 'test book ' . ($i + 1),
                     'comment'      => '',
                     'difficulty'   => 'easy',
                     'amount'       => 1000,

@@ -100,7 +100,6 @@ class TestCase extends OrchestraTestCase
     {
         return [
             ForestServiceProvider::class,
-            ExcelServiceProvider::class,
         ];
     }
 
