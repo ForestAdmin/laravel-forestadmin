@@ -409,7 +409,9 @@ class RelationshipsControllerTest extends TestCase
     public function testUpdateHasOne(): void
     {
         $book = Book::first();
-        $editor = Editor::create(['name' => 'foo', 'book_id' => 2]);
+        $book->editor->book_id = null;
+        $book->editor->save();
+        $editor = Editor::create(['name' => 'foo', 'book_id' => null]);
 
         // TODO update test -> maybe set book_id nullable ?
         $call = $this->put(

@@ -111,10 +111,11 @@ class ResourcesControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $expectedCount = Book::where(['difficulty' => 'hard', 'label' => 'foo'])->count();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertCount(1, $data['data']);
+        $this->assertCount($expectedCount, $data['data']);
         $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
     }
@@ -959,9 +960,10 @@ class ResourcesControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $expectedCount = Book::where(['label' => $book->label, 'difficulty' => $book->difficulty])->count();
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertCount(1, $data['data']);
+        $this->assertCount($expectedCount, $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
