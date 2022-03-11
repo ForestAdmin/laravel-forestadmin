@@ -1,3 +1,10 @@
+# [1.0.0-beta.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2022-03-11)
+
+
+### Bug Fixes
+
+* onboarding installation on php8.1 ([#25](https://github.com/ForestAdmin/laravel-forestadmin/issues/25)) ([ef22634](https://github.com/ForestAdmin/laravel-forestadmin/commit/ef22634059240ad848087d93277fbe5baab4562c))
+
 # [1.0.0-beta.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2022-03-10)
 
 
