@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
+use ForestAdmin\LaravelForestAdmin\Facades\SmartFeatures;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
@@ -41,6 +42,7 @@ class BaseTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
+        $model = SmartFeatures::handleSmartFields($model);
         $relations = collect($model->getRelations())->filter()->all();
         $this->setDefaultIncludes(array_keys($relations));
 

@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
 use ForestAdmin\LaravelForestAdmin\Services\ChartApiResponse;
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartFeaturesHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 
@@ -52,6 +53,7 @@ class ForestServiceProvider extends ServiceProvider
         $this->app->bind('chart-api', fn() => new ChartApiResponse());
         $this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection());
         $this->app->bind('json-api', fn() => new JsonApiResponse());
+        $this->app->bind('smart-features', fn() => new SmartFeaturesHandler());
     }
 
     /**

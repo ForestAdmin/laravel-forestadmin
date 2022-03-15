@@ -2,8 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
-use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-
 /**
  * Class AbstractField
  *
