@@ -56,10 +56,9 @@ class ForestSchemaInstrospection
     public function getSmartFields(string $collection): array
     {
         $collection = Str::camel($collection);
-        $data = collect($this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.is_virtual == true)]"));
-        $data = $data->mapWithKeys(fn($item) => [$item['field'] => $item])->all();
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.is_virtual == true)]");
 
-        return $data ?: [];
+        return $data ? collect($data)->mapWithKeys(fn($item) => [$item['field'] => $item])->all() : [];
     }
 
     /**
