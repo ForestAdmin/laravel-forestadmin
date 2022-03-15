@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
@@ -63,5 +64,19 @@ abstract class BaseRepository
                 $model->$key()->associate($related);
             }
         }
+    }
+
+    /**
+     * @param Model $model
+     * @return Model
+     */
+    protected function fetchSmartFields(Model $model): Model
+    {
+        $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($model)));
+        foreach ($smartFields as $smartField) {
+            $model->{$smartField['field']} = call_user_func($model->{$smartField['field']}()->call());
+        }
+
+        return $model;
     }
 }

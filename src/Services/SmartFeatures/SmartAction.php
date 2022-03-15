@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
+namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
 use Closure;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
@@ -101,10 +101,10 @@ class SmartAction
 
     /**
      * @param string $key
-     * @return Field
+     * @return SmartActionField
      * @throws \Exception
      */
-    public function getField(string $key): Field
+    public function getField(string $key): SmartActionField
     {
         $field = $this->fields->first(fn ($field) => $field->getField() === $key);
         if (null !== $field) {
@@ -151,7 +151,7 @@ class SmartAction
      */
     public function addField(array $attributes): SmartAction
     {
-        $field = App::makeWith(Field::class, ['attributes' => $attributes]);
+        $field = App::makeWith(SmartActionField::class, ['attributes' => $attributes]);
         $this->fields->push($field);
 
         return $this;

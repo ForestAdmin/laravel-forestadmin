@@ -1,43 +1,18 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Services\SmartActions;
+namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 
 /**
- * Class Field
+ * Class SmartActionField
  *
  * @package  Laravel-forestadmin
  * @license  GNU https://www.gnu.org/licences/licences.html
  * @link     https://github.com/ForestAdmin/laravel-forestadmin
  */
-class Field
+class SmartActionField extends AbstractField
 {
-    /**
-     * @var string
-     */
-    protected string $field;
-
-    /**
-     * @var string
-     */
-    protected string $type;
-
-    /**
-     * @var bool
-     */
-    protected bool $is_required;
-
-    /**
-     * @var bool
-     */
-    protected bool $is_read_only;
-
-    /**
-     * @var string|null
-     */
-    protected ?string $default_value;
-
     /**
      * @var string|null
      */
@@ -46,17 +21,7 @@ class Field
     /**
      * @var string|null
      */
-    protected ?string $reference;
-
-    /**
-     * @var string|null
-     */
     protected ?string $hook;
-
-    /**
-     * @var array|null
-     */
-    protected ?array $enums;
 
     /**
      * @var mixed
@@ -68,30 +33,17 @@ class Field
      */
     public function __construct(array $attributes)
     {
-        $this->field = $attributes['field'];
-        $this->type = $attributes['type'];
-        $this->is_required = $attributes['is_required'] ?? false;
-        $this->is_read_only = $attributes['is_read_only'] ?? false;
-        $this->default_value = $attributes['default_value'] ?? null;
-        $this->reference = $attributes['reference'] ?? null;
+        parent::__construct($attributes);
+
         $this->description = $attributes['description'] ?? null;
         $this->hook = $attributes['hook'] ?? null;
         $this->value = $attributes['value'] ?? null;
 
         //--- required only if type === 'Enum' ---//
         $this->enums = $attributes['enums'] ?? null;
-
         if ($this->type === 'Enum') {
             $this->validEnum();
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getField()
-    {
-        return $this->field;
     }
 
     /**
@@ -104,9 +56,9 @@ class Field
 
     /**
      * @param array $data
-     * @return Field
+     * @return SmartActionField
      */
-    public function merge(array $data): Field
+    public function merge(array $data): SmartActionField
     {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {

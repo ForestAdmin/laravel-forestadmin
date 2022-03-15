@@ -3,7 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use Illuminate\Support\Collection;
 
 /**
@@ -57,5 +58,18 @@ trait ForestCollection
         } else {
             throw new ForestException("There is no smart-action $name");
         }
+    }
+
+    /**
+     * @param array $attributes
+     * @return SmartField
+     */
+    public function smartField(array $attributes): SmartField
+    {
+        [$one, $field] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $attributes['field'] = $field['function'];
+
+
+        return new SmartField($attributes);
     }
 }

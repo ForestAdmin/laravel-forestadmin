@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

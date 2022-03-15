@@ -3,8 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\Field;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartActionField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Support\Facades\App;
 
@@ -70,7 +70,7 @@ class SmartActionTest extends TestCase
     {
         $field = $this->buildSmartAction()->getField('foo');
 
-        $this->assertInstanceOf(Field::class, $field);
+        $this->assertInstanceOf(SmartActionField::class, $field);
         $this->assertEquals('foo', $field->getField());
     }
 

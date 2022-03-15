@@ -7,6 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\CustomFields;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\DataTypes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -124,6 +126,7 @@ class ForestModel
     public function getFields(): array
     {
         $fields = $this->fetchFieldsFromTable();
+        $fields = $fields->merge($this->fetchSmartFields());
 
         $schemaFields = method_exists($this->model, 'schemaFields') ? $this->model->schemaFields() : [];
         foreach ($schemaFields as $field) {
@@ -367,6 +370,27 @@ class ForestModel
     }
 
     /**
+     * @return Collection
+     */
+    public function fetchSmartFields(): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartFields = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType())
+                && $returnType->getName() === SmartField::class
+                && $method->getName() !== 'smartField'
+            ) {
+                $serialize = $this->model->{$method->getName()}()->serialize();
+                $smartFields->put($serialize['field'], $serialize);
+            }
+        }
+
+        return $smartFields;
+    }
+
+    /**
      * @param Collection $fields
      * @param array      $relations
      * @return Collection
@@ -382,20 +406,20 @@ class ForestModel
                 case BelongsToMany::class:
                     $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
                     $field = array_merge(
-                        $field,
-                        [
-                            'field'      => $relation->getRelationName(),
-                        ]
+                $field,
+                [
+                    'field'      => $relation->getRelationName(),
+                ]
                     );
                     $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
                     break;
                 case HasMany::class:
                 case HasOne::class:
                     $field = array_merge(
-                        $this->fieldDefaultValues(),
-                        [
-                            'field'      => $name,
-                        ]
+                $this->fieldDefaultValues(),
+                [
+                    'field'      => $name,
+                ]
                     );
                     $name = $relation->getRelated()->getTable();
                     break;
