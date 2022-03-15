@@ -36,7 +36,7 @@ class SmartActionTest extends TestCase
         $result = [
             'foo' => [
                 'field'         => 'foo',
-                'type'          => 'string',
+                'type'          => 'String',
                 'is_required'   => true,
                 'is_read_only'  => false,
                 'default_value' => null,
@@ -48,7 +48,7 @@ class SmartActionTest extends TestCase
             ],
             'bar' => [
                 'field'         => 'bar',
-                'type'          => 'string',
+                'type'          => 'String',
                 'is_required'   => true,
                 'is_read_only'  => false,
                 'default_value' => null,
@@ -179,7 +179,7 @@ class SmartActionTest extends TestCase
             'fields'   => [
                 [
                     'field'         => 'foo',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,
@@ -191,7 +191,7 @@ class SmartActionTest extends TestCase
                 ],
                 [
                     'field'         => 'bar',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,

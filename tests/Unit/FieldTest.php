@@ -80,7 +80,7 @@ class FieldTest extends TestCase
 
         $result = [
             'field'         => 'foo',
-            'type'          => 'string',
+            'type'          => 'String',
             'is_required'   => true,
             'is_read_only'  => false,
             'default_value' => null,
