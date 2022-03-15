@@ -22,7 +22,7 @@ class SmartFeaturesHandler
     {
         $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($model)));
         foreach ($smartFields as $smartField) {
-            $model->{$smartField['field']} = call_user_func($model->{$smartField['field']}()->call());
+            $model->{$smartField['field']} = call_user_func($model->{$smartField['field']}()->get);
         }
 
         return $model;

@@ -14,7 +14,12 @@ class SmartField extends AbstractField
     /**
      * @var mixed
      */
-    protected \Closure $get;
+    public \Closure $get;
+
+    /**
+     * @var mixed
+     */
+    public \Closure $set;
 
     /**
      * @param array $attributes
@@ -36,10 +41,13 @@ class SmartField extends AbstractField
     }
 
     /**
-     * @return \Closure
+     * @param \Closure $set
+     * @return SmartField
      */
-    public function call(): \Closure
+    public function set(\Closure $set): SmartField
     {
-        return $this->get;
+        $this->set = $set;
+
+        return $this;
     }
 }
