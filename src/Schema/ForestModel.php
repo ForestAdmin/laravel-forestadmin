@@ -378,10 +378,7 @@ class ForestModel
         $smartFields = new Collection();
 
         foreach ($methods as $method) {
-            if (($returnType = $method->getReturnType())
-                && $returnType->getName() === SmartField::class
-                && $method->getName() !== 'smartField'
-            ) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartField::class && $method->getName() !== 'smartField') {
                 $serialize = $this->model->{$method->getName()}()->serialize();
                 $smartFields->put($serialize['field'], $serialize);
             }
@@ -406,20 +403,20 @@ class ForestModel
                 case BelongsToMany::class:
                     $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
                     $field = array_merge(
-                $field,
-                [
-                    'field'      => $relation->getRelationName(),
-                ]
+                        $field,
+                        [
+                            'field' => $relation->getRelationName(),
+                        ]
                     );
                     $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
                     break;
                 case HasMany::class:
                 case HasOne::class:
                     $field = array_merge(
-                $this->fieldDefaultValues(),
-                [
-                    'field'      => $name,
-                ]
+                        $this->fieldDefaultValues(),
+                        [
+                            'field' => $name,
+                        ]
                     );
                     $name = $relation->getRelated()->getTable();
                     break;
