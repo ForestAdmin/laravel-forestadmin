@@ -445,7 +445,7 @@ class ForestModel
     {
         return [
             'field'         => $name,
-            'type'          => 'string',
+            'type'          => 'String',
             'default_value' => null,
             'enums'         => null,
             'integration'   => null,

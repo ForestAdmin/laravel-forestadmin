@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
+use Illuminate\Support\Str;
+
 /**
  * Class AbstractField
  *
@@ -82,17 +84,17 @@ abstract class AbstractField implements FieldContract
     public function __construct(array $attributes)
     {
         $this->field = $attributes['field'];
-        $this->type = $attributes['type'];
+        $this->type = Str::ucfirst($attributes['type']) ?? 'String';
         $this->is_required = $attributes['is_required'] ?? false;
-        $this->is_read_only = $attributes['is_read_only'] ?? false;
+        $this->is_read_only = $attributes['is_read_only'] ?? true;
         $this->reference = $attributes['reference'] ?? null;
         $this->default_value = null;
         $this->enums = $attributes['enums'] ?? null;
 
         // TODO check if useless
         $this->integration = null;
-        $this->is_filterable = true;
-        $this->is_sortable = true;
+        $this->is_filterable = false;
+        $this->is_sortable = false;
         $this->is_virtual = true;
         $this->inverse_of = null;
         $this->validations = [];
