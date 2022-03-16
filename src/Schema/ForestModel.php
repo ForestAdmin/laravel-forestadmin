@@ -348,7 +348,9 @@ class ForestModel
     {
         $fields = new Collection();
         $connexion = $this->model->getConnection()->getDoctrineSchemaManager();
-        $connexion->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+        if ($connexion->getDatabasePlatform()) {
+            $connexion->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+        }
         $columns = $connexion->listTableColumns($this->table, $this->database);
 
         if ($columns) {
