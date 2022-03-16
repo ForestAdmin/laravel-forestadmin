@@ -1,3 +1,11 @@
+# [1.0.0-beta.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2022-03-16)
+
+
+### Bug Fixes
+
+* **schema:** add support on Mariadb enum ([#27](https://github.com/ForestAdmin/laravel-forestadmin/issues/27)) ([db1d3e6](https://github.com/ForestAdmin/laravel-forestadmin/commit/db1d3e65360308c8544120c308fede02322afd01))
+* **schema:** added support enum for mariaDB ([#26](https://github.com/ForestAdmin/laravel-forestadmin/issues/26)) ([9206a3d](https://github.com/ForestAdmin/laravel-forestadmin/commit/9206a3d68b871fed7656316ebb51237328a0a9ab))
+
 # [1.0.0-beta.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2022-03-11)
 
 
