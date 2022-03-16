@@ -462,6 +462,7 @@ class ForestModelTest extends TestCase
     public function getLaravelModel()
     {
         $schemaManager = $this->prophesize(AbstractSchemaManager::class);
+        $schemaManager->getDatabasePlatform()->willReturn(null);
         $schemaManager->listTableColumns(Argument::any(), Argument::any())
             ->willReturn(
                 [
