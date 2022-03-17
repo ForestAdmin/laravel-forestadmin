@@ -64,7 +64,9 @@ trait HasSearch
     protected function handleSearchField(Builder $query, Model $model, array $field, string $value): Builder
     {
         $name = $model->getTable() . '.' . $field['field'];
-        if ($field['type'] === 'Number') {
+        if ($field['is_virtual']) {
+            $query = call_user_func($model->{$field['field']}()->search, $query, $value);
+        } elseif ($field['type'] === 'Number') {
             if (is_numeric($value)) {
                 $query->orWhere($name, (int) $value);
             }
@@ -86,7 +88,7 @@ trait HasSearch
         $fieldsToSearch = [];
         $fields = ForestSchema::getFields(class_basename($model));
         foreach ($fields as $field) {
-            if (in_array($field['type'], ['String', 'Number', 'Enum'], true) && !$field['reference'] && !$field['is_virtual'] && $this->fieldInSearchFields($model, $field['field'])) {
+            if (in_array($field['type'], ['String', 'Number', 'Enum'], true) && !$field['reference'] && $this->fieldInSearchFields($model, $field['field'])) {
                 $fieldsToSearch[] = $field;
             }
         }
