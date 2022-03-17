@@ -24,6 +24,11 @@ class SmartField extends AbstractField
     /**
      * @var mixed
      */
+    public \Closure $sort;
+
+    /**
+     * @var mixed
+     */
     public \Closure $filter;
 
     /**
@@ -46,6 +51,17 @@ class SmartField extends AbstractField
     public function get(\Closure $get): SmartField
     {
         $this->get = $get;
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $sort
+     * @return SmartField
+     */
+    public function sort(\Closure $sort): SmartField
+    {
+        $this->sort = $sort;
 
         return $this;
     }
