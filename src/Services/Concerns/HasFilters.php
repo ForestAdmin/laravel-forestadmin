@@ -185,7 +185,7 @@ trait HasFilters
         $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($this->model)));
         if (isset($smartFields[Str::after($field, '.')])) {
             $smartField = $smartFields[Str::after($field, '.')];
-            call_user_func_array($this->model->{$smartField['field']}()->filter, [$query, $value, $operator, $this->aggregator]);
+            call_user_func($this->model->{$smartField['field']}()->filter, $query, $value, $operator, $this->aggregator);
         } elseif (in_array($type, ['Date', 'Dateonly'], true) && in_array($operator, $this->dateOperators, true)) {
             $this->dateFilters($query, $field, $operator, $value);
         } else {
