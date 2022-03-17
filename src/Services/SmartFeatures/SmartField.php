@@ -22,6 +22,11 @@ class SmartField extends AbstractField
     public \Closure $set;
 
     /**
+     * @var mixed
+     */
+    public \Closure $filter;
+
+    /**
      * @param array $attributes
      */
     public function __construct(array $attributes)
@@ -47,6 +52,17 @@ class SmartField extends AbstractField
     public function set(\Closure $set): SmartField
     {
         $this->set = $set;
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $filter
+     * @return SmartField
+     */
+    public function filter(\Closure $filter): SmartField
+    {
+        $this->filter = $filter;
 
         return $this;
     }
