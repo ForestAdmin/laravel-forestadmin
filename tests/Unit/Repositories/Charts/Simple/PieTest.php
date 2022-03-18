@@ -5,13 +5,13 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Pie;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
 
@@ -24,7 +24,6 @@ use Mockery as m;
  */
 class PieTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use ScopeManagerFactory;
 
@@ -61,8 +60,13 @@ class PieTest extends TestCase
     {
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->getBook()->save();
         $book = Book::first();
+
+        $result = Book::select(DB::raw('categories.label as key, COUNT(*) as value'))
+            ->join('categories', 'books.category_id', '=', 'categories.id')
+            ->groupBy('categories.label')
+            ->get()
+            ->toArray();
 
         $params = '{
             "type": "Pie",
@@ -78,7 +82,7 @@ class PieTest extends TestCase
         $get = $repository->get();
 
         $this->assertIsArray($get);
-        $this->assertEquals([['key' => $book->category->label, 'value' => 1]], $get);
+        $this->assertEquals($result, $get);
     }
 
     /**
@@ -90,8 +94,12 @@ class PieTest extends TestCase
     {
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->getBook()->save();
         $book = Book::first();
+        $result = Book::select(DB::raw('categories.label as key, SUM(books.id) as value'))
+            ->join('categories', 'books.category_id', '=', 'categories.id')
+            ->groupBy('categories.label')
+            ->get()
+            ->toArray();
 
         $params = '{
             "type": "Pie",
@@ -108,7 +116,7 @@ class PieTest extends TestCase
         $get = $repository->get();
 
         $this->assertIsArray($get);
-        $this->assertEquals([['key' => $book->category->label, 'value' => 1]], $get);
+        $this->assertEquals($result, $get);
     }
 
     /**

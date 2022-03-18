@@ -143,7 +143,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $comment = Comment::where('book_id', '!=', $book->id)->first();
         $call = $this->post(
-            '/forest/book/'. $book->id .'/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
@@ -176,7 +176,7 @@ class RelationshipsControllerTest extends TestCase
             ]
         )->first();
         $call = $this->post(
-            '/forest/book/'. $book->id .'/relationships/tags',
+            '/forest/book/' . $book->id . '/relationships/tags',
             [
                 'data' => [
                     [
@@ -208,7 +208,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $range = Range::whereRelation('books', 'books.id', '!=', $book->id)->first();
         $call = $this->post(
-            '/forest/book/'. $book->id .'/relationships/ranges',
+            '/forest/book/' . $book->id . '/relationships/ranges',
             [
                 'data' => [
                     [
@@ -234,7 +234,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $movie = Movie::create(['body' => 'test movie', 'book_id' => $book->id]);
         $call = $this->delete(
-            '/forest/book/'. $book->id .'/relationships/movies',
+            '/forest/book/' . $book->id . '/relationships/movies',
             [
                 'data' => [
                     [
@@ -286,7 +286,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $range = Range::whereRelation('books', 'books.id', '=', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/'. $book->id .'/relationships/ranges',
+            '/forest/book/' . $book->id . '/relationships/ranges',
             [
                 'data' => [
                     [
@@ -311,7 +311,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $comment = Comment::where('book_id', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/'. $book->id .'/relationships/comments?delete=true',
+            '/forest/book/' . $book->id . '/relationships/comments?delete=true',
             [
                 'data' => [
                     [
@@ -336,7 +336,7 @@ class RelationshipsControllerTest extends TestCase
     {
         $book = Book::first();
         $call = $this->delete(
-            '/forest/book/'. $book->id .'/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
@@ -362,7 +362,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $comment = Comment::where('book_id', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/'. $book->id .'/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
@@ -387,7 +387,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $category = Category::create(['label' => 'foo']);
         $call = $this->put(
-            '/forest/book/'. $book->id .'/relationships/category',
+            '/forest/book/' . $book->id . '/relationships/category',
             [
                 'data' => [
                     'id'   => $category->id,
@@ -415,7 +415,7 @@ class RelationshipsControllerTest extends TestCase
 
         // TODO update test -> maybe set book_id nullable ?
         $call = $this->put(
-            '/forest/book/'. $book->id .'/relationships/editor',
+            '/forest/book/' . $book->id . '/relationships/editor',
             [
                 'data' => [
                     'id'   => $editor->id,
@@ -440,7 +440,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $category = Category::create(['label' => 'foo']);
         $call = $this->put(
-            '/forest/book/'. $book->id .'/relationships/category',
+            '/forest/book/' . $book->id . '/relationships/category',
             [
                 'data' => [
                     'id'   => '100',
@@ -464,7 +464,7 @@ class RelationshipsControllerTest extends TestCase
         $book = Book::first();
         $advertisementOfBook2 = Advertisement::firstWhere('book_id', 2);
         $call = $this->put(
-            '/forest/book/'. $book->id .'/relationships/advertisement',
+            '/forest/book/' . $book->id . '/relationships/advertisement',
             [
                 'data' => [
                     'id'   => $advertisementOfBook2->id,

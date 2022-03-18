@@ -5,16 +5,14 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Value;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Mockery as m;
 
 /**
@@ -26,7 +24,6 @@ use Mockery as m;
  */
 class ValueTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use ScopeManagerFactory;
 
@@ -63,8 +60,8 @@ class ValueTest extends TestCase
     {
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->getBook()->save();
         $book = Book::first();
+        $result = Book::sum('amount');
 
         $params = '{
             "type": "Value",
@@ -80,7 +77,7 @@ class ValueTest extends TestCase
         $get = $repository->get();
 
         $this->assertIsArray($get);
-        $this->assertEquals(['countCurrent' => $book->amount, 'countPrevious' => null], $get);
+        $this->assertEquals(['countCurrent' => $result, 'countPrevious' => null], $get);
     }
 
     /**
@@ -93,7 +90,7 @@ class ValueTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        Book::create(
+        $book1 = Book::create(
             [
                 'label'        => 'foo bar',
                 'comment'      => '',
@@ -105,7 +102,7 @@ class ValueTest extends TestCase
             ]
         );
 
-        Book::create(
+        $book2 = Book::create(
             [
                 'label'        => 'foo bar',
                 'comment'      => '',
@@ -132,7 +129,7 @@ class ValueTest extends TestCase
         $get = $repository->get();
 
         $this->assertIsArray($get);
-        $this->assertEquals(['countCurrent' => Book::first()->amount, 'countPrevious' => Book::all()->last()->amount], $get);
+        $this->assertEquals(['countCurrent' => $book1->amount, 'countPrevious' => $book2->amount], $get);
     }
 
     /**

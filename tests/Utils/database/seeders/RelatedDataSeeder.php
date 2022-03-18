@@ -62,9 +62,9 @@ class RelatedDataSeeder extends Seeder
                     ]
                 );
 
-//                $image = new Image(['name' => $faker->name, 'url' => $faker->url()]);
-//                $image->imageable()->associate($book);
-//                $image->save();
+                //                $image = new Image(['name' => $faker->name, 'url' => $faker->url()]);
+                //                $image->imageable()->associate($book);
+                //                $image->save();
 
                 for ($i = 0; $i < 2; $i++) {
                     $tag = new Tag(['label' => $faker->name]);
