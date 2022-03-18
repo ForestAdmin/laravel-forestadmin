@@ -86,7 +86,7 @@ abstract class AbstractField implements FieldContract
         $this->field = $attributes['field'];
         $this->type = Str::ucfirst($attributes['type']) ?? 'String';
         $this->is_required = $attributes['is_required'] ?? false;
-        $this->is_read_only = $attributes['is_read_only'] ?? true;
+        $this->is_read_only = $attributes['is_read_only'] ?? false;
         $this->is_filterable = $attributes['is_filterable'] ?? false;
         $this->is_sortable = $attributes['is_sortable'] ?? false;
         $this->reference = $attributes['reference'] ?? null;

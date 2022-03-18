@@ -8,8 +8,10 @@ use ForestAdmin\LaravelForestAdmin\Repositories\ResourceUpdater;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Mockery as m;
 
 /**
@@ -22,6 +24,7 @@ use Mockery as m;
 class ResourceUpdaterTest extends TestCase
 {
     use FakeData;
+    use FakeSchema;
     use ScopeManagerFactory;
 
     /**
@@ -77,6 +80,7 @@ class ResourceUpdaterTest extends TestCase
         ];
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $this->getBook()->save();
         $repository = m::mock(ResourceUpdater::class, [Book::first(), 'Book'])
@@ -115,6 +119,7 @@ class ResourceUpdaterTest extends TestCase
         ];
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $this->getBook()->save();
         $repository = m::mock(ResourceUpdater::class, [Book::first(), 'Book'])
