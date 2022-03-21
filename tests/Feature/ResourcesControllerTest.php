@@ -976,6 +976,33 @@ class ResourcesControllerTest extends TestCase
     }
 
     /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testFiltersOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->label = 'my favorite book';
+        $book->difficulty = 'easy';
+        $book->save();
+
+        $params = ['fields' => ['book' => 'id,label,reference'], 'filters' => '{"field":"reference","operator":"equal","value":"my favorite book-easy"}'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals('my favorite book', $data['data'][0]['attributes']['label']);
+    }
+
+    /**
      * @return array
      */
     public function getScopesFromApi(): array
