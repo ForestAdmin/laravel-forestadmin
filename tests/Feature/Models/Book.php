@@ -54,6 +54,15 @@ class Book extends Model
     {
         return $this->smartField(['type' => 'String'])
             ->get(fn() => $this->label . '-' . $this->difficulty)
+            ->set(
+                function ($value) {
+                    $data = explode('-', $value);
+                    $this->label = $data[0];
+                    $this->difficulty = $data[1];
+
+                    return $this;
+                }
+            )
             ->sort(fn(Builder $query, string $direction) => $query->orderBy('label'))
             ->filter(
                 static function (Builder $query, $value, string $operator, string $aggregator) {

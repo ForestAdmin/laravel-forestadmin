@@ -453,6 +453,34 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testUpdateSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        $this->getBook()->save();
+        $book = Book::first();
+        $params = [
+            'data' => [
+                'id'            => $book->id,
+                'attributes'    => [
+                    'reference'  => 'new label-hard',
+                ],
+            ],
+            'type' => 'books',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->put('/forest/book/' . $book->id, $params);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $attributes = $data['data']['attributes'];
+
+        $this->assertEquals('new label', $attributes['label']);
+        $this->assertEquals('hard', $attributes['difficulty']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testUpdatePermissionDenied(): void
     {
         $this->makeScopeManager($this->forestUser);
