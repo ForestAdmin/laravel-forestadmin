@@ -881,6 +881,50 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testSortAscOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => 'reference'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::orderBy('label')->first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::orderBy('label')->get()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortDescOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => '-reference'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::orderBy('label', 'desc')->first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::orderBy('label', 'desc')->get()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testFiltersWithQueryBuilder(): void
     {
         $this->makeScopeManager($this->forestUser);

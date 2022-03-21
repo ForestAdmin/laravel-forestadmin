@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -52,7 +53,8 @@ class Book extends Model
     public function reference(): SmartField
     {
         return $this->smartField(['type' => 'String'])
-            ->get(fn() => $this->label . '-' . $this->difficulty);
+            ->get(fn() => $this->label . '-' . $this->difficulty)
+            ->sort(fn(Builder $query, string $direction) => $query->orderBy('label'));
     }
 
     /**
