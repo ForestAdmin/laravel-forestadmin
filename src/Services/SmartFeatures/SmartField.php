@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
+use Illuminate\Database\Eloquent\Builder;
+
 /**
  * Class SmartField
  *
@@ -12,27 +14,27 @@ namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 class SmartField extends AbstractField
 {
     /**
-     * @var mixed
+     * @var \Closure
      */
     public \Closure $get;
 
     /**
-     * @var mixed
+     * @var \Closure
      */
     public \Closure $set;
 
     /**
-     * @var mixed
+     * @var \Closure
      */
     public \Closure $sort;
 
     /**
-     * @var mixed
+     * @var \Closure
      */
     public \Closure $filter;
 
     /**
-     * @var mixed
+     * @var \Closure
      */
     public \Closure $search;
 
@@ -42,6 +44,20 @@ class SmartField extends AbstractField
     public function __construct(array $attributes)
     {
         parent::__construct($attributes);
+
+        $this->initializeClosures();
+    }
+
+    /**
+     * @return void
+     */
+    private function initializeClosures(): void
+    {
+        $this->get = fn() => null;
+        $this->set = fn () => null;
+        $this->sort = fn (Builder $query, string $direction) => $query;
+        $this->filter = fn (Builder $query, $value, string $operator, string $aggregator) => $query;
+        $this->search = fn (Builder $query, $value) => $query;
     }
 
     /**

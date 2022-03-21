@@ -66,7 +66,7 @@ class JsonApiResponseTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->get();
         $render = $jsonApi->render($books, 'Book');
@@ -89,7 +89,7 @@ class JsonApiResponseTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->paginate();
         $render = $jsonApi->render($books, 'Book');
@@ -112,7 +112,7 @@ class JsonApiResponseTest extends TestCase
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->first();
 
@@ -161,14 +161,15 @@ class JsonApiResponseTest extends TestCase
         $book1->setRelation('category', $category);
         $book2 = Book::create(['label' => 'bar', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 50.00, 'options' => [], 'category_id' => 1]);
         $book2->setRelation('category', $category);
-
         return [
             'type'          => 'Book',
             'id'            => (string) $book1->id,
             'attributes'    => [
                 'label'       => $book1->label,
                 'comment'     => $book1->comment,
+                'difficulty'  => $book1->difficulty,
                 'category_id' => (string) $category->id,
+                'reference'   => call_user_func($book1->reference()->get)
             ],
             'relationships' => [
                 'category' => [

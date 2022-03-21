@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,6 +45,15 @@ class Book extends Model
         'category_id',
         'published_at',
     ];
+
+    /**
+     * @return SmartField
+     */
+    public function reference(): SmartField
+    {
+        return $this->smartField(['type' => 'String'])
+            ->get(fn() => $this->label . '-' . $this->difficulty);
+    }
 
     /**
      * @return Collection

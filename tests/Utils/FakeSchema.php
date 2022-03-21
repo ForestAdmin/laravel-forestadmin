@@ -146,6 +146,23 @@ trait FakeSchema
                             "validations"   => [],
                             "relationship"  => "HasOne",
                         ],
+                        [
+                            "field"         => "reference",
+                            "type"          => "String",
+                            "default_value" => null,
+                            "enums"         => null,
+                            "integration"   => null,
+                            "is_filterable" => false,
+                            "is_read_only"  => false,
+                            "is_required"   => false,
+                            "is_sortable"   => false,
+                            "is_virtual"    => true,
+                            "is_searchable" => null,
+                            "reference"     => null,
+                            "inverse_of"    => null,
+                            "widget"        => null,
+                            "validations"   => [],
+                        ],
                     ],
                     "actions" => [
                         [
