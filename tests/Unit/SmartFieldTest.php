@@ -97,12 +97,39 @@ class SmartFieldTest extends TestCase
         $smartField->search(fn(Builder $query, $value) => $query->whereRaw("LOWER(label) LIKE LOWER(?)", ['%' . $value . '%']));
         $resultCall = call_user_func($smartField->search, Book::query(), 'foo');
         $expected = [
-            'type'     => 'raw',
-            'sql'   => 'LOWER(label) LIKE LOWER(?)',
-            'boolean'  => 'and',
+            'type'    => 'raw',
+            'sql'     => 'LOWER(label) LIKE LOWER(?)',
+            'boolean' => 'and',
         ];
 
         $this->assertInstanceOf(Builder::class, $resultCall);
         $this->assertEquals($expected, $resultCall->getQuery()->wheres[0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testSerialize(): void
+    {
+        $smartField = new SmartField(['field' => 'reference', 'type' => 'String']);
+        $result = $smartField->serialize();
+        $expected = [
+            'field'         => 'reference',
+            'type'          => 'String',
+            'default_value' => null,
+            'enums'         => null,
+            'integration'   => null,
+            'is_filterable' => false,
+            'is_read_only'  => false,
+            'is_required'   => false,
+            'is_sortable'   => false,
+            'is_virtual'    => true,
+            'reference'     => null,
+            'inverse_of'    => null,
+            'validations'   => [],
+        ];
+
+        $this->assertIsArray($result);
+        $this->assertEquals($expected, $result);
     }
 }
