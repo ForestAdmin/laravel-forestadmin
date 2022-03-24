@@ -27,4 +27,18 @@ class SmartFeaturesHandler
 
         return $model;
     }
+
+    /**
+     * @param Model $model
+     * @return Model
+     */
+    public function handleSmartRelationships(Model $model): Model
+    {
+        $smartRelationships = ForestSchema::getSmartRelationships(strtolower(class_basename($model)));
+        foreach ($smartRelationships as $smartRelationship) {
+            $model->setRelation($smartRelationship['field'], call_user_func($model->{$smartRelationship['field']}()->get));
+        }
+
+        return $model;
+    }
 }

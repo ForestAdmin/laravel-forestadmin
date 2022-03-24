@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  *
  * @method static Model handleSmartFields(Model $model)
+ * @method static Model handleSmartRelationships(Model $model)
  *
  * @see SmartFeaturesHandler
  */
