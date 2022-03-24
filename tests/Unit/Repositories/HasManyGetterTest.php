@@ -10,8 +10,10 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\File;
 use Mockery as m;
 
 /**
@@ -24,6 +26,7 @@ use Mockery as m;
 class HasManyGetterTest extends TestCase
 {
     use FakeData;
+    use FakeSchema;
     use ScopeManagerFactory;
 
     /**
@@ -48,6 +51,8 @@ class HasManyGetterTest extends TestCase
         );
         //--- push instance of ScopeManager in App ---//
         $this->makeScopeManager($forestUser);
+
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
     }
 
     /**
