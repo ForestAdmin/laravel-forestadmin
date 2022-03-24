@@ -94,6 +94,12 @@ class ForestSchemaInstrospection
     {
         $collection = Str::camel($collection);
         $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.relationship == 'HasMany' or @.relationship == 'BelongsToMany')].field");
+        $smartRelationships = $this->getSmartRelationships($collection);
+        foreach ($smartRelationships as $relationship) {
+            if (is_array($relationship['type'])) {
+                $data[] = $relationship['field'];
+            }
+        }
 
         return $data ?: [];
     }

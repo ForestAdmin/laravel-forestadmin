@@ -54,10 +54,10 @@ class SmartField extends AbstractField
     private function initializeClosures(): void
     {
         $this->get = fn() => null;
-        $this->set = fn () => null;
-        $this->sort = fn (Builder $query, string $direction) => $query;
-        $this->filter = fn (Builder $query, $value, string $operator, string $aggregator) => $query;
-        $this->search = fn (Builder $query, $value) => $query;
+        $this->set = fn() => null;
+        $this->sort = fn(Builder $query, string $direction) => $query;
+        $this->filter = fn(Builder $query, $value, string $operator, string $aggregator) => $query;
+        $this->search = fn(Builder $query, $value) => $query;
     }
 
     /**

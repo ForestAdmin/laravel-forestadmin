@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +38,7 @@ class HasManyGetter extends ResourceGetter
      * @param Model  $model
      * @param string $relation
      * @param        $parentId
+     * @throws \Exception
      */
     public function __construct(Model $model, string $relation, $parentId)
     {
@@ -52,6 +54,11 @@ class HasManyGetter extends ResourceGetter
      */
     public function all(bool $paginate = true): LengthAwarePaginator
     {
+        $smartRelationships = ForestSchema::getSmartRelationships(class_basename($this->model));
+        if (isset($smartRelationships[$this->relation])) {
+            return call_user_func($this->model->{$this->relation}()->get, $this->parentInstance->id);
+        }
+
         $relatedModel = $this->parentInstance->{$this->relation}()->getRelated();
         $pageParams = $this->params['page'] ?? [];
         $relation = $this->parentInstance->{$this->relation}();

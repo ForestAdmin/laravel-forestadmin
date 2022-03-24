@@ -19,9 +19,9 @@ abstract class AbstractField implements FieldContract
     protected string $field;
 
     /**
-     * @var string
+     * @var string|array
      */
-    protected string $type;
+    protected string|array $type;
 
     /**
      * @var string|null
@@ -84,7 +84,6 @@ abstract class AbstractField implements FieldContract
     public function __construct(array $attributes)
     {
         $this->field = $attributes['field'];
-        $this->type = Str::ucfirst($attributes['type']) ?? 'String';
         $this->is_required = $attributes['is_required'] ?? false;
         $this->is_read_only = $attributes['is_read_only'] ?? false;
         $this->is_filterable = $attributes['is_filterable'] ?? false;
@@ -93,6 +92,12 @@ abstract class AbstractField implements FieldContract
         $this->default_value = null;
         $this->enums = $attributes['enums'] ?? null;
         $this->is_virtual = true;
+
+        if (!is_array($attributes['type'])) {
+            $this->type = Str::ucfirst($attributes['type']) ?? 'String';
+        } else {
+            $this->type = $attributes['type'];
+        }
 
         // TODO check if useless
         $this->integration = null;

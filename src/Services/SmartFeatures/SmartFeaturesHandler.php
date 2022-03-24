@@ -36,7 +36,10 @@ class SmartFeaturesHandler
     {
         $smartRelationships = ForestSchema::getSmartRelationships(strtolower(class_basename($model)));
         foreach ($smartRelationships as $smartRelationship) {
-            $model->setRelation($smartRelationship['field'], call_user_func($model->{$smartRelationship['field']}()->get));
+            //--- only belongsTo relation ---//
+            if (!is_array($smartRelationship['type'])) {
+                $model->setRelation($smartRelationship['field'], call_user_func($model->{$smartRelationship['field']}()->get));
+            }
         }
 
         return $model;

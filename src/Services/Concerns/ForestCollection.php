@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use Illuminate\Support\Collection;
 
 /**
@@ -71,5 +72,18 @@ trait ForestCollection
 
 
         return new SmartField($attributes);
+    }
+
+    /**
+     * @param array $attributes
+     * @return SmartField
+     */
+    public function smartRelationship(array $attributes): SmartRelationship
+    {
+        [$one, $field] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $attributes['field'] = $field['function'];
+
+
+        return new SmartRelationship($attributes);
     }
 }
