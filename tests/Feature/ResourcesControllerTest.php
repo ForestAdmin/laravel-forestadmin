@@ -14,6 +14,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -220,7 +221,7 @@ class ResourcesControllerTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Http\Response::class, $call->baseResponse);
         $this->assertEquals($params['header'], $data[0]);
-        $this->assertEquals(implode(',', $book->toArray()), $data[1]);
+        $this->assertEquals(implode(',', $book->toArray()), str_replace('"', '', $data[1]));
     }
 
     /**
@@ -939,7 +940,7 @@ class ResourcesControllerTest extends TestCase
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertCount(1, $data['data']);
+        $this->assertCount(Book::where('label', $book->label)->count(), $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
     }
