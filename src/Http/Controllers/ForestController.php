@@ -7,7 +7,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
-
 /**
  * Class ForestController
  *
