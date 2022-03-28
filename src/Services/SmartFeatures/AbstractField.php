@@ -99,7 +99,6 @@ abstract class AbstractField implements FieldContract
             $this->type = $attributes['type'];
         }
 
-        // TODO check if useless
         $this->integration = null;
         $this->inverse_of = null;
         $this->validations = [];
