@@ -3,9 +3,11 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
@@ -85,5 +87,34 @@ trait ForestCollection
 
 
         return new SmartRelationship($attributes);
+    }
+
+    /**
+     * @return Model
+     */
+    public function handleSmartFields(): Model
+    {
+        $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($this)));
+        foreach ($smartFields as $smartField) {
+            $this->{$smartField['field']} = call_user_func($this->{$smartField['field']}()->get);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function handleSmartRelationships(): Model
+    {
+        $smartRelationships = ForestSchema::getSmartRelationships(strtolower(class_basename($this)));
+        foreach ($smartRelationships as $smartRelationship) {
+            //--- only belongsTo relation ---//
+            if (!is_array($smartRelationship['type'])) {
+                $this->setRelation($smartRelationship['field'], call_user_func($this->{$smartRelationship['field']}()->get));
+            }
+        }
+
+        return $this;
     }
 }

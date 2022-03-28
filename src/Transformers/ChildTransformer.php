@@ -2,7 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
-use ForestAdmin\LaravelForestAdmin\Facades\SmartFeatures;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
@@ -21,7 +20,9 @@ class ChildTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
-        $model = SmartFeatures::handleSmartFields($model);
+        if (method_exists($model, 'smartActions')) {
+            $model->handleSmartFields()->handleSmartRelationships();
+        }
 
         return $model->attributesToArray();
     }
