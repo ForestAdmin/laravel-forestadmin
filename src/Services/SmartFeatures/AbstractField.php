@@ -21,7 +21,7 @@ abstract class AbstractField implements FieldContract
     /**
      * @var string|array
      */
-    protected string|array $type;
+    protected $type;
 
     /**
      * @var string|null
