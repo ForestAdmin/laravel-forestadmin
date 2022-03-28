@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +74,28 @@ class Book extends Model
                     }
 
                     return $query;
+                }
+            );
+    }
+
+    /**
+     * @return SmartRelationship
+     */
+    public function smartBookstores(): SmartRelationship
+    {
+        return $this->smartRelationship(
+            [
+                'type' => ['String'],
+                'reference' => 'bookstore.id'
+            ]
+        )
+            ->get(
+                static function ($id) {
+                    return Bookstore::select('bookstores.*')
+                        ->leftJoin('companies', 'companies.id', '=', 'bookstores.company_id')
+                        ->leftJoin('books', 'companies.book_id', '=', 'books.id')
+                        ->where('books.id', $id)
+                        ->paginate();
                 }
             );
     }
