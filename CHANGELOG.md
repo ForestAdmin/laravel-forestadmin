@@ -1,3 +1,10 @@
+# [1.0.0-beta.6](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2022-03-28)
+
+
+### Features
+
+* **smart-field:** added smart-fields and smart-relationships support ([#28](https://github.com/ForestAdmin/laravel-forestadmin/issues/28)) ([ee09b7c](https://github.com/ForestAdmin/laravel-forestadmin/commit/ee09b7c2ad08b4dc6f7e49dc6f03e641e62b3c9a))
+
 # [1.0.0-beta.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2022-03-16)
 
 
