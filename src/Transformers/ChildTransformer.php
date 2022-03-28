@@ -20,6 +20,10 @@ class ChildTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
+        if (method_exists($model, 'smartActions')) {
+            $model->handleSmartFields()->handleSmartRelationships();
+        }
+
         return $model->attributesToArray();
     }
 }

@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
@@ -66,7 +67,7 @@ class JsonApiResponseTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->get();
         $render = $jsonApi->render($books, 'Book');
@@ -89,7 +90,7 @@ class JsonApiResponseTest extends TestCase
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->paginate();
         $render = $jsonApi->render($books, 'Book');
@@ -112,7 +113,7 @@ class JsonApiResponseTest extends TestCase
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id')
+        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
             ->with('category:categories.id')
             ->first();
 
@@ -125,6 +126,15 @@ class JsonApiResponseTest extends TestCase
             ]
         ];
 
+        //--- test smartRelationship HasMany ---//
+        $smartBookstores = [
+            "links" => [
+                "related" => [
+                    "href" => "/forest/book/1/relationships/smartBookstores",
+                ],
+            ]
+        ];
+
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('included', $render);
@@ -133,6 +143,55 @@ class JsonApiResponseTest extends TestCase
         $this->assertEquals($data['attributes'], $render['data']['attributes']);
         $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
         $this->assertEquals($comments, $render['data']['relationships']['comments']);
+        $this->assertEquals($smartBookstores, $render['data']['relationships']['smartBookstores']);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testRenderItemSmartBelongsTo(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        $this->addDatabaseContent();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $movie = Movie::first();
+        $render = $jsonApi->render($movie, 'Movie');
+        $included = [
+            [
+                'type'       => 'Category',
+                'id'         => (string) $movie->book->category->id,
+                'attributes' => [
+                    'label'      => $movie->book->category->label,
+                    'created_at' => $movie->book->category->created_at->jsonSerialize(),
+                    'updated_at' => $movie->book->category->updated_at->jsonSerialize(),
+                ],
+            ],
+        ];
+        $attributes = [
+            'body'       => $movie->body,
+            'book_id'    => $movie->book_id,
+            'created_at' => $movie->created_at->jsonSerialize(),
+            'updated_at' => $movie->updated_at->jsonSerialize(),
+        ];
+        //--- test smartRelationship HasMany ---//
+        $smartCategory = [
+            'data' => [
+                'type' => 'Category',
+                'id'   => '1',
+            ],
+        ];
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('included', $render);
+        $this->assertEquals($included, $render['included']);
+        $this->assertEquals('Movie', $render['data']['type']);
+        $this->assertEquals($movie->id, $render['data']['id']);
+        $this->assertEquals($attributes, $render['data']['attributes']);
+        $this->assertEquals($smartCategory, $render['data']['relationships']['smartCategory']);
     }
 
     /**
@@ -159,8 +218,16 @@ class JsonApiResponseTest extends TestCase
         $category = Category::create(['label' => 'category1']);
         $book1 = Book::create(['label' => 'foo', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 100.00, 'options' => [], 'category_id' => 1]);
         $book1->setRelation('category', $category);
+        $book1->movies()->saveMany([
+            new Movie(['body' => 'foo body 1']),
+            new Movie(['body' => 'foo body 2']),
+        ]);
         $book2 = Book::create(['label' => 'bar', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 50.00, 'options' => [], 'category_id' => 1]);
         $book2->setRelation('category', $category);
+        $book1->movies()->saveMany([
+            new Movie(['body' => 'foo body 3']),
+            new Movie(['body' => 'foo body 4']),
+        ]);
 
         return [
             'type'          => 'Book',
@@ -168,7 +235,9 @@ class JsonApiResponseTest extends TestCase
             'attributes'    => [
                 'label'       => $book1->label,
                 'comment'     => $book1->comment,
+                'difficulty'  => $book1->difficulty,
                 'category_id' => (string) $category->id,
+                'reference'   => call_user_func($book1->reference()->get)
             ],
             'relationships' => [
                 'category' => [
@@ -183,6 +252,13 @@ class JsonApiResponseTest extends TestCase
                             'href' => '/forest/book/1/relationships/comments'
                         ]
                     ],
+                ],
+                'smartBookstores' => [
+                    'links' => [
+                        'related' => [
+                            'href' => '/forest/book/1/relationships/smartBookstores',
+                        ],
+                    ]
                 ]
             ],
         ];

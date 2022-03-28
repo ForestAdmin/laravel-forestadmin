@@ -25,6 +25,7 @@ class ResourceGetter extends BaseRepository
 
     /**
      * @param Model $model
+     * @throws \Exception
      */
     public function __construct(Model $model)
     {

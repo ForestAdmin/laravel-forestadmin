@@ -240,7 +240,7 @@ class QueryBuilderTest extends TestCase
     public function handleSearchField($field, $fieldType, $value)
     {
         $model = $this->getLaravelModel();
-        $field = ['field' => $field, 'type' => $fieldType];
+        $field = ['field' => $field, 'type' => $fieldType, 'is_virtual' => false];
         $data = ['search' => $value];
         $queryBuilder = m::mock(QueryBuilder::class, [$model, $data])->makePartial();
         $builder = new EloquentQueryBuilder(new Builder($model->getConnection()));

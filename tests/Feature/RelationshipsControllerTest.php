@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Bookstore;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Editor;
@@ -106,6 +107,29 @@ class RelationshipsControllerTest extends TestCase
         $this->assertEquals('Comment', $data['data'][0]['type']);
         $this->assertEquals($comment->id, $data['data'][0]['id']);
         $this->assertEquals($comment->body, $data['data'][0]['attributes']['body']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexSmartRelationship(): void
+    {
+        $this->getBook()->save();
+        $this->getBookstores();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $call = $this->get('/forest/book/1/relationships/smartBookstores');
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $bookstore = Bookstore::first();
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('bookstore', $data['data'][0]['type']);
+        $this->assertEquals($bookstore->id, $data['data'][0]['id']);
+        $this->assertEquals($bookstore->label, $data['data'][0]['attributes']['label']);
+        $this->assertEquals($bookstore->company_id, $data['data'][0]['attributes']['company_id']);
     }
 
     /**

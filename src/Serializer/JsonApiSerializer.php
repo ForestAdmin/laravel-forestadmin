@@ -24,8 +24,8 @@ class JsonApiSerializer extends FractalJsonApiSerializer
 
         $resource = [
             'data' => [
-                'type' => $resourceKey,
-                'id' => "$id",
+                'type'       => $resourceKey,
+                'id'         => "$id",
                 'attributes' => $data,
             ],
         ];

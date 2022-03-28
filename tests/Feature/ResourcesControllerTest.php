@@ -453,6 +453,34 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testUpdateSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        $this->getBook()->save();
+        $book = Book::first();
+        $params = [
+            'data' => [
+                'id'            => $book->id,
+                'attributes'    => [
+                    'reference'  => 'new label-hard',
+                ],
+            ],
+            'type' => 'books',
+        ];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->put('/forest/book/' . $book->id, $params);
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $attributes = $data['data']['attributes'];
+
+        $this->assertEquals('new label', $attributes['label']);
+        $this->assertEquals('hard', $attributes['difficulty']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testUpdatePermissionDenied(): void
     {
         $this->makeScopeManager($this->forestUser);
@@ -881,6 +909,50 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testSortAscOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => 'reference'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::orderBy('label')->first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::orderBy('label')->get()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testSortDescOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => '-reference'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals(Book::orderBy('label', 'desc')->first()->id, $data['data'][0]['id']);
+        $this->assertEquals(Book::orderBy('label', 'desc')->get()->last()->id, $data['data'][1]['id']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testFiltersWithQueryBuilder(): void
     {
         $this->makeScopeManager($this->forestUser);
@@ -929,6 +1001,33 @@ class ResourcesControllerTest extends TestCase
         $this->assertCount(1, $data['data']);
         $this->assertEquals('book', $data['data'][0]['type']);
         $this->assertEquals('hard', $data['data'][0]['attributes']['difficulty']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testFiltersOnSmartField(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 0; $i < 2; $i++) {
+            $this->getBook()->save();
+        }
+        $book = Book::first();
+        $book->label = 'my favorite book';
+        $book->difficulty = 'easy';
+        $book->save();
+
+        $params = ['fields' => ['book' => 'id,label,reference'], 'filters' => '{"field":"reference","operator":"equal","value":"my favorite book-easy"}'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/book?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertCount(1, $data['data']);
+        $this->assertEquals('book', $data['data'][0]['type']);
+        $this->assertEquals('my favorite book', $data['data'][0]['attributes']['label']);
     }
 
     /**

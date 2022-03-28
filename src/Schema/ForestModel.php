@@ -7,6 +7,9 @@ use Doctrine\DBAL\Types\Types;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\CustomFields;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\DataTypes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -124,6 +127,8 @@ class ForestModel
     public function getFields(): array
     {
         $fields = $this->fetchFieldsFromTable();
+        $fields = $fields->merge($this->fetchSmartFields());
+        $fields = $fields->merge($this->fetchSmartRelationships());
 
         $schemaFields = method_exists($this->model, 'schemaFields') ? $this->model->schemaFields() : [];
         foreach ($schemaFields as $field) {
@@ -370,6 +375,42 @@ class ForestModel
     }
 
     /**
+     * @return Collection
+     */
+    public function fetchSmartFields(): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartFields = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartField::class && $method->getName() !== 'smartField') {
+                $serialize = $this->model->{$method->getName()}()->serialize();
+                $smartFields->put($serialize['field'], $serialize);
+            }
+        }
+
+        return $smartFields;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function fetchSmartRelationships(): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartFields = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartRelationship::class && $method->getName() !== 'smartRelationship') {
+                $serialize = $this->model->{$method->getName()}()->serialize();
+                $smartFields->put($serialize['field'], $serialize);
+            }
+        }
+
+        return $smartFields;
+    }
+
+    /**
      * @param Collection $fields
      * @param array      $relations
      * @return Collection
@@ -387,7 +428,7 @@ class ForestModel
                     $field = array_merge(
                         $field,
                         [
-                            'field'      => $relation->getRelationName(),
+                            'field' => $relation->getRelationName(),
                         ]
                     );
                     $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
@@ -397,7 +438,7 @@ class ForestModel
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => $name,
+                            'field' => $name,
                         ]
                     );
                     $name = $relation->getRelated()->getTable();
@@ -427,7 +468,7 @@ class ForestModel
     {
         return [
             'field'         => $name,
-            'type'          => 'string',
+            'type'          => 'String',
             'default_value' => null,
             'enums'         => null,
             'integration'   => null,

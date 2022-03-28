@@ -214,7 +214,7 @@ class SmartActionControllerTest extends TestCase
             'fields' => [
                 [
                     'field'         => 'token',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,
@@ -226,7 +226,7 @@ class SmartActionControllerTest extends TestCase
                 ],
                 [
                     'field'         => 'foo',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,

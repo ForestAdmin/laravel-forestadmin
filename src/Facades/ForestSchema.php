@@ -15,6 +15,8 @@ use JsonPath\JsonObject;
  *
  * @method static JsonObject getSchema()
  * @method static array getFields(string $collection)
+ * @method static array getSmartFields(string $collection)
+ * @method static array getSmartRelationships(string $collection)
  * @method static null|string getTypeByField(string $collection, string $field)
  * @method static array getRelatedData(string $collection)
  *

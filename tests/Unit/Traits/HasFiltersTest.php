@@ -389,6 +389,7 @@ class HasFiltersTest extends TestCase
      */
     public function testCallFilterException(): void
     {
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $timezone = new \DateTimeZone('UTC');
         $data = [
             [

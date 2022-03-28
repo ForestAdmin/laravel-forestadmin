@@ -71,8 +71,8 @@ class HasSearchTest extends TestCase
 
         $getFields = $this->invokeMethod($trait, 'getFieldsToSearch', [$model]);
 
-        $this->assertCount(3, $getFields);
-        $this->assertEquals([$fields[0], $fields[1], $fields[2]], $getFields);
+        $this->assertCount(4, $getFields);
+        $this->assertEquals([$fields[0], $fields[1], $fields[2], $fields[3]], $getFields);
     }
 
     /**

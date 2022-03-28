@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -21,7 +22,12 @@ trait HasSort
     protected function appendSort(Builder $query, string $sort): void
     {
         [$sortBy, $direction] = $this->sortByAndDirection($sort);
-        $query->orderBy($sortBy, $direction);
+        $smartFields = ForestSchema::getSmartFields(class_basename($this->model));
+        if (isset($smartFields[$sortBy])) {
+            call_user_func($this->model->{$sortBy}()->sort, $query, $direction);
+        } else {
+            $query->orderBy($sortBy, $direction);
+        }
     }
 
     /**

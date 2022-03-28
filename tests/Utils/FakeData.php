@@ -3,8 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
 
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Bookstore;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Company;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
 use Illuminate\Support\Carbon;
@@ -37,6 +39,22 @@ trait FakeData
         $book->setRelation('category', $category);
 
         return $book;
+    }
+
+    /**
+     * @return void
+     */
+    public function getBookstores(): void
+    {
+        $company = new Company();
+        $company->name = 'company-foo';
+        $company->book_id = 1;
+        $company->save();
+
+        $bookstore = new Bookstore();
+        $bookstore->label = 'bookstore-foo';
+        $bookstore->company_id = $company->id;
+        $bookstore->save();
     }
 
     /**

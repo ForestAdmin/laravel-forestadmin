@@ -2,7 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\BindingResolutionException;

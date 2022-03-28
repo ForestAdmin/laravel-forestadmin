@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
@@ -41,11 +42,21 @@ class BaseTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
+        $smartRelationships = ForestSchema::getSmartRelationships(class_basename($model));
+        if (method_exists($model, 'smartActions')) {
+            $model->handleSmartFields()->handleSmartRelationships();
+        }
+
         $relations = collect($model->getRelations())->filter()->all();
         $this->setDefaultIncludes(array_keys($relations));
 
         foreach ($relations as $key => $value) {
-            $this->addMethod('include' . Str::ucfirst($key), fn() => $this->item($value, new ChildTransformer(), Str::ucfirst($key)));
+            $resourceKey = $key;
+            if (isset($smartRelationships[$key])) {
+                //--- force key name as an existing model for include smartRelationship ---//
+                $resourceKey = Str::before($smartRelationships[$key]['reference'], '.');
+            }
+            $this->addMethod('include' . Str::ucfirst($key), fn() => $this->item($value, new ChildTransformer(), Str::ucfirst($resourceKey)));
         }
 
         return $model->attributesToArray();
