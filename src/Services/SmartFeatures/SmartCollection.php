@@ -46,12 +46,7 @@ class SmartCollection
      */
     public function serializeFields(): array
     {
-        return $this->fields()->mapWithKeys(
-            function ($item) {
-                $data = $item->serialize();
-                return [$data['field'] => $data];
-            }
-        )->all();
+        return $this->fields()->map(fn ($item) => $item->serialize())->all();
     }
 
     /**
