@@ -12,7 +12,6 @@ use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
