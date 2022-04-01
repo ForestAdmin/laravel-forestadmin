@@ -159,5 +159,4 @@ class SmartCollectionTest extends TestCase
 
         return $smartCollection;
     }
-
 }
