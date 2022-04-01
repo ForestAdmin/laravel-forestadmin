@@ -46,7 +46,9 @@ class SmartCollection
      */
     public function serializeFields(): array
     {
-        return $this->fields()->map(fn ($item) => $item->serialize())->all();
+        $this->isValid();
+
+        return $this->fields()->map(fn($item) => $item->serialize())->all();
     }
 
     /**
@@ -66,5 +68,19 @@ class SmartCollection
             'fields'                 => $this->serializeFields(),
             'actions'                => [],
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        $filter = $this->fields()->filter(fn($item) => $item instanceof SmartField ? null : $item);
+
+        if (!empty($filter->all())) {
+            throw new ForestException("Each field of a SmartCollection must be an instance of SmartField");
+        }
+
+        return true;
     }
 }
