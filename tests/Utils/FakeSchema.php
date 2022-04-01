@@ -185,6 +185,7 @@ trait FakeSchema
                         [
                             "id"       => "Book.smart action single",
                             "name"     => "smart action single",
+                            "methodName" => "smartActionSingle",
                             "fields"   => [],
                             "endpoint" => "\/forest\/smart-actions\/book_smart-action-single",
                             "type"     => "single",
@@ -197,6 +198,7 @@ trait FakeSchema
                         [
                             "id"       => "Book.smart action bulk",
                             "name"     => "smart action bulk",
+                            "methodName" => "smartActionBulk",
                             "fields"   => [],
                             "endpoint" => "\/forest\/smart-actions\/book_smart-action-bulk",
                             "type"     => "bulk",
