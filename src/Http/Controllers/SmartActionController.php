@@ -5,13 +5,10 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Str;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Class SmartActionController
@@ -41,7 +38,8 @@ class SmartActionController extends ForestController
     {
         [$collection, $name] = explode('_', $route->parameter('action'));
         $this->collection = Schema::getModel($collection);
-        $this->smartAction = $this->collection->getSmartAction($name);
+        $smartActionName = $this->collection->getSmartAction($name)['methodName'];
+        $this->smartAction = $this->collection->{$smartActionName}();
 
         if ($type = $route->parameter('hook')) {
             return $type === 'load' ? $this->executeLoadHook() : $this->executeChangeHook();

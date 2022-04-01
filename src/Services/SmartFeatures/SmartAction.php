@@ -64,18 +64,25 @@ class SmartAction
     protected array $change = [];
 
     /**
-     * @param string  $model
-     * @param string  $name
-     * @param string  $type
-     * @param Closure $execute
+     * @var string
      */
-    public function __construct(string $model, string $name, string $type, Closure $execute)
+    protected string $methodName;
+
+    /**
+     * @param string      $model
+     * @param string      $name
+     * @param string      $type
+     * @param Closure     $execute
+     * @param string|null $methodName
+     */
+    public function __construct(string $model, string $name, string $type, Closure $execute, ?string $methodName = null)
     {
         $this->model = $model;
         $this->name = $name;
         $this->type = $type;
         $this->execute = $execute;
         $this->fields = collect();
+        $this->methodName = $methodName ?? '';
     }
 
     /**
@@ -106,7 +113,7 @@ class SmartAction
      */
     public function getField(string $key): SmartActionField
     {
-        $field = $this->fields->first(fn ($field) => $field->getField() === $key);
+        $field = $this->fields->first(fn($field) => $field->getField() === $key);
         if (null !== $field) {
             return $field;
         } else {
@@ -223,13 +230,14 @@ class SmartAction
     public function serialize(): array
     {
         return [
-            'id'       => $this->model . '.' . $this->name,
-            'name'     => $this->name,
-            'fields'   => $this->fields->map(fn($item) => $item->serialize())->all(),
-            'endpoint' => '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey(),
-            'type'     => $this->type,
-            'download' => $this->download,
-            'hooks'    => $this->hooks(),
+            'id'         => $this->model . '.' . $this->name,
+            'name'       => $this->name,
+            'methodName' => $this->methodName,
+            'fields'     => $this->fields->map(fn($item) => $item->serialize())->all(),
+            'endpoint'   => '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey(),
+            'type'       => $this->type,
+            'download'   => $this->download,
+            'hooks'      => $this->hooks(),
         ];
     }
 }

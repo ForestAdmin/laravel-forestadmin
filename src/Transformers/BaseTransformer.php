@@ -43,7 +43,7 @@ class BaseTransformer extends TransformerAbstract
     public function transform(Model $model)
     {
         $smartRelationships = ForestSchema::getSmartRelationships(class_basename($model));
-        if (method_exists($model, 'smartActions')) {
+        if (method_exists($model, 'handleSmartFields')) {
             $model->handleSmartFields()->handleSmartRelationships();
         }
 
