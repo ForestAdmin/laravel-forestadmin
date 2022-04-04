@@ -1,3 +1,10 @@
+# [1.0.0-beta.7](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2022-04-04)
+
+
+### Features
+
+* **smart-collections:** add smart-collections support ([1e9f7a7](https://github.com/ForestAdmin/laravel-forestadmin/commit/1e9f7a7ab9882baa16d379e04e2bd186e20d060d))
+
 # [1.0.0-beta.6](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2022-03-28)
 
 
