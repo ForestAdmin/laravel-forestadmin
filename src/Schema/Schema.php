@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Schema;
 use Composer\Autoload\ClassMapGenerator;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Utils\Database;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
 use GuzzleHttp\Exception\GuzzleException;
@@ -108,6 +109,9 @@ class Schema
                     $model = app()->make($file);
                     $forestModel = new ForestModel($model);
                     $collections[] = $forestModel->serialize();
+                } elseif ($class->isSubclassOf(SmartCollection::class) && $class->isInstantiable()) {
+                    $smartCollection = app()->make($file);
+                    $collections[] = $smartCollection->serialize();
                 }
             }
         }

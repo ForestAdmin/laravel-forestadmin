@@ -7,9 +7,9 @@ use Doctrine\DBAL\Types\Types;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\CustomFields;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\DataTypes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -116,7 +116,7 @@ class ForestModel
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
-            'actions'                => $this->getSmartActions(),
+            'actions'                => $this->fetchSmartActions()->toArray(),
         ];
     }
 
@@ -140,21 +140,6 @@ class ForestModel
         }
 
         return $fields->values()->toArray();
-    }
-
-    /**
-     * @return array
-     * @throws Exception
-     */
-    public function getSmartActions(): array
-    {
-        $schemaSmartActions = [];
-        $smartActions = method_exists($this->model, 'smartActions') ? $this->model->smartActions() : [];
-        foreach ($smartActions as $smartAction) {
-            $schemaSmartActions[] = $smartAction->serialize();
-        }
-
-        return $schemaSmartActions;
     }
 
     /**
@@ -372,6 +357,23 @@ class ForestModel
         $fields = $fields->reject(fn($item) => $item['type'] === 'unknown');
 
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
+    }
+
+    /**
+     * @return Collection
+     */
+    public function fetchSmartActions(): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartActions = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartAction::class && $method->getName() !== 'smartAction') {
+                $smartActions->push($this->model->{$method->getName()}()->serialize());
+            }
+        }
+
+        return $smartActions;
     }
 
     /**

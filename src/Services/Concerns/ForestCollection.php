@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class ForestCollection
@@ -38,32 +39,6 @@ trait ForestCollection
     }
 
     /**
-     * @return Collection
-     * @codeCoverageIgnore
-     */
-    public function smartActions(): Collection
-    {
-        return collect();
-    }
-
-    /**
-     * @param string $name
-     * @return SmartAction
-     */
-    public function getSmartAction(string $name): SmartAction
-    {
-        $smartAction = $this->smartActions()->first(
-            fn ($item) => $item->getKey() === $name
-        );
-
-        if (null !== $smartAction) {
-            return $smartAction;
-        } else {
-            throw new ForestException("There is no smart-action $name");
-        }
-    }
-
-    /**
      * @param array $attributes
      * @return SmartField
      */
@@ -77,8 +52,39 @@ trait ForestCollection
     }
 
     /**
+     * @param $name
+     * @return mixed|void
+     */
+    public function getSmartAction($name)
+    {
+        $smartActions = ForestSchema::getSmartActions(strtolower(class_basename($this)));
+        foreach ($smartActions as $smartAction) {
+            if (Str::slug($smartAction['name']) === $name && method_exists($this, $smartAction['methodName'])) {
+                return $smartAction;
+            }
+        }
+
+        throw new ForestException("There is no smart-action $name");
+    }
+
+    /**
+     * @param string      $type
+     * @param \Closure    $execute
+     * @param string|null $name
+     * @return SmartAction
+     */
+    public function smartAction(string $type, \Closure $execute, ?string $name = null): SmartAction
+    {
+        [$one, $field] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $methodName = $field['function'];
+        $name = $name ?? $methodName;
+
+        return new SmartAction(class_basename($this), $name, $type, $execute, $methodName);
+    }
+
+    /**
      * @param array $attributes
-     * @return SmartField
+     * @return SmartRelationship
      */
     public function smartRelationship(array $attributes): SmartRelationship
     {

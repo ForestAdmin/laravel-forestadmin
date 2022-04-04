@@ -101,58 +101,50 @@ class Book extends Model
     }
 
     /**
-     * @return Collection
+     * @return SmartAction
      */
-    public function smartActions(): Collection
+    public function smartActionBulk(): SmartAction
     {
-        return collect(
-            [
-            App::makeWith(
-                SmartAction::class,
-                [
-                    'model'   => class_basename($this),
-                    'name'    => 'smart action bulk',
-                    'type'    => 'bulk',
-                    'execute' => function () {
-                        $ids = $this->getIdsFromBulkRequest();
-                        return ['success' => "ids => " . implode(',', $ids)];
-                    },
-                ]
-            ),
-            App::makeWith(
-                SmartAction::class,
-                [
-                    'model'   => class_basename($this),
-                    'name'    => 'smart action single',
-                    'type'    => 'single',
-                    'execute' => function () {
+        return $this->smartAction(
+            'bulk',
+            function () {
+                $ids = $this->getIdsFromBulkRequest();
+                return ['success' => "ids => " . implode(',', $ids)];
+            },
+            'smart action bulk'
+        );
+    }
 
-                        return ['success' => "Test working!"];
-                    },
-                ]
+    /**
+     * @return SmartAction
+     */
+    public function smartActionSingle(): SmartAction
+    {
+        return $this->smartAction(
+            'bulk',
+            fn () => ['success' => "Test working!"],
+            'smart action single'
+        )
+            ->addField(['field' => 'token', 'type' => 'string', 'is_required' => true])
+            ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])
+            ->load(
+                function () {
+                    $fields = $this->getFields();
+                    $fields['token']['value'] = 'default';
+
+                    return $fields;
+                }
             )
-                ->addField(['field' => 'token', 'type' => 'string', 'is_required' => true])
-                ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])
-                ->load(
-                    function () {
+            ->change(
+                [
+                    'onFooChange' => function () {
                         $fields = $this->getFields();
-                        $fields['token']['value'] = 'default';
+                        $fields['token']['value'] = 'Test onChange Foo';
 
                         return $fields;
                     }
-                )
-                ->change(
-                    [
-                        'onFooChange' => function () {
-                            $fields = $this->getFields();
-                            $fields['token']['value'] = 'Test onChange Foo';
-
-                            return $fields;
-                        }
-                    ]
-                ),
-            ]
-        );
+                ]
+            );
     }
 
     /**

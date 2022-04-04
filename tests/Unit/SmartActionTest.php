@@ -174,9 +174,10 @@ class SmartActionTest extends TestCase
     {
         $serialize = $this->buildSmartAction()->serialize();
         $result = [
-            'id'       => 'SmartActionTest.smart action',
-            'name'     => 'smart action',
-            'fields'   => [
+            'id'         => 'SmartActionTest.smart action',
+            'name'       => 'smart action',
+            'methodName' => 'smartAction',
+            'fields'     => [
                 [
                     'field'         => 'foo',
                     'type'          => 'String',
@@ -202,10 +203,10 @@ class SmartActionTest extends TestCase
                     'value'         => null,
                 ],
             ],
-            'endpoint' => '/forest/smart-actions/smartactiontest_smart-action',
-            'type'     => 'single',
-            'download' => false,
-            'hooks'    => [
+            'endpoint'   => '/forest/smart-actions/smartactiontest_smart-action',
+            'type'       => 'single',
+            'download'   => false,
+            'hooks'      => [
                 'load'   => true,
                 'change' => ['onFooChange'],
             ],
@@ -228,6 +229,7 @@ class SmartActionTest extends TestCase
                 'execute' => function () {
                     return ['success' => true];
                 },
+                'methodName' => 'smartAction',
             ]
         )
             ->load(
