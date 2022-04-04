@@ -69,20 +69,20 @@ class SmartAction
     protected string $methodName;
 
     /**
-     * @param string      $model
-     * @param string      $name
-     * @param string      $type
-     * @param Closure     $execute
-     * @param string|null $methodName
+     * @param string  $model
+     * @param string  $name
+     * @param string  $type
+     * @param Closure $execute
+     * @param string  $methodName
      */
-    public function __construct(string $model, string $name, string $type, Closure $execute, ?string $methodName = null)
+    public function __construct(string $model, string $name, string $type, Closure $execute, string $methodName)
     {
         $this->model = $model;
         $this->name = $name;
         $this->type = $type;
         $this->execute = $execute;
         $this->fields = collect();
-        $this->methodName = $methodName ?? '';
+        $this->methodName = $methodName;
     }
 
     /**

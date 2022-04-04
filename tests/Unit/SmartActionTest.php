@@ -176,7 +176,7 @@ class SmartActionTest extends TestCase
         $result = [
             'id'         => 'SmartActionTest.smart action',
             'name'       => 'smart action',
-            'methodName' => '',
+            'methodName' => 'smartAction',
             'fields'     => [
                 [
                     'field'         => 'foo',
@@ -229,6 +229,7 @@ class SmartActionTest extends TestCase
                 'execute' => function () {
                     return ['success' => true];
                 },
+                'methodName' => 'smartAction',
             ]
         )
             ->load(
