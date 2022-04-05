@@ -1,3 +1,10 @@
+# [1.0.0-beta.8](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2022-04-05)
+
+
+### Bug Fixes
+
+* authentication on production environment ([#30](https://github.com/ForestAdmin/laravel-forestadmin/issues/30)) ([3ba7872](https://github.com/ForestAdmin/laravel-forestadmin/commit/3ba78721dbe998e1007b1935486769e86f71be0a))
+
 # [1.0.0-beta.7](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2022-04-04)
 
 
