@@ -52,16 +52,21 @@ class RelationshipsController extends Controller
     protected string $parentId;
 
     /**
+     * @param $method
+     * @param $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function __construct()
+    public function callAction($method, $parameters)
     {
-        [$collection, $parentId, $relation] = array_values(request()->route()->parameters());
+        [$collection, $parentId, $relation] = array_values($parameters);
         $this->model = $this->getModel(ucfirst($collection));
         $this->name = (class_basename($this->model));
         $this->relationship = $relation;
         $this->relationName = (class_basename($this->model->$relation()->getRelated()));
         $this->parentId = $parentId;
+
+        return parent::callAction($method, $parameters);
     }
 
     /**
