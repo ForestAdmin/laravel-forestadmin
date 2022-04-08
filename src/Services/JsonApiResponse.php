@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use League\Fractal\Manager;
@@ -76,6 +77,20 @@ class JsonApiResponse
         $resource = new Item($data, $transformer, $name);
 
         return $this->fractal->createData($resource)->toArray();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function deactivateCountResponse(): JsonResponse
+    {
+        return response()->json(
+            [
+                'meta' => [
+                    'count' => 'deactivated'
+                ],
+            ]
+        );
     }
 
     /**

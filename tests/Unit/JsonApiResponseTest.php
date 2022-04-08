@@ -30,6 +30,16 @@ class JsonApiResponseTest extends TestCase
     use FakeSchema;
     use FakeData;
 
+    public function testDeactivateCountResponse()
+    {
+        $jsonApi = new JsonApiResponse();
+        $response = $jsonApi->deactivateCountResponse();
+        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(['meta' => ['count' => 'deactivated']], $content);
+    }
+
     /**
      * @return void
      * @throws \ReflectionException

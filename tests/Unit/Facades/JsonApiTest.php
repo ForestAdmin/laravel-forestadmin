@@ -88,5 +88,23 @@ class JsonApiTest extends TestCase
         $this->assertEquals($response, $facadeCall);
     }
 
-    public function 
+    public function testDeactivateCountResponse(): void
+    {
+        $response = response()->json([
+            'meta' => [
+                'count' => 'deactivated'
+            ],
+        ]);
+
+        $jsonApi = m::mock(JsonApiResponse::class)
+            ->shouldReceive('deactivateCountResponse')
+            ->once()
+            ->andReturn($response)
+            ->getMock();
+
+        app()->instance('json-api', $jsonApi);
+        $facadeCall = JsonApi::deactivateCountResponse();
+
+        $this->assertEquals($response, $facadeCall);
+    }
 }
