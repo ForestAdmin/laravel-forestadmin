@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
-use ForestAdmin\LaravelForestAdmin\Transformers\ChartTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as BaseCollection;
@@ -64,17 +63,17 @@ class JsonApiResponse
     }
 
     /**
-     * @param        $class
+     * @param        $data
      * @param string $name
      * @param string $transformer
      * @return array|null
      * @throws BindingResolutionException
      */
-    public function renderItem($class, string $name, string $transformer)
+    public function renderItem($data, string $name, string $transformer)
     {
         $this->fractal->setSerializer(new JsonApiSerializer(config('app.url')));
         $transformer = app()->make($transformer);
-        $resource = new Item($class, $transformer, $name);
+        $resource = new Item($data, $transformer, $name);
 
         return $this->fractal->createData($resource)->toArray();
     }

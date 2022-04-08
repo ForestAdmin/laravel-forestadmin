@@ -58,4 +58,35 @@ class JsonApiTest extends TestCase
 
         $this->assertEquals($response, $facadeCall);
     }
+
+    /**
+     * @return void
+     */
+    public function testRenderItem(): void
+    {
+        $response = [
+                'data' => [
+                    'type'       => 'data',
+                    'id'         => '1',
+                    'attributes' => [
+                        'foo' => 'bar',
+                    ],
+                ]
+            ];
+        $data = ['id'  => 1,'foo' => 'bar'];
+
+        $jsonApi = m::mock(JsonApiResponse::class)
+            ->shouldReceive('renderItem')
+            ->withArgs([$data, 'data', TestTransformers::class])
+            ->once()
+            ->andReturn($response)
+            ->getMock();
+
+        app()->instance('json-api', $jsonApi);
+        $facadeCall = JsonApi::renderItem($data, 'data', TestTransformers::class);
+
+        $this->assertEquals($response, $facadeCall);
+    }
+
+    public function 
 }
