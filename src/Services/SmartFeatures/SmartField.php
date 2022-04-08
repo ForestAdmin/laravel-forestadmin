@@ -45,6 +45,7 @@ class SmartField extends AbstractField
     {
         parent::__construct($attributes);
 
+        $this->is_read_only = $attributes['is_read_only'] ?? true;
         $this->initializeClosures();
     }
 
