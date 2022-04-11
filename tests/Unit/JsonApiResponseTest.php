@@ -97,6 +97,30 @@ class JsonApiResponseTest extends TestCase
      * @return void
      * @throws \ReflectionException
      */
+    public function testRenderCollectionWithMeta(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        $data = $this->addDatabaseContent();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
+            ->with('category:categories.id')
+            ->get();
+        $render = $jsonApi->render($books, 'Book', ['foo' => 'bar']);
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('included', $render);
+        $this->assertEquals($data, $render['data'][0]);
+        $this->assertEquals(['foo' => 'bar'], $render['meta']);
+    }
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
     public function testRenderPaginate(): void
     {
         $jsonApi = new JsonApiResponse();
@@ -116,6 +140,29 @@ class JsonApiResponseTest extends TestCase
         $this->assertEquals($data, $render['data'][0]);
     }
 
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testRenderPaginateWithMeta(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        $data = $this->addDatabaseContent();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
+            ->with('category:categories.id')
+            ->paginate();
+        $render = $jsonApi->render($books, 'Book', ['foo' => 'bar']);
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('included', $render);
+        $this->assertEquals($data, $render['data'][0]);
+        $this->assertEquals(['foo' => 'bar'], $render['meta']);
+    }
 
     /**
      * @return void
@@ -162,6 +209,36 @@ class JsonApiResponseTest extends TestCase
         $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
         $this->assertEquals($comments, $render['data']['relationships']['comments']);
         $this->assertEquals($smartBookstores, $render['data']['relationships']['smartBookstores']);
+    }
+
+    /**
+     * @return void
+     * @throws BindingResolutionException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testRenderWithMeta(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        $data = $this->addDatabaseContent();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
+            ->with('category:categories.id')
+            ->first();
+
+        $render = $jsonApi->render($book, 'Book', ['foo' => 'bar']);
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('included', $render);
+        $this->assertEquals($data['type'], $render['data']['type']);
+        $this->assertEquals($data['id'], $render['data']['id']);
+        $this->assertEquals($data['attributes'], $render['data']['attributes']);
+        $this->assertEquals($data['relationships']['category'], $render['data']['relationships']['category']);
+        $this->assertEquals(['foo' => 'bar'], $render['meta']);
     }
 
     /**
