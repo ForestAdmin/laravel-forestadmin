@@ -1,3 +1,10 @@
+# [1.0.0-beta.9](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2022-04-11)
+
+
+### Bug Fixes
+
+* searchExtended on model without relations ([#31](https://github.com/ForestAdmin/laravel-forestadmin/issues/31)) ([c14a7a7](https://github.com/ForestAdmin/laravel-forestadmin/commit/c14a7a7fa553002d4202a38ac18d0564e67ee5b8))
+
 # [1.0.0-beta.8](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2022-04-05)
 
 
