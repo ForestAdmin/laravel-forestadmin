@@ -43,7 +43,7 @@ class JsonApiResponse
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function render($class, string $name)
+    public function render($class, string $name, array $meta = [])
     {
         $this->fractal->setSerializer(new JsonApiSerializer(config('app.url')));
         $transformer = app()->make(BaseTransformer::class);
@@ -58,6 +58,10 @@ class JsonApiResponse
             }
         } else {
             $resource = new Item($class, $transformer, $name);
+        }
+
+        if ($meta) {
+            $resource->setMeta(array_merge($resource->getMeta(), $meta));
         }
 
         return $this->fractal->createData($resource)->toArray();
