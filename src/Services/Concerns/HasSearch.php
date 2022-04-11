@@ -24,34 +24,34 @@ trait HasSearch
     protected function appendSearch(Builder $query, $search, bool $isExtended = false): void
     {
         $model = $query->getModel();
-        if ($isExtended) {
-            $singleRelations = $this->getSingleRelations($model);
-            foreach ($singleRelations as $key => $value) {
-                $relatedModel = $model->$key()->getRelated();
-                $fieldsToSearch = $this->getFieldsToSearch($relatedModel);
-                $query->orWhereHas(
-                    $key,
-                    function ($query) use ($fieldsToSearch, $search, $relatedModel) {
-                        $query->where(
+        $singleRelations = $this->getSingleRelations($model);
+        $query->where(
+            function ($query) use ($search, $model, $isExtended, $singleRelations) {
+                if ($isExtended && !empty($singleRelations)) {
+                    foreach ($singleRelations as $key => $value) {
+                        $relatedModel = $model->$key()->getRelated();
+                        $fieldsToSearch = $this->getFieldsToSearch($relatedModel);
+                        $query->orWhereHas(
+                            $key,
                             function ($query) use ($fieldsToSearch, $search, $relatedModel) {
-                                foreach ($fieldsToSearch as $field) {
-                                    $this->handleSearchField($query, $relatedModel, $field, $search);
-                                }
+                                $query->where(
+                                    function ($query) use ($fieldsToSearch, $search, $relatedModel) {
+                                        foreach ($fieldsToSearch as $field) {
+                                            $this->handleSearchField($query, $relatedModel, $field, $search);
+                                        }
+                                    }
+                                );
                             }
                         );
                     }
-                );
-            }
-        } else {
-            $fieldsToSearch = $this->getFieldsToSearch($model);
-            $query->where(
-                function ($query) use ($fieldsToSearch, $search, $model) {
+                } else {
+                    $fieldsToSearch = $this->getFieldsToSearch($model);
                     foreach ($fieldsToSearch as $field) {
                         $this->handleSearchField($query, $model, $field, $search);
                     }
                 }
-            );
-        }
+            }
+        );
     }
 
     /**
