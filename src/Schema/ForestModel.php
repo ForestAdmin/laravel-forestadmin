@@ -422,7 +422,6 @@ class ForestModel
         foreach ($relations as $name => $type) {
             $relation = $this->model->$name();
             $related = Str::camel(class_basename($relation->getRelated()));
-
             switch ($type) {
                 case BelongsTo::class:
                 case BelongsToMany::class:
@@ -433,7 +432,6 @@ class ForestModel
                             'field' => $relation->getRelationName(),
                         ]
                     );
-                    $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
                     break;
                 case HasMany::class:
                 case HasOne::class:
@@ -443,7 +441,6 @@ class ForestModel
                             'field' => $name,
                         ]
                     );
-                    $name = $relation->getRelated()->getTable();
                     break;
             }
 
@@ -456,7 +453,7 @@ class ForestModel
             $field['reference'] = $related . '.' . $relation->getRelated()->getKeyName();
             $field['relationship'] = $this->mapRelationships($type);
             $field['inverse_of'] = Str::camel($this->getName());
-            $fields->put($name, $field);
+            $fields->push($field);
         }
 
         return $fields;
