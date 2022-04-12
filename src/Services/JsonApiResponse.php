@@ -38,6 +38,7 @@ class JsonApiResponse
     /**
      * @param        $class
      * @param string $name
+     * @param array  $meta
      * @return array|null
      * @throws BindingResolutionException
      * @throws ContainerExceptionInterface
