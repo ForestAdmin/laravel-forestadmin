@@ -69,7 +69,6 @@ class HasFiltersOperatorsTest extends TestCase
             ],
             'Number'   => [
                 ['type' => 'NotNull', 'column' => 'amount', 'boolean' => 'and',],
-                ['type' => 'Basic', 'column' => 'amount', 'operator' => '!=', 'value' => '', 'boolean' => 'or',],
             ],
             'String'   => [
                 ['type' => 'NotNull', 'column' => 'label', 'boolean' => 'and',],
@@ -129,7 +128,6 @@ class HasFiltersOperatorsTest extends TestCase
             ],
             'Number'   => [
                 ['type' => 'Null', 'column' => 'amount', 'boolean' => 'and',],
-                ['type' => 'Basic', 'column' => 'amount', 'operator' => '=', 'value' => '', 'boolean' => 'or',],
             ],
             'String'   => [
                 ['type' => 'Null', 'column' => 'label', 'boolean' => 'and',],

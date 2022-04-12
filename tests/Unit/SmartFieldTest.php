@@ -120,7 +120,7 @@ class SmartFieldTest extends TestCase
             'enums'         => null,
             'integration'   => null,
             'is_filterable' => false,
-            'is_read_only'  => false,
+            'is_read_only'  => true,
             'is_required'   => false,
             'is_sortable'   => false,
             'is_virtual'    => true,
