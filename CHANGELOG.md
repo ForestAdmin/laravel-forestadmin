@@ -1,3 +1,10 @@
+# [1.0.0-beta.10](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2022-04-13)
+
+
+### Features
+
+* add deactivate count and refactor smart features ([#32](https://github.com/ForestAdmin/laravel-forestadmin/issues/32)) ([49cddf4](https://github.com/ForestAdmin/laravel-forestadmin/commit/49cddf4ca7ea7a1316b9e3e29b1fbcef7242c714))
+
 # [1.0.0-beta.9](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2022-04-11)
 
 
