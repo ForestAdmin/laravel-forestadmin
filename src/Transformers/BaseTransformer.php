@@ -42,7 +42,6 @@ class BaseTransformer extends TransformerAbstract
      */
     public function transform(Model $model)
     {
-        $smartRelationships = ForestSchema::getSmartRelationships(class_basename($model));
         if (method_exists($model, 'handleSmartFields')) {
             $model->handleSmartFields()->handleSmartRelationships();
         }
@@ -51,12 +50,7 @@ class BaseTransformer extends TransformerAbstract
         $this->setDefaultIncludes(array_keys($relations));
 
         foreach ($relations as $key => $value) {
-            $resourceKey = $key;
-            if (isset($smartRelationships[$key])) {
-                //--- force key name as an existing model for include smartRelationship ---//
-                $resourceKey = Str::before($smartRelationships[$key]['reference'], '.');
-            }
-            $this->addMethod('include' . Str::ucfirst($key), fn() => $this->item($value, new ChildTransformer(), Str::ucfirst($resourceKey)));
+            $this->addMethod('include' . Str::ucfirst($key), fn() => $this->item($value, new ChildTransformer(), class_basename($value)));
         }
 
         return $model->attributesToArray();

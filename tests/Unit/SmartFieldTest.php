@@ -68,6 +68,7 @@ class SmartFieldTest extends TestCase
 
     /**
      * @return void
+     * @throws \ReflectionException
      */
     public function testFilter(): void
     {
@@ -85,6 +86,7 @@ class SmartFieldTest extends TestCase
         ];
 
         $this->assertInstanceOf(Builder::class, $resultCall);
+        $this->assertTrue($this->invokeProperty($smartField, 'is_filterable'));
         $this->assertEquals($expected, $resultCall->getQuery()->wheres[0]);
     }
 
@@ -120,7 +122,7 @@ class SmartFieldTest extends TestCase
             'enums'         => null,
             'integration'   => null,
             'is_filterable' => false,
-            'is_read_only'  => false,
+            'is_read_only'  => true,
             'is_required'   => false,
             'is_sortable'   => false,
             'is_virtual'    => true,

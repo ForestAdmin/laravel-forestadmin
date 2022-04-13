@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
+use Closure;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
@@ -68,18 +69,18 @@ trait ForestCollection
     }
 
     /**
-     * @param string      $type
-     * @param \Closure    $execute
-     * @param string|null $name
+     * @param string       $type
+     * @param string|null  $name
+     * @param Closure|null $execute
      * @return SmartAction
      */
-    public function smartAction(string $type, \Closure $execute, ?string $name = null): SmartAction
+    public function smartAction(string $type, ?string $name = null, ?Closure $execute = null): SmartAction
     {
         [$one, $field] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $methodName = $field['function'];
         $name = $name ?? $methodName;
 
-        return new SmartAction(class_basename($this), $name, $type, $execute, $methodName);
+        return new SmartAction(class_basename($this), $name, $type, $methodName, $execute);
     }
 
     /**

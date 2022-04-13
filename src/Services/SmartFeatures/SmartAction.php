@@ -49,9 +49,9 @@ class SmartAction
     protected array $hooks;
 
     /**
-     * @var Closure
+     * @var Closure|null
      */
-    protected Closure $execute;
+    protected ?Closure $execute;
 
     /**
      * @var Closure|null
@@ -69,13 +69,13 @@ class SmartAction
     protected string $methodName;
 
     /**
-     * @param string  $model
-     * @param string  $name
-     * @param string  $type
-     * @param Closure $execute
-     * @param string  $methodName
+     * @param string       $model
+     * @param string       $name
+     * @param string       $type
+     * @param string       $methodName
+     * @param Closure|null $execute
      */
-    public function __construct(string $model, string $name, string $type, Closure $execute, string $methodName)
+    public function __construct(string $model, string $name, string $type, string $methodName, ?Closure $execute = null)
     {
         $this->model = $model;
         $this->name = $name;

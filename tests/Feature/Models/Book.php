@@ -107,11 +107,11 @@ class Book extends Model
     {
         return $this->smartAction(
             'bulk',
+            'smart action bulk',
             function () {
                 $ids = $this->getIdsFromBulkRequest();
                 return ['success' => "ids => " . implode(',', $ids)];
             },
-            'smart action bulk'
         );
     }
 
@@ -122,8 +122,8 @@ class Book extends Model
     {
         return $this->smartAction(
             'bulk',
+            'smart action single',
             fn () => ['success' => "Test working!"],
-            'smart action single'
         )
             ->addField(['field' => 'token', 'type' => 'string', 'is_required' => true])
             ->addField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'hook' => 'onFooChange'])

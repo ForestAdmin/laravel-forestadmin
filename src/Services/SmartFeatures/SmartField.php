@@ -45,6 +45,7 @@ class SmartField extends AbstractField
     {
         parent::__construct($attributes);
 
+        $this->is_read_only = $attributes['is_read_only'] ?? true;
         $this->initializeClosures();
     }
 
@@ -100,6 +101,7 @@ class SmartField extends AbstractField
     public function filter(\Closure $filter): SmartField
     {
         $this->filter = $filter;
+        $this->is_filterable = true;
 
         return $this;
     }

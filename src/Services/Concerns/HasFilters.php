@@ -209,7 +209,7 @@ trait HasFilters
                 $query->where(
                     function ($query) use ($field, $type, $operator) {
                         $operator === 'blank' ? $query->whereNull($field) : $query->whereNotNull($field);
-                        if (!in_array($type, ['Boolean', 'Uuid', 'Json', 'Date', 'Dateonly'], true)) {
+                        if (!in_array($type, ['Boolean', 'Uuid', 'Json', 'Date', 'Dateonly', 'Number'], true)) {
                             $symbol = $operator === 'blank' ? '=' : '!=';
                             $query->orWhere($field, $symbol, '');
                         }
