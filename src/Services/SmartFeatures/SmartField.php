@@ -101,6 +101,7 @@ class SmartField extends AbstractField
     public function filter(\Closure $filter): SmartField
     {
         $this->filter = $filter;
+        $this->is_filterable = true;
 
         return $this;
     }
