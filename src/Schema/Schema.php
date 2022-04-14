@@ -135,8 +135,11 @@ class Schema
 
         foreach ($schema['collections'] as $collection) {
             $collectionActions = $collection['actions'];
-            unset($collection['actions']);
-            $included[] = $this->getActionsByCollection($collectionActions, true);
+            $collectionSegments = $collection['segments'];
+            unset($collection['actions'], $collection['segments']);
+
+            $included[] = $this->getSmartFeaturesByCollection('actions', $collectionActions, true);
+            $included[] = $this->getSmartFeaturesByCollection('segments', $collectionSegments, true);
 
             $data[] = [
                 'id'            => $collection['name'],
@@ -144,10 +147,10 @@ class Schema
                 'attributes'    => $collection,
                 'relationships' => [
                     'actions'  => [
-                        'data' => $this->getActionsByCollection($collectionActions)
+                        'data' => $this->getSmartFeaturesByCollection('actions', $collectionActions)
                     ],
                     'segments' => [
-                        'data' => []
+                        'data' => $this->getSmartFeaturesByCollection('segments', $collectionSegments)
                     ]
                 ]
             ];
@@ -161,27 +164,29 @@ class Schema
     }
 
     /**
-     * @param array $data
-     * @param bool  $withAttributes
+     * @param string $type
+     * @param array  $data
+     * @param bool   $withAttributes
      * @return array
      */
-    private function getActionsByCollection(array $data, bool $withAttributes = false): array
+    private function getSmartFeaturesByCollection(string $type, array $data, bool $withAttributes = false): array
     {
-        $actions = [];
+        $smartFeatures = [];
 
         foreach ($data as $value) {
-            $action = [
+            $smartFeature = [
                 'id'   => $value['id'],
-                'type' => 'actions',
+                'type' => $type,
             ];
             if ($withAttributes) {
-                $action['attributes'] = $value;
+                $smartFeature['attributes'] = $value;
             }
-            $actions[] = $action;
+            $smartFeatures[] = $smartFeature;
         }
 
-        return $actions;
+        return $smartFeatures;
     }
+
 
     /**
      * Fetch all files in the model directory

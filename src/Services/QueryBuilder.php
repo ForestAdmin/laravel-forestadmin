@@ -108,6 +108,12 @@ class QueryBuilder
             $this->appendSort($query, $this->params['sort']);
         }
 
+        if (array_key_exists('segment', $this->params)) {
+            $smartSegmentName = $this->model->getSmartSegment($this->params['segment'])['methodName'];
+            $smartSegment = $this->model->{$smartSegmentName}();
+            $query->where($smartSegment->getExecute());
+        }
+
         return $query;
     }
 

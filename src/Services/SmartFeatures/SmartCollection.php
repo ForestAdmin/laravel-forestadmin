@@ -67,6 +67,7 @@ class SmartCollection
             'pagination_type'        => 'page',
             'fields'                 => $this->serializeFields(),
             'actions'                => [],
+            'segments'               => [],
         ];
     }
 

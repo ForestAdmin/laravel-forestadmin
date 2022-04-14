@@ -10,6 +10,7 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -116,6 +117,7 @@ class ForestModel
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
+            'segments'               => $this->fetchSmartSegments()->toArray(),
             'actions'                => $this->fetchSmartActions()->toArray(),
         ];
     }
@@ -374,6 +376,23 @@ class ForestModel
         }
 
         return $smartActions;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function fetchSmartSegments(): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartSegments = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartSegment::class && $method->getName() !== 'smartSegment') {
+                $smartSegments->push($this->model->{$method->getName()}()->serialize());
+            }
+        }
+
+        return $smartSegments;
     }
 
     /**
