@@ -393,6 +393,9 @@ class ForestModel
                 case BelongsTo::class:
                 case BelongsToMany::class:
                     $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
+                    if ($field === null) {
+                        continue 2;
+                    }
                     $field = array_merge(
                         $field,
                         [
