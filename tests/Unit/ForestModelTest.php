@@ -8,10 +8,17 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Schema\ForestModel;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -33,6 +40,7 @@ use Mockery as m;
 class ForestModelTest extends TestCase
 {
     use ProphecyTrait;
+    use FakeData;
 
     /**
      * @return void
@@ -63,7 +71,7 @@ class ForestModelTest extends TestCase
                         'widget'        => null,
                         'validations'   => [],
 
-                    ]
+                    ],
                 ]
             );
 
@@ -125,7 +133,7 @@ class ForestModelTest extends TestCase
                             'inverse_of'    => null,
                             'widget'        => null,
                             'validations'   => [],
-                        ]
+                        ],
                     ]
                 )
             );
@@ -193,7 +201,7 @@ class ForestModelTest extends TestCase
 
         $relations = $forestModel->getRelations($forestModel->getModel());
         foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            $publicMethods[$method->getName()] = (string) $method->getReturnType();
+            $publicMethods[$method->getName()] = (string)$method->getReturnType();
         }
 
         $this->assertIsArray($relations);
@@ -217,8 +225,8 @@ class ForestModelTest extends TestCase
 
         $relations = $forestModel->getSingleRelations($forestModel->getModel());
         foreach ((new \ReflectionClass($forestModel->getModel()))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            if (in_array((string) $method->getReturnType(), [BelongsTo::class, HasOne::class], true)) {
-                $publicMethods[$method->getName()] = (string) $method->getReturnType();
+            if (in_array((string)$method->getReturnType(), [BelongsTo::class, HasOne::class], true)) {
+                $publicMethods[$method->getName()] = (string)$method->getReturnType();
             }
         }
 
@@ -452,6 +460,81 @@ class ForestModelTest extends TestCase
         $forestModel->setDatabase($value);
 
         $this->assertEquals($value, $forestModel->getDatabase());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartAction(): void
+    {
+        $book = $this->getBook();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartAction::class);
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(2, $value->count());
+        $this->assertEquals('Book.smart action bulk', $value->first()['id']);
+        $this->assertEquals('Book.smart action single', $value->last()['id']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartRelationship(): void
+    {
+        $book = $this->getBook();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartRelationship::class);
+        $smartRelationship = new SmartRelationship(
+            [
+                'type'      => ['String'],
+                'reference' => 'bookstore.id',
+                'field'     => 'smartBookstores',
+            ]
+        );
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartRelationship->serialize(), $value->first());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartField(): void
+    {
+        $book = $this->getBook();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartField::class);
+        $smartField = new SmartField(['type' => 'String', 'field' => 'reference', 'is_filterable' => true]);
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartField->serialize(), $value->first());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartSegment(): void
+    {
+        $book = $this->getBook();
+        $forestModel = m::mock(ForestModel::class, [$book->category])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartSegment::class);
+        $smartSegment = new SmartSegment(
+            class_basename($book->category),
+            'bestName',
+            'bestCategories',
+            fn(Builder $query) => $query->where('id', '<', 3),
+        );
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartSegment->serialize(), $value->first());
     }
 
     /**
