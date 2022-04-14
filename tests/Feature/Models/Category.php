@@ -2,6 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
 
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,8 +16,21 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Category extends Model
 {
+    use ForestCollection;
+
     protected $fillable = [
         'label',
         'product_id',
     ];
+
+    /**
+     * @return SmartSegment
+     */
+    public function bestCategories(): SmartSegment
+    {
+        return $this->smartSegment(
+            fn(Builder $query) => $query->where('id', '<', 3),
+            'bestName'
+        );
+    }
 }
