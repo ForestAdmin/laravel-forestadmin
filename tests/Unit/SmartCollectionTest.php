@@ -93,6 +93,7 @@ class SmartCollectionTest extends TestCase
                     ))->serialize(),
                 ],
                 "actions"                => [],
+                "segments"               => [],
             ],
             $smartCollection->serialize()
         );

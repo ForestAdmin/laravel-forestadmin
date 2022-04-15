@@ -77,6 +77,18 @@ class ForestSchemaInstrospection
      * @param string $collection
      * @return array
      */
+    public function getSmartSegments(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].segments[*]");
+
+        return $data ?: [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
     public function getSmartRelationships(string $collection): array
     {
         $collection = Str::camel($collection);

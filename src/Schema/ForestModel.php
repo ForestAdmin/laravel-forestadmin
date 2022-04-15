@@ -10,6 +10,7 @@ use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -116,7 +117,8 @@ class ForestModel
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
-            'actions'                => $this->fetchSmartActions()->toArray(),
+            'segments'               => $this->fetchSmartFeatures(SmartSegment::class)->toArray(),
+            'actions'                => $this->fetchSmartFeatures(SmartAction::class)->toArray(),
         ];
     }
 
@@ -127,8 +129,8 @@ class ForestModel
     public function getFields(): array
     {
         $fields = $this->fetchFieldsFromTable();
-        $fields = $fields->merge($this->fetchSmartFields());
-        $fields = $fields->merge($this->fetchSmartRelationships());
+        $fields = $fields->merge($this->fetchSmartFeatures(SmartField::class));
+        $fields = $fields->merge($this->fetchSmartFeatures(SmartRelationship::class));
 
         $schemaFields = method_exists($this->model, 'schemaFields') ? $this->model->schemaFields() : [];
         foreach ($schemaFields as $field) {
@@ -360,56 +362,21 @@ class ForestModel
     }
 
     /**
+     * @param string $class
      * @return Collection
      */
-    public function fetchSmartActions(): Collection
+    public function fetchSmartFeatures(string $class): Collection
     {
         $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $smartActions = new Collection();
+        $smartFeatures = new Collection();
 
         foreach ($methods as $method) {
-            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartAction::class && $method->getName() !== 'smartAction') {
-                $smartActions->push($this->model->{$method->getName()}()->serialize());
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === $class && $method->getName() !== lcfirst(class_basename($class))) {
+                $smartFeatures->push($this->model->{$method->getName()}()->serialize());
             }
         }
 
-        return $smartActions;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function fetchSmartFields(): Collection
-    {
-        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $smartFields = new Collection();
-
-        foreach ($methods as $method) {
-            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartField::class && $method->getName() !== 'smartField') {
-                $serialize = $this->model->{$method->getName()}()->serialize();
-                $smartFields->put($serialize['field'], $serialize);
-            }
-        }
-
-        return $smartFields;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function fetchSmartRelationships(): Collection
-    {
-        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $smartFields = new Collection();
-
-        foreach ($methods as $method) {
-            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartRelationship::class && $method->getName() !== 'smartRelationship') {
-                $serialize = $this->model->{$method->getName()}()->serialize();
-                $smartFields->put($serialize['field'], $serialize);
-            }
-        }
-
-        return $smartFields;
+        return $smartFeatures;
     }
 
     /**
@@ -426,6 +393,11 @@ class ForestModel
                 case BelongsTo::class:
                 case BelongsToMany::class:
                     $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
+                    // @codeCoverageIgnoreStart
+                    if ($field === null) {
+                        continue 2;
+                    }
+                    // @codeCoverageIgnoreEnd
                     $field = array_merge(
                         $field,
                         [

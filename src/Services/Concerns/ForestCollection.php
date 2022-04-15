@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -53,6 +54,20 @@ trait ForestCollection
     }
 
     /**
+     * @param Closure     $segment
+     * @param string|null $name
+     * @return SmartSegment
+     */
+    public function smartSegment(Closure $segment, ?string $name = null): SmartSegment
+    {
+        [$one, $field] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $methodName = $field['function'];
+        $name = $name ?? $methodName;
+
+        return new SmartSegment(class_basename($this), $name, $methodName, $segment);
+    }
+
+    /**
      * @param $name
      * @return mixed|void
      */
@@ -66,6 +81,22 @@ trait ForestCollection
         }
 
         throw new ForestException("There is no smart-action $name");
+    }
+
+    /**
+     * @param $name
+     * @return mixed|void
+     */
+    public function getSmartSegment($name)
+    {
+        $smartSegments = ForestSchema::getSmartSegments(strtolower(class_basename($this)));
+        foreach ($smartSegments as $smartSegment) {
+            if ($smartSegment['name'] === $name && method_exists($this, $smartSegment['methodName'])) {
+                return $smartSegment;
+            }
+        }
+
+        throw new ForestException("There is no smart-segment $name");
     }
 
     /**

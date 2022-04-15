@@ -4,8 +4,10 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
@@ -133,6 +135,48 @@ class ResourcesControllerTest extends TestCase
         $this->assertCount(1, $data['data']);
         $this->assertEquals($book->difficulty, $data['data'][0]['attributes']['difficulty']);
         $this->assertEquals($book->label, $data['data'][0]['attributes']['label']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexWithSegment(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        for ($i = 1; $i < 5; $i++) {
+            Category::create(['label' => 'Foo' . $i]);
+        }
+
+        $params = ['fields' => ['category' => 'id,label'], 'segment' => 'bestName'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $call = $this->get('/forest/category?' . http_build_query($params));
+        $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals('category', $data['data'][0]['type']);
+        $this->assertCount(2, $data['data']);
+        $this->assertEquals('Foo1', $data['data'][0]['attributes']['label']);
+        $this->assertEquals('Foo2', $data['data'][1]['attributes']['label']);
+    }
+
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexWithSegmentDoesnotExist(): void
+    {
+        $this->makeScopeManager($this->forestUser);
+        $params = ['fields' => ['category' => 'id,label'], 'segment' => 'foo'];
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $this->expectException(ForestException::class);
+        $this->expectExceptionMessage("🌳🌳🌳 There is no smart-segment foo");
+
+        $this->get('/forest/category?' . http_build_query($params));
     }
 
     /**
