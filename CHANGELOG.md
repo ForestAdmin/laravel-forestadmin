@@ -1,3 +1,10 @@
+# [1.0.0-beta.11](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2022-04-15)
+
+
+### Features
+
+* **smart-segment:** add smart-segments support ([#33](https://github.com/ForestAdmin/laravel-forestadmin/issues/33)) ([66d33d3](https://github.com/ForestAdmin/laravel-forestadmin/commit/66d33d328ccdffd338f55af08933505bafa42821))
+
 # [1.0.0-beta.10](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2022-04-13)
 
 
