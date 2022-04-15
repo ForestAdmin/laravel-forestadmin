@@ -42,9 +42,11 @@ class ForestSchemaIntrospectionTest extends TestCase
     {
         $forestSchema = $this->makeForestSchema();
         $data = $forestSchema->getFields('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['fields'];
 
         $this->assertIsArray($data);
-        $this->assertEquals($this->fakeSchema(false)['collections'][0]['fields'], $data);
+        $this->assertEquals($expected, $data);
     }
 
     /**
@@ -102,6 +104,129 @@ class ForestSchemaIntrospectionTest extends TestCase
         $this->assertNull($resultUnknownType);
     }
 
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartFields(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartFields('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['fields'];
+        foreach ($expected as $key => $value) {
+            if ($value['is_virtual'] && $value['reference'] === null) {
+                $expected[$value['field']] = $value;
+            }
+            unset($expected[$key]);
+        }
+
+        $this->assertIsArray($data);
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartFieldsCollectionDoesNotExists(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartFields('foo');
+
+        $this->assertIsArray($data);
+        $this->isEmpty($data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartActions(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartActions('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['actions'];
+
+        $this->assertIsArray($data);
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartActionsCollectionDoesNotExists(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartActions('foo');
+
+        $this->assertIsArray($data);
+        $this->isEmpty($data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartSegments(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartSegments('category');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('category', array_column($schemaCollection, 'name'))]['segments'];
+
+        $this->assertIsArray($data);
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartSegmentsCollectionDoesNotExists(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartSegments('foo');
+
+        $this->assertIsArray($data);
+        $this->isEmpty($data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartRelationships(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartRelationships('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['fields'];
+        foreach ($expected as $key => $value) {
+            if ($value['is_virtual'] && $value['reference'] !== null) {
+                $expected[$value['field']] = $value;
+            }
+            unset($expected[$key]);
+        }
+
+        $this->assertIsArray($data);
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testGetSmartRelationshipsCollectionDoesNotExists(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getSmartRelationships('foo');
+
+        $this->assertIsArray($data);
+        $this->isEmpty($data);
+    }
 
     /**
      * @return ForestSchemaInstrospection
