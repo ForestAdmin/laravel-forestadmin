@@ -25,7 +25,7 @@ class EventProvider extends EventServiceProvider
             ArtisanStart::class,
         ],
         RouteMatched::class => [
-            RouterMatchedListener::class, 'handle'
+            RouterMatchedListener::class,
         ],
     ];
 }
