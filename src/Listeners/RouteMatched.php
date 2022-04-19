@@ -28,7 +28,7 @@ class RouteMatched
      */
     public function handle(RouteMatchedEvent $routeMatchedEvent): void
     {
-        if ($this->shouldRun($routeMatchedEvent->request) && config('app.env') !== 'locsal') {
+        if ($this->shouldRun($routeMatchedEvent->request) && config('app.env') !== 'local') {
             $filePath = App::basePath(config('forest.json_file_path'));
 
             if (File::exists($filePath)) {
