@@ -13,7 +13,6 @@ use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
 
 /**
  * Class RelationshipsController
@@ -22,7 +21,7 @@ use Illuminate\Routing\Controller;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class RelationshipsController extends Controller
+class RelationshipsController extends ForestController
 {
     use Schema;
 

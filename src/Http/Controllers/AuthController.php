@@ -10,7 +10,6 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Controller;
 use JsonException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
@@ -21,7 +20,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class AuthController extends Controller
+class AuthController extends ForestController
 {
     /**
      * @var AuthManager
