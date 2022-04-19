@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin;
 
 use ForestAdmin\LaravelForestAdmin\Commands\ForestInstall;
+use ForestAdmin\LaravelForestAdmin\Commands\SendApimap;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\AuthorizationProvider;
 use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
@@ -37,6 +38,7 @@ class ForestServiceProvider extends ServiceProvider
             $this->commands(
                 [
                     ForestInstall::class,
+                    SendApimap::class,
                 ]
             );
         }
