@@ -1,3 +1,10 @@
+# [1.0.0-beta.12](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2022-04-19)
+
+
+### Bug Fixes
+
+* **dependency:** fix the dependency that serialize api response ([#34](https://github.com/ForestAdmin/laravel-forestadmin/issues/34)) ([69f0f74](https://github.com/ForestAdmin/laravel-forestadmin/commit/69f0f7438dc2d1cb597cc8aa3a4b3a86d029d11b))
+
 # [1.0.0-beta.11](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2022-04-15)
 
 
