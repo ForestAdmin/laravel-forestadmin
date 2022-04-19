@@ -21,7 +21,7 @@
     "firebase/php-jwt": "^6.0",
     "galbar/jsonpath": "^2.0",
     "guzzlehttp/guzzle": "^7.4",
-    "league/fractal": "^0.20",
+    "league/fractal": "^0.20.1",
     "league/oauth2-client": "^2.6",
     "ramsey/uuid": "^4.2",
     "usmanhalalit/laracsv": "^2.1"
