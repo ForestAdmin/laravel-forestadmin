@@ -3,8 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use ForestAdmin\LaravelForestAdmin\Listeners\ArtisanStart;
+use ForestAdmin\LaravelForestAdmin\Listeners\RouteMatched as RouterMatchedListener;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Routing\Events\RouteMatched;
 
 /**
  * Class EventProvider
@@ -22,5 +24,9 @@ class EventProvider extends EventServiceProvider
         CommandStarting::class => [
             ArtisanStart::class,
         ],
+        RouteMatched::class => [
+            RouterMatchedListener::class, 'handle'
+        ],
     ];
 }
+
