@@ -1,3 +1,10 @@
+# [1.0.0-beta.13](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2022-04-19)
+
+
+### Bug Fixes
+
+* deploy on production ([#35](https://github.com/ForestAdmin/laravel-forestadmin/issues/35)) ([9db8471](https://github.com/ForestAdmin/laravel-forestadmin/commit/9db8471fb50ea301a50d3bed3098bc3c9395472c))
+
 # [1.0.0-beta.12](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2022-04-19)
 
 
