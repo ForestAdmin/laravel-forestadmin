@@ -1,3 +1,10 @@
+# [1.0.0-beta.14](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2022-04-20)
+
+
+### Bug Fixes
+
+* readme update documentation link ([#36](https://github.com/ForestAdmin/laravel-forestadmin/issues/36)) ([3dee307](https://github.com/ForestAdmin/laravel-forestadmin/commit/3dee3070910c05843ecd856c5856b0298eff4d3d))
+
 # [1.0.0-beta.13](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2022-04-19)
 
 
