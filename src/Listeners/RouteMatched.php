@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
- * @codeCoverageIgnore
  */
 class RouteMatched
 {
