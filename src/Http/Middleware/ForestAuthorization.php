@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Middleware;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\ForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Auth\Model\ForestUser;
-use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
