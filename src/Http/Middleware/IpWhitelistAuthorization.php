@@ -3,6 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Middleware;
 
 use ForestAdmin\LaravelForestAdmin\Services\IpWhitelist;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class IpWhitelistAuthorization
@@ -25,13 +27,14 @@ class IpWhitelistAuthorization
         /** @var IpWhitelist $ipWhitelist */
         $ipWhitelist = app(IpWhitelist::class);
         if ($ipWhitelist->isEnabled()) {
-            dd($ipWhitelist->isIpMatchesAnyRule($request->ip()));
+            $ip = $request->ip();
+            if ($ipWhitelist->isIpMatchesAnyRule($ip)) {
+                return next($request);
+            } else {
+                throw new HttpException(Response::HTTP_FORBIDDEN, "IP address rejected ($ip)");
+            }
         }
 
-        // if not enabled -> next($request)
-        // if enabled
-            // - test isIpMatchesAnyRule
-                    // OK NEXT
-                    // KO 403
+        return next($request);
     }
 }
