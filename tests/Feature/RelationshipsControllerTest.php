@@ -4,9 +4,11 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CompanyFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Company;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Editor;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
@@ -104,8 +106,8 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testIndexSmartRelationship(): void
     {
-        $this->getBook()->save();
-        $this->getBookstores();
+        Company::factory(1)->create();
+        Bookstore::factory(1)->create();
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

@@ -65,7 +65,7 @@ class Book extends Model
                     return $this;
                 }
             )
-            ->sort(fn(Builder $query, string $direction) => $query->orderBy('label'))
+            ->sort(fn(Builder $query, string $direction) => $query->orderBy('label', $direction))
             ->filter(
                 static function (Builder $query, $value, string $operator, string $aggregator) {
                     $data = explode('-', $value);

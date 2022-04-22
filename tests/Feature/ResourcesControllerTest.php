@@ -12,9 +12,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -128,10 +126,10 @@ class ResourcesControllerTest extends TestCase
     public function testIndexWithSegment(): void
     {
         $this->makeScopeManager($this->forestUser);
+        Category::truncate();
         for ($i = 1; $i < 5; $i++) {
             Category::create(['label' => 'Foo' . $i]);
         }
-
         $params = ['fields' => ['category' => 'id,label'], 'segment' => 'bestName'];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -150,8 +148,9 @@ class ResourcesControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
-    public function testIndexWithSegmentDoesnotExist(): void
+    public function testIndexWithSegmentDoesNotExist(): void
     {
+        $this->withoutExceptionHandling();
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['category' => 'id,label'], 'segment' => 'foo'];
         App::shouldReceive('basePath')->andReturn(null);
@@ -159,7 +158,6 @@ class ResourcesControllerTest extends TestCase
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage("🌳🌳🌳 There is no smart-segment foo");
-
         $this->get('/forest/category?' . http_build_query($params));
     }
 
@@ -475,7 +473,6 @@ class ResourcesControllerTest extends TestCase
     public function testUpdateSmartField(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         $book = Book::first();
         $params = [
             'data' => [
@@ -888,9 +885,7 @@ class ResourcesControllerTest extends TestCase
     public function testSortAscOnSmartField(): void
     {
         $this->makeScopeManager($this->forestUser);
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-        }
+        $books = Book::orderBy('label', 'ASC')->limit(3)->get();
         $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => 'reference'];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -899,8 +894,8 @@ class ResourcesControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals(Book::orderBy('label')->first()->id, $data['data'][0]['id']);
-        $this->assertEquals(Book::orderBy('label')->get()->last()->id, $data['data'][1]['id']);
+        $this->assertEquals($books->first()->id, $data['data'][0]['id']);
+        $this->assertEquals($books->last()->id, $data['data'][2]['id']);
     }
 
     /**
@@ -910,9 +905,7 @@ class ResourcesControllerTest extends TestCase
     public function testSortDescOnSmartField(): void
     {
         $this->makeScopeManager($this->forestUser);
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-        }
+        $books = Book::orderBy('label', 'DESC')->limit(3)->get();
         $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => '-reference'];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -921,8 +914,8 @@ class ResourcesControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertEquals('book', $data['data'][0]['type']);
-        $this->assertEquals(Book::orderBy('label', 'desc')->first()->id, $data['data'][0]['id']);
-        $this->assertEquals(Book::orderBy('label', 'desc')->get()->last()->id, $data['data'][1]['id']);
+        $this->assertEquals($books->first()->id, $data['data'][0]['id']);
+        $this->assertEquals($books->last()->id, $data['data'][2]['id']);
     }
 
     /**
@@ -977,9 +970,6 @@ class ResourcesControllerTest extends TestCase
     public function testFiltersOnSmartField(): void
     {
         $this->makeScopeManager($this->forestUser);
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-        }
         $book = Book::first();
         $book->label = 'my favorite book';
         $book->difficulty = 'easy';

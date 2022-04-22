@@ -7,12 +7,15 @@ use Doctrine\DBAL\Schema\SchemaException;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Mockery as m;
 
 /**
@@ -25,6 +28,7 @@ use Mockery as m;
 class ResourceGetterTest extends TestCase
 {
     use ScopeManagerFactory;
+    use FakeSchema;
 
     /**
      * @return void
@@ -118,8 +122,27 @@ class ResourceGetterTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
-    public function getRequest(): void
+    public function testAllWithSegmentException(): void
+    {
+        $this->getRequest(true);
+        $repository = m::mock(ResourceGetter::class, [Book::first()])
+            ->makePartial();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $this->expectException(ForestException::class);
+        $this->expectExceptionMessage("🌳🌳🌳 There is no smart-segment foo");
+
+        $repository->all();
+    }
+
+    /**
+     * @param bool $withSegment
+     * @return void
+     */
+    public function getRequest($withSegment = false): void
     {
         $params = [
             'fields' => [
@@ -133,6 +156,11 @@ class ResourceGetterTest extends TestCase
                 'size'   => 15,
             ],
         ];
+
+        if ($withSegment) {
+            $params['segment'] = 'foo';
+        }
+
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
     }

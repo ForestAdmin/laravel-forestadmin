@@ -2,6 +2,8 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CompanyFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,4 +15,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Company extends Model
 {
+    use HasFactory;
+
+    /**
+     * @return CompanyFactory
+     */
+    protected static function newFactory()
+    {
+        return new CompanyFactory();
+    }
 }

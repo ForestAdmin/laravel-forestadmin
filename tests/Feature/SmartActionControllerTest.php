@@ -137,7 +137,7 @@ class SmartActionControllerTest extends TestCase
                 ],
             ],
         ];
-        $books =  Book::where('id', '!=', 2)->orderBy('id', 'asc')->pluck('id')->toArray();
+        $books = Book::where('id', '!=', 2)->orderBy('id', 'asc')->pluck('id')->toArray();
         $call = $this->postJson('/forest/smart-actions/book_smart-action-bulk', $payload);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
