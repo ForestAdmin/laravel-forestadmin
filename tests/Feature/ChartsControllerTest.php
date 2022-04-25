@@ -355,8 +355,6 @@ class ChartsControllerTest extends TestCase
         $call = $this->postJson('/forest/stats/book', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        //        dd($response, $data['expected']);
-
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
         $this->assertChartResponse($data['expected'], $response);
     }
