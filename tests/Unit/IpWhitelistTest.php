@@ -2,9 +2,11 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Services\IpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -94,13 +96,135 @@ class IpWhitelistTest extends TestCase
      */
     public function testIsIpMatchRuleOnRange(): void
     {
-        $ip1 = '100.2.3.99';
-        $ip2 = '100.2.3.200';
+        $ip1 = '100.2.3.10';
+        $ip2 = '100.2.3.110';
+
         $ipWhitelist = new IpWhitelist($this->makeForestApi());
         $rule = $ipWhitelist->getRules()[1];
-dd($rule, $ipWhitelist->isIpMatchRule($ip1, $rule));
+
         $this->assertTrue($ipWhitelist->isIpMatchRule($ip1, $rule));
-        //$this->assertFalse($ipWhitelist->isIpMatchRule($ip2, $rule));
+        $this->assertFalse($ipWhitelist->isIpMatchRule($ip2, $rule));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchRuleOnSubnet(): void
+    {
+        $ip1 = '180.10.10.10';
+        $ip2 = '181.10.10.100';
+
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $rule = $ipWhitelist->getRules()[2];
+
+        $this->assertTrue($ipWhitelist->isIpMatchRule($ip1, $rule));
+        $this->assertFalse($ipWhitelist->isIpMatchRule($ip2, $rule));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchRuleInvalidRule(): void
+    {
+        $ip = '127.0.0.1';
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $rule = [
+            'type' => 4,
+            'ip'   => $ip,
+        ];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid rule type');
+
+        $this->assertTrue($ipWhitelist->isIpMatchRule($ip, $rule));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchIp(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertTrue($ipWhitelist->isIpMatchIp('127.0.0.1', '127.0.0.1'));
+        $this->assertFalse($ipWhitelist->isIpMatchIp('127.0.0.1', '192.168.0.1'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchIpOnBothLoopback(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertTrue($ipWhitelist->isIpMatchIp('127.0.0.1', '::1'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsSameIpVersion(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertTrue($ipWhitelist->isSameIpVersion('127.0.0.1', '127.0.0.1'));
+        $this->assertFalse($ipWhitelist->isSameIpVersion('127.0.0.1', '::1'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsBothLoopback(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertTrue($ipWhitelist->isBothLoopback('127.0.0.1', '::1'));
+        $this->assertFalse($ipWhitelist->isBothLoopback('127.0.0.1', '::2'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchRange(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertFalse($ipWhitelist->isIpMatchRange('10.0.0.1', '2002:a00:1::', '2002:a00:64::'));
+        $this->assertTrue($ipWhitelist->isIpMatchRange('10.0.0.5', '10.0.0.1', '10.0.0.100'));
+        $this->assertFalse($ipWhitelist->isIpMatchRange('10.0.0.110', '10.0.0.1', '10.0.0.100'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIsIpMatchSubnet(): void
+    {
+        $ipWhitelist = new IpWhitelist($this->makeForestApi());
+        $this->assertTrue($ipWhitelist->isIpMatchSubnet('10.0.0.1', '10.0.0.0/24'));
+        $this->assertFalse($ipWhitelist->isIpMatchSubnet('2002:a00:1::', '10.0.0.0/24'));
+        $this->assertFalse($ipWhitelist->isIpMatchSubnet('11.0.0.1', '10.0.0.0/24'));
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function testRetrieve(): void
+    {
+        $forestApiGet = $this->prophesize(ForestApiRequester::class);
+        $forestApiGet
+            ->get(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willThrow(new \RuntimeException());
+
+        $this->expectException(ForestApiException::class);
+        $this->expectExceptionMessage(ErrorMessages::UNEXPECTED);
+
+        new IpWhitelist($forestApiGet->reveal());
     }
 
     /**

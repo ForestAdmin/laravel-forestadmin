@@ -147,18 +147,11 @@ class IpWhitelist
             return false;
         }
 
-        $ipMinimum = IpAddress::parseAddressString($min)->toString();
-        $ipMaximum = IpAddress::parseAddressString($max)->toString();
-        $ipValue = IpAddress::parseAddressString($ip)->toString();
-
-        dd($ipMinimum, $ipMaximum, $ipValue, $ipValue >= $ipMinimum, $ipValue <= $ipMaximum);
-
-        return $ipValue >= $ipMinimum && $ipValue <= $ipMaximum;
-
-        /*$range = IpAddress::getRangeFromBoundaries($min, $max);
+        $ipMinimum = IpAddress::parseAddressString($min);
+        $ipMaximum = IpAddress::parseAddressString($max);
         $ipValue = IpAddress::parseAddressString($ip);
 
-        return $range->contains($ipValue);*/
+        return $ipValue->getComparableString() >= $ipMinimum->getComparableString() && $ipValue->getComparableString() <= $ipMaximum->getComparableString();
     }
 
     /**
