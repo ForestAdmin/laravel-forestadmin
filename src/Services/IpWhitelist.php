@@ -29,12 +29,12 @@ class IpWhitelist
     /**
      * @var bool
      */
-    public bool $useIpWhitelist = false;
+    private bool $useIpWhitelist = false;
 
     /**
      * @var array
      */
-    public array $rules = [];
+    private array $rules = [];
 
     /**
      * @var ForestApiRequester
