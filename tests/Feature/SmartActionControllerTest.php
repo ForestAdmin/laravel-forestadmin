@@ -10,6 +10,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
@@ -29,6 +30,7 @@ class SmartActionControllerTest extends TestCase
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
+    use MockIpWhitelist;
 
     /**
      * @var ForestUser
@@ -70,6 +72,7 @@ class SmartActionControllerTest extends TestCase
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
+        $this->mockIpWhitelist();
     }
 
     /**

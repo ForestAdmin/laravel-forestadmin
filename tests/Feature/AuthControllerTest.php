@@ -7,6 +7,7 @@ use ForestAdmin\LaravelForestAdmin\Auth\AuthManager;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\AuthController;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +26,16 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class AuthControllerTest extends TestCase
 {
     use ProphecyTrait;
+    use MockIpWhitelist;
+
+    /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->mockIpWhitelist();
+    }
 
     /**
      * @var AuthController

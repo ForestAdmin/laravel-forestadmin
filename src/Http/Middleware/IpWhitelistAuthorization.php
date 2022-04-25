@@ -29,12 +29,12 @@ class IpWhitelistAuthorization
         if ($ipWhitelist->isEnabled()) {
             $ip = $request->ip();
             if ($ipWhitelist->isIpMatchesAnyRule($ip)) {
-                return next($request);
+                return $next($request);
             } else {
                 throw new HttpException(Response::HTTP_FORBIDDEN, "IP address rejected ($ip)");
             }
         }
 
-        return next($request);
+        return $next($request);
     }
 }

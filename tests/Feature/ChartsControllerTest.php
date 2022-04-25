@@ -11,6 +11,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -32,6 +33,7 @@ class ChartsControllerTest extends TestCase
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
+    use MockIpWhitelist;
 
     /**
      * @var ForestUser
@@ -73,6 +75,7 @@ class ChartsControllerTest extends TestCase
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
+        $this->mockIpWhitelist();
     }
 
     /**
