@@ -7,11 +7,9 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Author;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Bookstore;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Company;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Editor;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Image;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Product;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
@@ -61,10 +59,6 @@ class RelatedDataSeeder extends Seeder
                     new Movie(['body' => $faker->sentence()]),
                     ]
                 );
-
-                //                $image = new Image(['name' => $faker->name, 'url' => $faker->url()]);
-                //                $image->imageable()->associate($book);
-                //                $image->save();
 
                 for ($i = 0; $i < 2; $i++) {
                     $tag = new Tag(['label' => $faker->name]);

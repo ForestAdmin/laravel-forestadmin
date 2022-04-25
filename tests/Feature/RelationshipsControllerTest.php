@@ -201,7 +201,6 @@ class RelationshipsControllerTest extends TestCase
         $this->assertEquals($tagIds, $book->tags->pluck('id')->toArray());
     }
 
-
     /**
      * @return void
      */
