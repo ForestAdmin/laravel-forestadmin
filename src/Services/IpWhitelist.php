@@ -66,7 +66,7 @@ class IpWhitelist
      */
     public function isIpMatchesAnyRule(string $ip)
     {
-        foreach ($this->rules as $rule) {
+        foreach ($this->getRules() as $rule) {
             if ($this->isIpMatchRule($ip, $rule)) {
                 return true;
             }
@@ -147,11 +147,18 @@ class IpWhitelist
             return false;
         }
 
-        $ipMinimum = IpAddress::parseAddressString($min);
-        $ipMaximum = IpAddress::parseAddressString($max);
-        $ipValue = IpAddress::parseAddressString($ip);
+        $ipMinimum = IpAddress::parseAddressString($min)->toString();
+        $ipMaximum = IpAddress::parseAddressString($max)->toString();
+        $ipValue = IpAddress::parseAddressString($ip)->toString();
+
+        dd($ipMinimum, $ipMaximum, $ipValue, $ipValue >= $ipMinimum, $ipValue <= $ipMaximum);
 
         return $ipValue >= $ipMinimum && $ipValue <= $ipMaximum;
+
+        /*$range = IpAddress::getRangeFromBoundaries($min, $max);
+        $ipValue = IpAddress::parseAddressString($ip);
+
+        return $range->contains($ipValue);*/
     }
 
     /**
@@ -169,6 +176,14 @@ class IpWhitelist
         }
 
         return $ipValue->matches($range);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRules(): array
+    {
+        return $this->rules;
     }
 
     /**
