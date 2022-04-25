@@ -225,7 +225,7 @@ class RelationshipsControllerTest extends TestCase
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
-        $this->assertEquals($rangeIds, $book->ranges->pluck('id')->sort()->values()->all());
+        $this->assertEquals($rangeIds, $book->ranges->pluck('id')->sort()->values()->toArray());
     }
 
     /**
