@@ -810,7 +810,7 @@ class ResourcesControllerTest extends TestCase
     public function testSearchExtendedWithQueryBuilder(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $category = Category::first();
+        $category = Category::whereHas('books')->first();
         $params = ['fields' => ['book' => 'id,label'], 'search' => $category->label, 'searchExtended' => 1];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

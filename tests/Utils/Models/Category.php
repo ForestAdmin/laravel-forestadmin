@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CategoryFactor
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Category
@@ -35,6 +36,14 @@ class Category extends Model
     protected static function newFactory()
     {
         return new CategoryFactory();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function books(): HasMany
+    {
+        return $this->hasMany(Book::class);
     }
 
     /**
