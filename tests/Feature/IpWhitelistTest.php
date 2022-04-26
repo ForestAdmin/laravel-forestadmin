@@ -10,7 +10,6 @@ use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Services\IpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
@@ -20,6 +19,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
+use JsonException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -32,7 +32,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class IpWhitelistTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
@@ -44,18 +43,8 @@ class IpWhitelistTest extends TestCase
     private ForestUser $forestUser;
 
     /**
-     * @param Application $app
      * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setUp(): void
     {
@@ -93,12 +82,11 @@ class IpWhitelistTest extends TestCase
 
     /**
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testIpValid(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book', ['REMOTE_ADDR' => '127.0.0.1']);
@@ -111,17 +99,14 @@ class IpWhitelistTest extends TestCase
 
     /**
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testIpInvalid(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
-
-        $params = ['fields' => ['book' => 'id,label']];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $call = $this->getJson('/forest/book?' . http_build_query($params), ['REMOTE_ADDR' => '129.0.0.1']);
+        $call = $this->getJson('/forest/book', ['REMOTE_ADDR' => '129.0.0.1']);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -131,12 +116,11 @@ class IpWhitelistTest extends TestCase
 
     /**
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testIpInRange(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book', ['REMOTE_ADDR' => '100.2.3.15']);
@@ -149,12 +133,11 @@ class IpWhitelistTest extends TestCase
 
     /**
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testIpSubNet(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book', ['REMOTE_ADDR' => '180.10.10.20']);
@@ -167,12 +150,11 @@ class IpWhitelistTest extends TestCase
 
     /**
      * @return void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testIpWhitelistCanNotFetchApi(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
