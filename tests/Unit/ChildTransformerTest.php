@@ -2,7 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Transformers\ChildTransformer;

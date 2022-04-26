@@ -6,7 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasFilters;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;

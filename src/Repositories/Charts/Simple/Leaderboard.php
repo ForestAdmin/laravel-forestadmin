@@ -44,7 +44,7 @@ class Leaderboard extends ChartRepository
                 break;
             case BelongsToMany::class:
                 $query->join($relation->getTable(), $relation->getTable() . '.' . $relation->getForeignPivotKeyName(), '=', $this->table . '.' . $relation->getParentKeyName());
-                $query->join($relatedModel->getTable(), $relatedModel->getTable() . '.' . $relation->getRelatedKeyName(), '=', $relation->getTable() . '.' . $relation->getRelatedKeyName());
+                $query->join($relatedModel->getTable(), $relatedModel->getTable() . '.' . $relation->getRelatedKeyName(), '=', $relation->getTable() . '.' . $relation->getRelatedPivotKeyName());
                 break;
             default:
                 throw new ForestException("Unsupported relation");

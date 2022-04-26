@@ -4,7 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;

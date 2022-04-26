@@ -346,7 +346,7 @@ trait FakeSchema
                     "is_searchable"          => true,
                     "only_for_relationships" => false,
                     "pagination_type"        => "page",
-                    "fields"                 => [
+                    "fields" => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -406,6 +406,7 @@ trait FakeSchema
                             "is_required"   => false,
                             "is_sortable"   => true,
                             "is_virtual"    => false,
+                            "is_searchable" => null,
                             "reference"     => null,
                             "inverse_of"    => null,
                             "widget"        => null,
@@ -421,8 +422,6 @@ trait FakeSchema
                     ],
                     "actions"                => [],
                 ],
-
-
             ],
         ];
 

@@ -3,11 +3,9 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\App;
 
 /**
  * Class SmartFieldTest
@@ -18,8 +16,6 @@ use Illuminate\Support\Facades\App;
  */
 class SmartFieldTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      */
@@ -37,7 +33,7 @@ class SmartFieldTest extends TestCase
      */
     public function testSet(): void
     {
-        $book = $this->getBook();
+        $book = Book::first();
         $smartField = new SmartField(['field' => 'reference', 'type' => 'String']);
         $smartField->set(
             function ($value) {

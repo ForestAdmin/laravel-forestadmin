@@ -3,11 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\TestTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -28,7 +27,6 @@ use Psr\Container\NotFoundExceptionInterface;
 class JsonApiResponseTest extends TestCase
 {
     use FakeSchema;
-    use FakeData;
 
     public function testDeactivateCountResponse()
     {
@@ -73,18 +71,17 @@ class JsonApiResponseTest extends TestCase
     /**
      * @return void
      * @throws \ReflectionException
+     * @throws \JsonException
      */
     public function testRenderCollection(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->get();
+        $books = Book::with('category:categories.id')->orderBy('id')->get();
         $render = $jsonApi->render($books, 'Book');
 
         $this->assertIsArray($render);
@@ -100,14 +97,10 @@ class JsonApiResponseTest extends TestCase
     public function testRenderCollectionWithMeta(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
-
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->get();
+        $books = Book::with('category:categories.id')->orderBy('id')->get();
         $render = $jsonApi->render($books, 'Book', ['foo' => 'bar']);
 
         $this->assertIsArray($render);
@@ -124,14 +117,10 @@ class JsonApiResponseTest extends TestCase
     public function testRenderPaginate(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
-
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->paginate();
+        $books = Book::with('category:categories.id')->orderBy('id')->paginate();
         $render = $jsonApi->render($books, 'Book');
 
         $this->assertIsArray($render);
@@ -147,14 +136,10 @@ class JsonApiResponseTest extends TestCase
     public function testRenderPaginateWithMeta(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
-
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-
-        $books = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->paginate();
+        $books = Book::with('category:categories.id')->orderBy('id')->paginate();
         $render = $jsonApi->render($books, 'Book', ['foo' => 'bar']);
 
         $this->assertIsArray($render);
@@ -174,28 +159,25 @@ class JsonApiResponseTest extends TestCase
     public function testRender(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
-
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->first();
+        $book = Book::with('category:categories.id')->orderBy('id')->first();
 
         $render = $jsonApi->render($book, 'Book');
         $comments = [
             'links' => [
                 'related' => [
-                    'href' => '/forest/book/1/relationships/comments',
+                    'href' => '/forest/book/' . $book->id . '/relationships/comments',
                 ],
             ],
         ];
 
         //--- test smartRelationship HasMany ---//
         $smartBookstores = [
-            "links" => [
-                "related" => [
-                    "href" => "/forest/book/1/relationships/smartBookstores",
+            'links' => [
+                'related' => [
+                    'href' => '/forest/book/' . $book->id . '/relationships/smartBookstores',
                 ],
             ],
         ];
@@ -221,14 +203,10 @@ class JsonApiResponseTest extends TestCase
     public function testRenderWithMeta(): void
     {
         $jsonApi = new JsonApiResponse();
-        $data = $this->addDatabaseContent();
-
+        $data = $this->expectedFormattedContent(Book::orderBy('id')->first());
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $book = Book::select('books.id', 'books.label', 'books.comment', 'books.category_id', 'books.difficulty')
-            ->with('category:categories.id')
-            ->first();
-
+        $book = Book::with('category:categories.id')->orderBy('id')->first();
         $render = $jsonApi->render($book, 'Book', ['foo' => 'bar']);
 
         $this->assertIsArray($render);
@@ -250,9 +228,8 @@ class JsonApiResponseTest extends TestCase
      */
     public function testRenderSmartBelongsTo(): void
     {
+        $this->seed(RelatedDataSeeder::class);
         $jsonApi = new JsonApiResponse();
-        $this->addDatabaseContent();
-
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $movie = Movie::first();
@@ -278,7 +255,7 @@ class JsonApiResponseTest extends TestCase
         $smartCategory = [
             'data' => [
                 'type' => 'Category',
-                'id'   => '1',
+                'id'   => (string)$movie->book->category->id,
             ],
         ];
 
@@ -298,10 +275,10 @@ class JsonApiResponseTest extends TestCase
      */
     public function testSearchDecorator(): void
     {
-        $this->getBook()->save();
         $jsonApi = new JsonApiResponse();
         $books = Book::all();
-        $decorators = $this->invokeMethod($jsonApi, 'searchDecorator', [$books, 'foo']);
+        $book = $books->first();
+        $decorators = $this->invokeMethod($jsonApi, 'searchDecorator', [$books, $book->label]);
 
         $this->assertIsArray($decorators);
         $this->assertArrayHasKey('decorators', $decorators);
@@ -329,52 +306,47 @@ class JsonApiResponseTest extends TestCase
     }
 
     /**
+     * @param Book $book
      * @return array
      */
-    public function addDatabaseContent(): array
+    public function expectedFormattedContent(Book $book): array
     {
-        $category = Category::create(['label' => 'category1']);
-        $book1 = Book::create(['label' => 'foo', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 100.00, 'options' => [], 'category_id' => 1]);
-        $book1->setRelation('category', $category);
-        $book1->movies()->saveMany([
-            new Movie(['body' => 'foo body 1']),
-            new Movie(['body' => 'foo body 2']),
-        ]);
-        $book2 = Book::create(['label' => 'bar', 'comment' => 'test', 'difficulty' => 'easy', 'amount' => 50.00, 'options' => [], 'category_id' => 1]);
-        $book2->setRelation('category', $category);
-        $book1->movies()->saveMany([
-            new Movie(['body' => 'foo body 3']),
-            new Movie(['body' => 'foo body 4']),
-        ]);
-
         return [
             'type'          => 'Book',
-            'id'            => (string)$book1->id,
+            'id'            => (string) $book->id,
             'attributes'    => [
-                'label'       => $book1->label,
-                'comment'     => $book1->comment,
-                'difficulty'  => $book1->difficulty,
-                'category_id' => (string)$category->id,
-                'reference'   => call_user_func($book1->reference()->get),
+                'label'        => $book->label,
+                'comment'      => $book->comment,
+                'difficulty'   => $book->difficulty,
+                'amount'       => $book->amount,
+                'active'       => $book->active,
+                'options'      => $book->options,
+                'other'        => $book->other,
+                'category_id'  => (string) $book->category_id,
+                'published_at' => $book->published_at,
+                'sold_at'      => $book->sold_at,
+                'created_at'   => $book->created_at->jsonSerialize(),
+                'updated_at'   => $book->updated_at->jsonSerialize(),
+                'reference'    => call_user_func($book->reference()->get)
             ],
             'relationships' => [
                 'category'        => [
                     'data' => [
-                        'type' => class_basename($category),
-                        'id'   => (string)$category->id,
+                        'type' => class_basename($book->category),
+                        'id'   => (string) $book->category->id,
                     ],
                 ],
                 'comments'        => [
                     'links' => [
                         'related' => [
-                            'href' => '/forest/book/1/relationships/comments',
+                            'href' => '/forest/book/' . $book->id . '/relationships/comments',
                         ],
                     ],
                 ],
                 'smartBookstores' => [
                     'links' => [
                         'related' => [
-                            'href' => '/forest/book/1/relationships/smartBookstores',
+                            'href' => '/forest/book/' . $book->id . '/relationships/smartBookstores',
                         ],
                     ],
                 ],

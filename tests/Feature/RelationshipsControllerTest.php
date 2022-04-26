@@ -4,21 +4,24 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Advertisement;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Bookstore;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Editor;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Sequel;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Tag;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CompanyFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Advertisement;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Company;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Editor;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Sequel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Tag;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Bookstore;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
@@ -39,22 +42,13 @@ class RelationshipsControllerTest extends TestCase
     use ScopeManagerFactory;
 
     /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
-
-    /**
      * @return void
      * @throws \JsonException
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->seed(RelatedDataSeeder::class);
 
         $forestUser = new ForestUser(
             [
@@ -92,9 +86,6 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testIndex(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
-
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
@@ -115,8 +106,8 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testIndexSmartRelationship(): void
     {
-        $this->getBook()->save();
-        $this->getBookstores();
+        Company::factory(1)->create();
+        Bookstore::factory(1)->create();
 
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -138,13 +129,12 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testCount(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
-        $call = $this->get('/forest/book/1/relationships/comments/count');
+        $bookId = 1;
+        $call = $this->get("/forest/book/$bookId/relationships/comments/count");
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Comment::count(), $data['count']);
+        $this->assertEquals(Comment::where('book_id', $bookId)->count(), $data['count']);
     }
 
     /**
@@ -152,21 +142,22 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testAssociateHasMany(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
         $book = Book::first();
+        $comment = Comment::where('book_id', '!=', $book->id)->first();
         $call = $this->post(
-            '/forest/book/1/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $comment->id,
                         'type' => 'comment',
                     ]
                 ]
             ]
         );
-        $commentIds = Comment::pluck('id')->toArray();
+        $commentIds = Comment::where('book_id', $book->id)
+            ->pluck('id')
+            ->toArray();
 
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
@@ -179,21 +170,30 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testAssociateMorphMany(): void
     {
-        $this->getBook()->save();
-        $this->getTags();
         $book = Book::first();
+        $tag = Tag::where(
+            [
+                ['taggable_id', '!=', $book->id],
+                ['taggable_type', '=', Book::class],
+            ]
+        )->first();
         $call = $this->post(
-            '/forest/book/1/relationships/tags',
+            '/forest/book/' . $book->id . '/relationships/tags',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $tag->id,
                         'type' => 'tag',
                     ]
                 ]
             ]
         );
-        $tagIds = Tag::pluck('id')->toArray();
+        $tagIds = Tag::where(
+            [
+                'taggable_id' => $book->id,
+                'taggable_type' => Book::class,
+            ]
+        )->pluck('id')->toArray();
 
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
@@ -201,29 +201,30 @@ class RelationshipsControllerTest extends TestCase
         $this->assertEquals($tagIds, $book->tags->pluck('id')->toArray());
     }
 
-
     /**
      * @return void
      */
     public function testAssociateBelongsToMany(): void
     {
-        $this->getBook()->save();
-        $this->getRanges();
+        $book = Book::first();
+        $range = Range::whereRelation('books', 'books.id', '!=', $book->id)->first();
         $call = $this->post(
-            '/forest/book/1/relationships/ranges',
+            '/forest/book/' . $book->id . '/relationships/ranges',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $range->id,
                         'type' => 'range',
                     ]
                 ]
             ]
         );
+        $rangeIds = Range::whereRelation('books', 'books.id', '=', $book->id)->pluck('id')->sort()->values()->toArray();
 
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
+        $this->assertEquals($rangeIds, $book->ranges->pluck('id')->sort()->values()->toArray());
     }
 
     /**
@@ -231,15 +232,14 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateHasMany(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
-        Movie::create(['body' => 'test movie', 'book_id' => $book->id]);
+        $movie = Movie::create(['body' => 'test movie', 'book_id' => $book->id]);
         $call = $this->delete(
-            '/forest/book/1/relationships/movies',
+            '/forest/book/' . $book->id . '/relationships/movies',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $movie->id,
                         'type' => 'movie',
                     ]
                 ]
@@ -249,7 +249,7 @@ class RelationshipsControllerTest extends TestCase
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
-        $this->assertNull(Movie::find(1)->book_id);
+        $this->assertNull(Movie::find($movie->id)->book_id);
     }
 
     /**
@@ -257,22 +257,21 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateMorphMany(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
-        Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
+        $sequel = Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
         $call = $this->delete(
             '/forest/book/1/relationships/sequels',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $sequel->id,
                         'type' => 'sequel',
                     ]
                 ]
             ]
         );
 
-        $sequel = Sequel::find(1);
+        $sequel = Sequel::find($sequel->id);
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
@@ -285,15 +284,14 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateBelongsToMany(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
-        $this->getRanges();
+        $range = Range::whereRelation('books', 'books.id', '=', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/1/relationships/ranges',
+            '/forest/book/' . $book->id . '/relationships/ranges',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $range->id,
                         'type' => 'range',
                     ]
                 ]
@@ -303,7 +301,7 @@ class RelationshipsControllerTest extends TestCase
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
-        $this->assertNotContains([1], $book->ranges->pluck('id')->toArray());
+        $this->assertNotContains([$range->id], $book->ranges->pluck('id')->toArray());
     }
 
     /**
@@ -311,14 +309,14 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateWithDelete(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
+        $book = Book::first();
+        $comment = Comment::where('book_id', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/1/relationships/comments?delete=true',
+            '/forest/book/' . $book->id . '/relationships/comments?delete=true',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $comment->id,
                         'type' => 'comments',
                     ]
                 ]
@@ -328,7 +326,7 @@ class RelationshipsControllerTest extends TestCase
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
-        $this->assertNull(Comment::find(1));
+        $this->assertNull(Comment::find($comment->id));
     }
 
     /**
@@ -337,10 +335,9 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateExceptionRecordsNotFound(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
+        $book = Book::first();
         $call = $this->delete(
-            '/forest/book/1/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
@@ -363,14 +360,14 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testDissociateExceptionRecordsConstraint(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
+        $book = Book::first();
+        $comment = Comment::where('book_id', $book->id)->first();
         $call = $this->delete(
-            '/forest/book/1/relationships/comments',
+            '/forest/book/' . $book->id . '/relationships/comments',
             [
                 'data' => [
                     [
-                        'id'   => '1',
+                        'id'   => $comment->id,
                         'type' => 'comments',
                     ]
                 ]
@@ -388,11 +385,10 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testUpdateBelongsTo(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $category = Category::create(['label' => 'foo']);
         $call = $this->put(
-            '/forest/book/1/relationships/category',
+            '/forest/book/' . $book->id . '/relationships/category',
             [
                 'data' => [
                     'id'   => $category->id,
@@ -413,11 +409,14 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testUpdateHasOne(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
-        $editor = Editor::create(['name' => 'foo', 'book_id' => 2]);
+        $book->editor->book_id = null;
+        $book->editor->save();
+        $editor = Editor::create(['name' => 'foo', 'book_id' => null]);
+
+        // TODO update test -> maybe set book_id nullable ?
         $call = $this->put(
-            '/forest/book/1/relationships/editor',
+            '/forest/book/' . $book->id . '/relationships/editor',
             [
                 'data' => [
                     'id'   => $editor->id,
@@ -425,7 +424,7 @@ class RelationshipsControllerTest extends TestCase
                 ]
             ]
         );
-        $book = $book->fresh();
+        $book = $book->refresh();
 
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
@@ -439,10 +438,10 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testUpdateExceptionRecordsNotFound(): void
     {
-        $this->getBook()->save();
+        $book = Book::first();
         $category = Category::create(['label' => 'foo']);
         $call = $this->put(
-            '/forest/book/1/relationships/category',
+            '/forest/book/' . $book->id . '/relationships/category',
             [
                 'data' => [
                     'id'   => '100',
@@ -463,13 +462,10 @@ class RelationshipsControllerTest extends TestCase
      */
     public function testUpdateExceptionRecordsConstraint(): void
     {
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-            Advertisement::create(['label' => 'foo', 'book_id' => $i + 1]);
-        }
+        $book = Book::first();
         $advertisementOfBook2 = Advertisement::firstWhere('book_id', 2);
         $call = $this->put(
-            '/forest/book/1/relationships/advertisement',
+            '/forest/book/' . $book->id . '/relationships/advertisement',
             [
                 'data' => [
                     'id'   => $advertisementOfBook2->id,

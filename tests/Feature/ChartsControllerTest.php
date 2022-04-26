@@ -4,15 +4,14 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
@@ -38,16 +37,6 @@ class ChartsControllerTest extends TestCase
      * @var ForestUser
      */
     private ForestUser $forestUser;
-
-    /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
 
     /**
      * @return void
@@ -231,7 +220,6 @@ class ChartsControllerTest extends TestCase
     public function testIndexValue(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Value');
@@ -240,6 +228,7 @@ class ChartsControllerTest extends TestCase
                 'values' => [$data['permission']],
             ]
         ];
+
         $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats/book', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -272,7 +261,6 @@ class ChartsControllerTest extends TestCase
     public function testIndexObjective(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Objective');
@@ -315,7 +303,6 @@ class ChartsControllerTest extends TestCase
     public function testIndexPie(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Pie');
@@ -356,7 +343,6 @@ class ChartsControllerTest extends TestCase
     public function testIndexLine(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $this->getBook()->save();
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $data = $this->getTestingDataLiveQueries('Line');
@@ -472,10 +458,10 @@ class ChartsControllerTest extends TestCase
                     'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}"
                 ],
                 'queryResult' => [
-                    (object) ['value' => 1],
+                    (object) ['value' => Book::where('label', 'foo')->count()],
                 ],
                 'expected'    => [
-                    'countCurrent'  => 1,
+                    'countCurrent'  => Book::where('label', 'foo')->count(),
                     'countPrevious' => null,
                 ],
             ],
@@ -495,17 +481,17 @@ class ChartsControllerTest extends TestCase
                     'aggregator'         => 'Count',
                 ],
                 'queryResult' => [
-                    (object) ['value' => 1, 'objective' => 10],
+                    (object) ['value' => Book::count(), 'objective' => 10],
                 ],
                 'expected'    => [
-                    'value'     => 1,
+                    'value'     => Book::count(),
                     'objective' => 10,
                 ],
             ],
             'Pie'         => [
                 'payloadQuery'     => [
                     'type'  => 'Pie',
-                    'query' => "select COUNT(books.label) as value, books.label as key from books group by books.label",
+                    'query' => "select COUNT(books.label) as value, books.label as key from books where label = 'foo' group by books.label",
                 ],
                 'payload' => [
                     'type'            => 'Pie',
@@ -521,17 +507,24 @@ class ChartsControllerTest extends TestCase
                     'groupByFieldName'   => 'label',
                     'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
                 ],
-                'queryResult' => [
-                    (object) ['value' => 1, 'key' => 'foo'],
-                ],
-                'expected'    => [
-                    ['value' => 1, 'key' => 'foo'],
-                ],
+                'queryResult' => array_map(
+                    static fn ($item) => (object) $item,
+                    Book::selectRaw('COUNT(books.label) as value, books.label as key')
+                        ->where('label', 'foo')
+                        ->groupBy('label')
+                        ->get()
+                        ->toArray()
+                ),
+                'expected' => Book::selectRaw('COUNT(books.label) as value, books.label as key')
+                    ->where('label', 'foo')
+                    ->groupBy('label')
+                    ->get()
+                    ->toArray(),
             ],
             'Line'        => [
                 'payloadQuery'     => [
                     'type'  => 'Line',
-                    'query' => "select count(*) as value, to_char(created_at, 'dd/mm/yyyy') as key from books group by key",
+                    'query' => "select count(*) as value, date(created_at, 'dd/mm/yyyy') as label from books group by label",
                 ],
                 'payload' => [
                     'aggregate'           => 'Count',
@@ -547,15 +540,25 @@ class ChartsControllerTest extends TestCase
                     'groupByFieldName'   => 'created_at',
                     'timeRange'          => 'Day',
                 ],
-                'queryResult' => [
-                    (object) ['value' => 1, 'key' => Carbon::now()->format('d/m/Y')],
-                ],
-                'expected'    => [
-                    [
-                        'label'  => Carbon::now()->format('d/m/Y'),
-                        'values' => ['value' => 1],
-                    ],
-                ],
+                'queryResult' => array_map(
+                    static fn ($item) => (object) $item,
+                    Book::selectRaw("count(*) as value, STRFTIME('%d/%m/%Y', created_at) as key")
+                        ->whereNotNull('created_at')
+                        ->groupBy('created_at')
+                        ->get()
+                        ->toArray()
+                ),
+                'expected' => Book::selectRaw("count(*) as value, STRFTIME('%d/%m/%Y', created_at) as key")
+                    ->whereNotNull('created_at')
+                    ->groupBy('created_at')
+                    ->get()
+                    ->map(
+                        fn($item) => [
+                        'label'  => $item['key'],
+                        'values' => ['value' => $item['value']],
+                        ]
+                    )
+                    ->toArray(),
             ],
             'Leaderboard' => [
                 'payloadQuery'     => [

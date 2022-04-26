@@ -4,10 +4,8 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
 use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\DatabaseHelper;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 
 /**
  * Class DatabaseHelperTest
@@ -18,8 +16,6 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
  */
 class DatabaseHelperTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      * @throws Exception
@@ -27,9 +23,8 @@ class DatabaseHelperTest extends TestCase
      */
     public function testGetColumns(): void
     {
-        $model = $this->getBook();
         $trait = $this->getObjectForTrait(DatabaseHelper::class);
-        $result = $this->invokeMethod($trait, 'getColumns', [$model]);
+        $result = $this->invokeMethod($trait, 'getColumns', [Book::first()]);
         $keyExpected = [
             'id',
             'label',

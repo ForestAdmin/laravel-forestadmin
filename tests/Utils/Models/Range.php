@@ -1,7 +1,9 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\RangeFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -14,9 +16,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Range extends Model
 {
+    use HasFactory;
+
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'label',
     ];
+
+    /**
+     * @return RangeFactory
+     */
+    protected static function newFactory()
+    {
+        return new RangeFactory();
+    }
 
     /**
      * @return BelongsToMany

@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
@@ -8,6 +8,8 @@ use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\RequestBulk;
 use Illuminate\Database\Eloquent\Builder;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\BookFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,8 +20,6 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 
 /**
  * Class Book
@@ -32,6 +32,7 @@ class Book extends Model
 {
     use ForestCollection;
     use RequestBulk;
+    use HasFactory;
 
     protected $casts = [
         'options' => 'array',
@@ -64,7 +65,7 @@ class Book extends Model
                     return $this;
                 }
             )
-            ->sort(fn(Builder $query, string $direction) => $query->orderBy('label'))
+            ->sort(fn(Builder $query, string $direction) => $query->orderBy('label', $direction))
             ->filter(
                 static function (Builder $query, $value, string $operator, string $aggregator) {
                     $data = explode('-', $value);
@@ -145,6 +146,14 @@ class Book extends Model
                     }
                 ]
             );
+    }
+
+    /**
+     * @return BookFactory
+     */
+    protected static function newFactory()
+    {
+        return new BookFactory();
     }
 
     /**

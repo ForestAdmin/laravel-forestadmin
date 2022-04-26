@@ -12,14 +12,12 @@ use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,7 +38,6 @@ use Mockery as m;
 class ForestModelTest extends TestCase
 {
     use ProphecyTrait;
-    use FakeData;
 
     /**
      * @return void
@@ -467,7 +464,7 @@ class ForestModelTest extends TestCase
      */
     public function testFetchSmartFeaturesWithSmartAction(): void
     {
-        $book = $this->getBook();
+        $book = Book::first();
         $forestModel = m::mock(ForestModel::class, [$book])
             ->makePartial();
         $value = $forestModel->fetchSmartFeatures(SmartAction::class);
@@ -483,7 +480,7 @@ class ForestModelTest extends TestCase
      */
     public function testFetchSmartFeaturesWithSmartRelationship(): void
     {
-        $book = $this->getBook();
+        $book = Book::first();
         $forestModel = m::mock(ForestModel::class, [$book])
             ->makePartial();
         $value = $forestModel->fetchSmartFeatures(SmartRelationship::class);
@@ -505,7 +502,7 @@ class ForestModelTest extends TestCase
      */
     public function testFetchSmartFeaturesWithSmartField(): void
     {
-        $book = $this->getBook();
+        $book = Book::first();
         $forestModel = m::mock(ForestModel::class, [$book])
             ->makePartial();
         $value = $forestModel->fetchSmartFeatures(SmartField::class);
@@ -521,12 +518,12 @@ class ForestModelTest extends TestCase
      */
     public function testFetchSmartFeaturesWithSmartSegment(): void
     {
-        $book = $this->getBook();
-        $forestModel = m::mock(ForestModel::class, [$book->category])
+        $category = Category::first();
+        $forestModel = m::mock(ForestModel::class, [$category])
             ->makePartial();
         $value = $forestModel->fetchSmartFeatures(SmartSegment::class);
         $smartSegment = new SmartSegment(
-            class_basename($book->category),
+            class_basename($category),
             'bestName',
             'bestCategories',
             fn(Builder $query) => $query->where('id', '<', 3),

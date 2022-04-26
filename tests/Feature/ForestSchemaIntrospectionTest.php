@@ -3,9 +3,9 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use JsonPath\JsonObject;

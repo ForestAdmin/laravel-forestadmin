@@ -3,12 +3,11 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyAssociator;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Sequel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Sequel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Mockery as m;
 
 /**
@@ -20,14 +19,11 @@ use Mockery as m;
  */
 class HasManyAssociatorTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      */
     public function testAddRelationHasMany(): void
     {
-        $this->getBook()->save();
         $movie = Movie::create(['body' => 'test movie']);
         $book = Book::first();
 
@@ -44,7 +40,6 @@ class HasManyAssociatorTest extends TestCase
      */
     public function testAddRelationMorphMany(): void
     {
-        $this->getBook()->save();
         $sequel = Sequel::create(['label' => 'sequel test']);
         $book = Book::first();
 
@@ -61,9 +56,6 @@ class HasManyAssociatorTest extends TestCase
      */
     public function testAddRelationBelongsToMany(): void
     {
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-        }
         $books = Book::all();
         $book1 = $books->first();
         $book2 = $books->last();

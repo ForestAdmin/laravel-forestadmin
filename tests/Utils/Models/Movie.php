@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models;
 
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
@@ -19,6 +19,8 @@ class Movie extends Model
 {
     use HasFactory;
     use ForestCollection;
+
+
 
     protected $fillable = [
         'body',

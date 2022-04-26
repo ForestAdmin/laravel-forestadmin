@@ -4,7 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Facades;
 
 use ForestAdmin\LaravelForestAdmin\Facades\JsonApi;
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Mockery as m;
 
