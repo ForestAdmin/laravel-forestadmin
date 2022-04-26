@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
@@ -31,6 +32,7 @@ class ResourcesControllerTest extends TestCase
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
+    use MockIpWhitelist;
 
     /**
      * @var ForestUser
@@ -72,6 +74,7 @@ class ResourcesControllerTest extends TestCase
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
+        $this->mockIpWhitelist();
     }
 
     /**
@@ -807,7 +810,7 @@ class ResourcesControllerTest extends TestCase
     public function testSearchExtendedWithQueryBuilder(): void
     {
         $this->makeScopeManager($this->forestUser);
-        $category = Category::first();
+        $category = Category::whereHas('books')->first();
         $params = ['fields' => ['book' => 'id,label'], 'search' => $category->label, 'searchExtended' => 1];
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));

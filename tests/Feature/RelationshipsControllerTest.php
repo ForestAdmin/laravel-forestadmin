@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Factories\CompanyFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Advertisement;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
@@ -18,9 +17,9 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Bookstore;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -36,10 +35,10 @@ use Illuminate\Support\Facades\File;
  */
 class RelationshipsControllerTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
+    use MockIpWhitelist;
 
     /**
      * @return void
@@ -78,6 +77,7 @@ class RelationshipsControllerTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
         $this->makeScopeManager($forestUser);
+        $this->mockIpWhitelist();
     }
 
     /**
@@ -219,12 +219,12 @@ class RelationshipsControllerTest extends TestCase
                 ]
             ]
         );
-        $rangeIds = Range::whereRelation('books', 'books.id', '=', $book->id)->pluck('id')->sort()->values()->toArray();
+        $rangeIds = array_values(Range::whereRelation('books', 'books.id', '=', $book->id)->pluck('id')->sort()->toArray());
 
         $this->assertInstanceOf(Response::class, $call->baseResponse);
         $this->assertEquals(204, $call->baseResponse->getStatusCode());
         $this->assertEmpty($call->baseResponse->getContent());
-        $this->assertEquals($rangeIds, $book->ranges->pluck('id')->sort()->values()->toArray());
+        $this->assertEquals($rangeIds, array_values($book->ranges->pluck('id')->sort()->toArray()));
     }
 
     /**

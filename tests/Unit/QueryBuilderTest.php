@@ -11,7 +11,6 @@ use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentQueryBuilder;
@@ -32,7 +31,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class QueryBuilderTest extends TestCase
 {
     use ProphecyTrait;
-    use FakeData;
     use ScopeManagerFactory;
 
     /**

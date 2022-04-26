@@ -23,6 +23,7 @@
     "guzzlehttp/guzzle": "^7.4",
     "league/fractal": "^0.20.1",
     "league/oauth2-client": "^2.6",
+    "mlocati/ip-lib": "^1.18",
     "ramsey/uuid": "^4.2",
     "usmanhalalit/laracsv": "^2.1"
   },

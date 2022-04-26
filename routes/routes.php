@@ -5,11 +5,13 @@ use ForestAdmin\LaravelForestAdmin\Http\Controllers\AuthController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\DispatchGateway;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\SmartActionController;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestAuthorization;
+use ForestAdmin\LaravelForestAdmin\Http\Middleware\IpWhitelistAuthorization;
 use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
         'prefix'     => 'forest',
+        'middleware' => [IpWhitelistAuthorization::class],
     ],
     function () {
         Route::get('/', [ApiMapsController::class, 'index']);
@@ -18,7 +20,7 @@ Route::group(
 
         Route::group(
             [
-                'middleware' => [ForestAuthorization::class]
+                'middleware' => [ForestAuthorization::class],
             ],
             function () {
                 // STATS

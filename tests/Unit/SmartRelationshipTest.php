@@ -2,13 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
-use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\App;
 
 /**
  * Class SmartRelationshipTest
@@ -19,8 +15,6 @@ use Illuminate\Support\Facades\App;
  */
 class SmartRelationshipTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      */
