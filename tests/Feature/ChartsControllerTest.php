@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
@@ -29,7 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ChartsControllerTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;

@@ -8,7 +8,6 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Line;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
@@ -26,7 +25,6 @@ use Mockery as m;
  */
 class LineTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use ScopeManagerFactory;
 
