@@ -1,3 +1,10 @@
+# [1.0.0-beta.15](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.14...v1.0.0-beta.15) (2022-04-26)
+
+
+### Features
+
+* **tests:** improve all tests with factories ([#37](https://github.com/ForestAdmin/laravel-forestadmin/issues/37)) ([427b22d](https://github.com/ForestAdmin/laravel-forestadmin/commit/427b22d567b8b289dd4be90354678425257c7fd9))
+
 # [1.0.0-beta.14](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2022-04-20)
 
 
