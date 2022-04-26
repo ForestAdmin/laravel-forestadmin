@@ -1,3 +1,10 @@
+# [1.0.0-beta.16](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2022-04-26)
+
+
+### Features
+
+* **ip-whitelist:** add ip-whitelist support ([#38](https://github.com/ForestAdmin/laravel-forestadmin/issues/38)) ([1fd2585](https://github.com/ForestAdmin/laravel-forestadmin/commit/1fd2585ca3a3ebfbe12a5590039a7cf470022abd))
+
 # [1.0.0-beta.15](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.14...v1.0.0-beta.15) (2022-04-26)
 
 
