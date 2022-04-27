@@ -27,7 +27,7 @@ class RouteMatched
      */
     public function handle(RouteMatchedEvent $routeMatchedEvent): void
     {
-        if ($this->shouldRun($routeMatchedEvent->request) && config('forest.send_apimap_auto')) {
+        if ($this->shouldRun($routeMatchedEvent->request) && config('forest.send_apimap_automatic')) {
             $filePath = App::basePath(config('forest.json_file_path'));
 
             if (File::exists($filePath)) {

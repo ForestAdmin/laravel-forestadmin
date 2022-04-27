@@ -49,7 +49,7 @@ class RouteMatchedTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-        $app['config']->set('forest.send_apimap_auto', true);
+        $app['config']->set('forest.send_apimap_automatic', true);
     }
 
     /**
