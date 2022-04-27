@@ -1,3 +1,10 @@
+# [1.0.0-beta.17](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2022-04-27)
+
+
+### Features
+
+* **deploy:** add FOREST_SEND_APIMAP_AUTOMATIC env to enable automatic sending of the apimap ([#39](https://github.com/ForestAdmin/laravel-forestadmin/issues/39)) ([781f199](https://github.com/ForestAdmin/laravel-forestadmin/commit/781f199288c7f7ef1a0409c0a201ac84d1be49c7))
+
 # [1.0.0-beta.16](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2022-04-26)
 
 
