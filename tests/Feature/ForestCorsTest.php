@@ -31,6 +31,31 @@ class ForestCorsTest extends TestCase
     /**
      * @return void
      */
+    public function testShouldReturnHeadersPrivateNetworkOnPreflightRequest(): void
+    {
+        $response = $this->withHeaders(
+            [
+                'Access-Control-Request-Private-Network' => 'true',
+                'Access-Control-Request-Method'          => 'true',
+                'HTTP_ORIGIN'                            => 'http://api.forestadmin.com',
+                'HTTP_ACCESS_CONTROL_REQUEST_METHOD'     => 'POST',
+            ]
+        )
+            ->options('forest/ping');
+
+        $this->assertEquals('http://api.forestadmin.com', $response->headers->get('access-control-allow-origin'));
+        $this->assertEquals('true', $response->headers->get('access-control-allow-credentials'));
+        $this->assertTrue(Str::containsAll($response->headers->get('access-control-allow-methods'), ['GET', 'POST', 'PUT', 'DELETE']));
+        $this->assertEquals(86400, $response->headers->get('access-control-max-age'));
+        $this->assertEquals(null, $response->headers->get('access-control-allow-headers'));
+        $this->assertEquals('true', $response->headers->get('Access-Control-Allow-Private-Network'));
+        $this->assertEquals(204, $response->getStatusCode());
+    }
+
+
+    /**
+     * @return void
+     */
     public function testShouldReturnHeadersOnPreflightRequest(): void
     {
         $response = $this->call(
@@ -40,8 +65,8 @@ class ForestCorsTest extends TestCase
             [],
             [],
             [
-                'HTTP_ORIGIN' => 'http://api.forestadmin.com',
-                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST'
+                'HTTP_ORIGIN'                        => 'http://api.forestadmin.com',
+                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
             ]
         );
 
@@ -107,8 +132,8 @@ class ForestCorsTest extends TestCase
             [],
             [],
             [
-                'HTTP_ORIGIN' => 'http://example.com',
-                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST'
+                'HTTP_ORIGIN'                        => 'http://example.com',
+                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
             ]
         );
 
@@ -131,8 +156,8 @@ class ForestCorsTest extends TestCase
             [],
             [],
             [
-                'HTTP_ORIGIN' => 'http://api.forestadmin.com',
-                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST'
+                'HTTP_ORIGIN'                        => 'http://api.forestadmin.com',
+                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
             ]
         );
 
@@ -144,8 +169,8 @@ class ForestCorsTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
      * @return void
+     * @throws \ReflectionException
      */
     public function testCoreOptions(): void
     {
@@ -180,12 +205,12 @@ class ForestCorsTest extends TestCase
     {
         $router->any(
             'forest/ping',
-            ['uses' => fn () => 'PONG']
+            ['uses' => fn() => 'PONG']
         );
 
         $router->any(
             'no-forest/ping',
-            ['uses' => fn () => 'PONG']
+            ['uses' => fn() => 'PONG']
         );
     }
 }
