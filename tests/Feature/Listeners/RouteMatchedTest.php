@@ -3,8 +3,6 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
-use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
-use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
 use ForestAdmin\LaravelForestAdmin\Listeners\RouteMatched;
 use ForestAdmin\LaravelForestAdmin\Schema\Schema;
@@ -18,16 +16,12 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Prophecy\Argument;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResourcesControllerTest
@@ -38,7 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RouteMatchedTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
