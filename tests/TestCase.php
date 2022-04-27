@@ -94,7 +94,6 @@ class TestCase extends OrchestraTestCase
     {
         parent::getEnvironmentSetUp($app);
         $config = $app['config'];
-        $config->set('app.env', 'local');
         $config->set('app.debug', true);
         $config->set('forest.api.secret', 'my-secret-key');
         $config->set('forest.api.auth-secret', 'auth-secret-key');
