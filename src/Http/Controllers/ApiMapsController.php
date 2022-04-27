@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Auth\OidcConfiguration;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Htptp;
 
 /**
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Htptp;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class ApiMapsController extends Controller
+class ApiMapsController extends ForestController
 {
     /**
      * @return Response
