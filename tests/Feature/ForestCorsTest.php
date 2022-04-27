@@ -47,7 +47,7 @@ class ForestCorsTest extends TestCase
         $this->assertEquals('true', $response->headers->get('access-control-allow-credentials'));
         $this->assertTrue(Str::containsAll($response->headers->get('access-control-allow-methods'), ['GET', 'POST', 'PUT', 'DELETE']));
         $this->assertEquals(86400, $response->headers->get('access-control-max-age'));
-        $this->assertEquals(null, $response->headers->get('access-control-allow-headers'));
+        $this->assertNull($response->headers->get('access-control-allow-headers'));
         $this->assertEquals('true', $response->headers->get('Access-Control-Allow-Private-Network'));
         $this->assertEquals(204, $response->getStatusCode());
     }
