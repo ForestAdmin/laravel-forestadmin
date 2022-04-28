@@ -1,3 +1,10 @@
+# [1.0.0-beta.18](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2022-04-28)
+
+
+### Features
+
+* **cors:** add access controll allow private network handling  ([#40](https://github.com/ForestAdmin/laravel-forestadmin/issues/40)) ([036fb08](https://github.com/ForestAdmin/laravel-forestadmin/commit/036fb08c00913b11a77c0e521c8d4fd9f3538c92))
+
 # [1.0.0-beta.17](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2022-04-27)
 
 
