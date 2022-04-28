@@ -52,8 +52,11 @@ class ForestCors
 
         if ($this->cors->isPreflightRequest($request)) {
             $response = $this->cors->handlePreflightRequest($request);
-
             $this->cors->varyHeader($response, 'Access-Control-Request-Method');
+
+            if ($request->headers->has('Access-Control-Request-Private-Network')) {
+                $response->headers->set('Access-Control-Allow-Private-Network', 'true');
+            }
 
             return $response;
         }
@@ -93,6 +96,7 @@ class ForestCors
     {
         return Str::startsWith($request->getRequestUri(), '/forest');
     }
+
 
     /**
      * Get CORS
