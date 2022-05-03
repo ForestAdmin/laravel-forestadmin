@@ -1,3 +1,10 @@
+# [1.0.0-beta.19](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2022-05-03)
+
+
+### Bug Fixes
+
+* **schema:** fix method that get the driver of the database ([#43](https://github.com/ForestAdmin/laravel-forestadmin/issues/43)) ([0770647](https://github.com/ForestAdmin/laravel-forestadmin/commit/0770647dfdbaeb751f9961b84f206128cc2f3992))
+
 # [1.0.0-beta.18](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2022-04-28)
 
 
