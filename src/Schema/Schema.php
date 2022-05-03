@@ -213,12 +213,14 @@ class Schema
      */
     private function metadata(): array
     {
+        $connection = $this->config->get('database.default');
+
         return [
             'meta' => [
                 'liana'         => self::LIANA_NAME,
                 'liana_version' => self::LIANA_VERSION,
                 'stack'         => [
-                    'database_type' => Database::getSource($this->config->get('database.default')),
+                    'database_type' => Database::getSource($this->config->get("database.connections.$connection.driver")),
                     'orm_version'   => app()->version(),
                 ],
             ],

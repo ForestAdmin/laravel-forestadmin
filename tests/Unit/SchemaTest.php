@@ -104,6 +104,9 @@ class SchemaTest extends TestCase
             ->get('database.default')
             ->willReturn('sqlite');
         $config
+            ->get('database.connections.sqlite.driver')
+            ->willReturn('sqlite');
+        $config
             ->get('forest.models_directory')
             ->willReturn(__DIR__ . '/../Feature/Models');
         $config
