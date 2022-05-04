@@ -1,3 +1,10 @@
+# [1.0.0-beta.20](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2022-05-04)
+
+
+### Features
+
+* **onboarding:** add a url control on forest install command ([#44](https://github.com/ForestAdmin/laravel-forestadmin/issues/44)) ([181da4c](https://github.com/ForestAdmin/laravel-forestadmin/commit/181da4c1a7daf24a47fd80684357ba60741d565b))
+
 # [1.0.0-beta.19](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2022-05-03)
 
 
