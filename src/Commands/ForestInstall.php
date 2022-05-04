@@ -33,7 +33,7 @@ class ForestInstall extends Command
         $url = $this->argument('url');
         $appUrl = config('app.url');
         if ($url !== $appUrl) {
-            $this->error("🌳🌳🌳 Something went wrong! You have set $url on step 1 but your APP_URL is set to $appUrl. Please fix this issue and try again 🌳🌳🌳");
+            $this->error("🌳🌳🌳 Something went wrong! The URL set on step 1 ($url) and you Laravel APP_URL ($appUrl) do not match. Please update as to make them match. 🌳🌳🌳");
             return;
         } else {
             $this->info('✅ Url properly configured');
