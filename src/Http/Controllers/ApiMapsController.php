@@ -3,8 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Auth\OidcConfiguration;
+use ForestAdmin\LaravelForestAdmin\Schema\Schema;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Htptp;
 
 /**
  * Class ApiMapsController
@@ -16,10 +18,16 @@ use Illuminate\Support\Facades\Htptp;
 class ApiMapsController extends ForestController
 {
     /**
-     * @return Response
+     * @return JsonResponse|Response
+     * @throws BindingResolutionException
      */
     public function index()
     {
-        return response()->noContent();
+        if (config('forest.api.secret')) {
+            app()->make(Schema::class)->sendApiMap();
+            return response()->noContent();
+        } else {
+            return response()->json(['error' => 'forest secret is missing'], Response::HTTP_UNAUTHORIZED);
+        }
     }
 }
