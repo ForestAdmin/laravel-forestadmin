@@ -13,7 +13,6 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -91,6 +90,23 @@ class Schema
     }
 
     /**
+     * @param string $modelName
+     * @return bool
+     */
+    public function modelIncluded(string $modelName): bool
+    {
+        if (empty(config('forest.included_models')) && empty(config('forest.excluded_models'))) {
+            return true;
+        }
+
+        if (!empty(config('forest.included_models'))) {
+            return in_array($modelName, config('forest.included_models'), true);
+        } else {
+            return !in_array($modelName, config('forest.excluded_models'), true);
+        }
+    }
+
+    /**
      * @return array
      * @throws BindingResolutionException
      * @throws Exception
@@ -105,7 +121,7 @@ class Schema
         foreach ($files as $file) {
             if (class_exists($file)) {
                 $class = (new \ReflectionClass($file));
-                if ($class->isSubclassOf(Model::class) && $class->isInstantiable()) {
+                if ($class->isSubclassOf(Model::class) && $class->isInstantiable() && $this->modelIncluded($file)) {
                     $model = app()->make($file);
                     $forestModel = new ForestModel($model);
                     $collections[] = $forestModel->serialize();

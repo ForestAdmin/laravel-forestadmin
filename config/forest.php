@@ -10,4 +10,6 @@ return [
         'secret'      => env('FOREST_ENV_SECRET'),
         'auth-secret' => env('FOREST_AUTH_SECRET'),
     ],
+    'included_models' => [],
+    'excluded_models' => [],
 ];

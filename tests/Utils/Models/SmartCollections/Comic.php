@@ -1,6 +1,6 @@
 <?php
 
-namespace ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\SmartCollections;
+namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\SmartCollections;
 
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;

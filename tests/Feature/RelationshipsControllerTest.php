@@ -207,7 +207,8 @@ class RelationshipsControllerTest extends TestCase
     public function testAssociateBelongsToMany(): void
     {
         $book = Book::first();
-        $range = Range::whereRelation('books', 'books.id', '!=', $book->id)->first();
+        $range = Range::whereDoesntHave('books', static fn($query) => $query->where('books.id', $book->id))->first();
+
         $call = $this->post(
             '/forest/book/' . $book->id . '/relationships/ranges',
             [

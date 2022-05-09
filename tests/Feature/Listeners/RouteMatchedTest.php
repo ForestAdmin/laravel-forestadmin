@@ -57,8 +57,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapNotSendWithOutFile(): void
     {
-        App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema($this->getConfig(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -71,8 +70,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapRouteNotMatchPattern(): void
     {
-        App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema($this->getConfig(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -86,7 +84,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSend(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema($this->getConfig(), $this->forestApiPost(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), $this->forestApiPost(), $this->getConsole('<info>Apimap Received<info>'));
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 
@@ -103,7 +101,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSendOnce(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema($this->getConfig(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 
@@ -127,28 +125,6 @@ class RouteMatchedTest extends TestCase
             );
 
         return $forestApiPost->reveal();
-    }
-
-    /**
-     * @return object
-     */
-    private function getConfig()
-    {
-        $config = $this->prophesize(Repository::class);
-        $config
-            ->get('database.default')
-            ->willReturn('sqlite');
-        $config
-            ->get('database.connections.sqlite.driver')
-            ->willReturn('sqlite');
-        $config
-            ->get('forest.models_directory')
-            ->willReturn(__DIR__ . '/../Feature/Models');
-        $config
-            ->get('forest.json_file_path')
-            ->willReturn('.forestadmin-schema.json');
-
-        return $config->reveal();
     }
 
     /**
