@@ -1,3 +1,10 @@
+# [1.0.0-beta.21](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.20...v1.0.0-beta.21) (2022-05-09)
+
+
+### Features
+
+* **config:** add include/exclude models settings ([#46](https://github.com/ForestAdmin/laravel-forestadmin/issues/46)) ([1dcab5a](https://github.com/ForestAdmin/laravel-forestadmin/commit/1dcab5a0ff64fcb08dd933eb4d5578e64235ea4a))
+
 # [1.0.0-beta.20](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2022-05-04)
 
 
