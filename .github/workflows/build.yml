@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ["7.4", "8.0", "8.1"]
+        php: ['7.4', '8.0', '8.1']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -63,10 +63,10 @@ jobs:
           persist-credentials: false # GITHUB_TOKEN must not be set for the semantic release
       - uses: actions/setup-node@v2
         with:
-          node-version: 12.13.0
+          node-version: 14.17.6
       - uses: actions/cache@v2
         with:
-          path: "**/node_modules"
+          path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install semantic release dependencies
         run: yarn
