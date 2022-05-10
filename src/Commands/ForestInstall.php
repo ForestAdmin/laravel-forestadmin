@@ -32,6 +32,12 @@ class ForestInstall extends Command
     {
         $url = $this->argument('url');
         $appUrl = config('app.url');
+        $documentationUrl = 'https://docs.forestadmin.com/documentation/how-tos/settings/laravel-specific-settings#onboard-with-laravel-valet';
+
+        if (preg_match('/^(http:\/\/.*)(.test)$/', $url)) {
+            $this->info("⚠️  If you use Valet, please activate SSL with valet secure command. See the <href=$documentationUrl>documentation</> for more information");
+        }
+        
         if ($url !== $appUrl) {
             $this->error("🌳🌳🌳 Something went wrong! The URL set on step 1 ($url) and you Laravel APP_URL ($appUrl) do not match. Please update as to make them match. 🌳🌳🌳");
             return;
