@@ -37,7 +37,7 @@ class ForestInstall extends Command
         if (preg_match('/^(http:\/\/.*)(.test)$/', $url)) {
             $this->info("⚠️  If you use Valet, please activate SSL with valet secure command. See the <href=$documentationUrl>documentation</> for more information");
         }
-        
+
         if ($url !== $appUrl) {
             $this->error("🌳🌳🌳 Something went wrong! The URL set on step 1 ($url) and you Laravel APP_URL ($appUrl) do not match. Please update as to make them match. 🌳🌳🌳");
             return;
