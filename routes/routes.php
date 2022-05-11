@@ -8,13 +8,13 @@ use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestAuthorization;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\IpWhitelistAuthorization;
 use Illuminate\Support\Facades\Route;
 
+Route::get('forest/', [ApiMapsController::class, 'index']);
 Route::group(
     [
         'prefix'     => 'forest',
         'middleware' => [IpWhitelistAuthorization::class],
     ],
     function () {
-        Route::get('/', [ApiMapsController::class, 'index']);
         Route::post('authentication', [AuthController::class, 'login'])->name('forest.auth.login');
         Route::get('authentication/callback', [AuthController::class, 'callback'])->name('forest.auth.callback');
 
