@@ -1,3 +1,10 @@
+# [1.0.0-beta.22](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2022-05-11)
+
+
+### Features
+
+* **onboard:** allow user to onboard with laravel valet ([#45](https://github.com/ForestAdmin/laravel-forestadmin/issues/45)) ([47fa556](https://github.com/ForestAdmin/laravel-forestadmin/commit/47fa556cfaaed1c8e189168c82f40892deac2981))
+
 # [1.0.0-beta.21](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.20...v1.0.0-beta.21) (2022-05-09)
 
 
