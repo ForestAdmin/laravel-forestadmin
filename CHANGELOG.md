@@ -1,3 +1,10 @@
+# [1.0.0-beta.23](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.22...v1.0.0-beta.23) (2022-05-17)
+
+
+### Features
+
+* **auth:** add logout route ([#49](https://github.com/ForestAdmin/laravel-forestadmin/issues/49)) ([369394a](https://github.com/ForestAdmin/laravel-forestadmin/commit/369394ac8dbb880a03058101ff2165c4f9df7224))
+
 # [1.0.0-beta.22](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2022-05-11)
 
 
