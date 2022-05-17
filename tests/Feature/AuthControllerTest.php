@@ -12,6 +12,7 @@ use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -30,6 +31,8 @@ class AuthControllerTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
      */
     public function setUp(): void
     {
@@ -41,6 +44,18 @@ class AuthControllerTest extends TestCase
      * @var AuthController
      */
     private AuthController $authController;
+
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     * @return void
+     */
+    public function testLogout(): void
+    {
+        $call = $this->post('forest/authentication/logout');
+
+        $this->assertEquals($call->getStatusCode(), Response::HTTP_NO_CONTENT);
+    }
 
     /**
      * @throws GuzzleException
@@ -65,6 +80,7 @@ class AuthControllerTest extends TestCase
 
         $this->assertEquals($return, json_decode($login->getContent(), true)['authorizationUrl']);
     }
+
 
     /**
      * @throws GuzzleException

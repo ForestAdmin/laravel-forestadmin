@@ -52,6 +52,14 @@ class AuthController extends ForestController
     }
 
     /**
+     * @return \Illuminate\Http\Response
+     */
+    public function logout()
+    {
+        return response()->noContent();
+    }
+
+    /**
      * @return JsonResponse
      * @throws GuzzleException
      * @throws JsonException

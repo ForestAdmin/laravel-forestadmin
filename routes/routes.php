@@ -9,6 +9,7 @@ use ForestAdmin\LaravelForestAdmin\Http\Middleware\IpWhitelistAuthorization;
 use Illuminate\Support\Facades\Route;
 
 Route::get('forest/', [ApiMapsController::class, 'index']);
+Route::post('forest/authentication/logout', [AuthController::class, 'logout']);
 Route::group(
     [
         'prefix'     => 'forest',
