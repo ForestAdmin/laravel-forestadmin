@@ -4,9 +4,8 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceRemover;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use Mockery as m;
 
 /**
@@ -18,14 +17,11 @@ use Mockery as m;
  */
 class ResourceRemoverTest extends TestCase
 {
-    use FakeData;
-
     /**
      * @return void
      */
     public function testDestroy(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ResourceRemover::class, [$book, 'Book'])
             ->makePartial();
@@ -40,7 +36,6 @@ class ResourceRemoverTest extends TestCase
      */
     public function testDestroyException(): void
     {
-        $this->getBook()->save();
         $repository = m::mock(ResourceRemover::class, [Book::first(), 'Book'])
             ->makePartial();
 
@@ -55,9 +50,6 @@ class ResourceRemoverTest extends TestCase
      */
     public function testDestroyBulk(): void
     {
-        for ($i = 0; $i < 2; $i++) {
-            $this->getBook()->save();
-        }
         $bookIds = Book::pluck('id')->toArray();
         $repository = m::mock(ResourceRemover::class, [Book::first(), 'Book'])
             ->makePartial();
@@ -71,9 +63,6 @@ class ResourceRemoverTest extends TestCase
      */
     public function testDestroyBulkWithIdsExcluded(): void
     {
-        for ($i = 0; $i < 5; $i++) {
-            $this->getBook()->save();
-        }
         $bookIds = Book::where('id', '<=', 5)->pluck('id')->toArray();
         $bookIdsExcluded = Book::where('id', '>', 5)->pluck('id')->toArray();
         $repository = m::mock(ResourceRemover::class, [Book::first(), 'Book'])
@@ -88,7 +77,6 @@ class ResourceRemoverTest extends TestCase
      */
     public function testDestroyBulkException(): void
     {
-        $this->getBook()->save();
         $repository = m::mock(ResourceRemover::class, [Book::first(), 'Book'])
             ->makePartial();
 

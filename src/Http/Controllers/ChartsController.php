@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Transformers\ChartTransformer;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\App;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -45,7 +46,7 @@ class ChartsController extends ForestController
 
         $name = request()->route()->parameter('collection');
         $model = $this->getModel(ucfirst($name));
-        $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\\' . $this->type)($model);
+        $repository = App::makeWith('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\\' . $this->type, ['model' => $model]);
 
         return response()->json(
             JsonApi::renderItem(
@@ -66,7 +67,7 @@ class ChartsController extends ForestController
     public function liveQuery(): JsonResponse
     {
         $this->authorize('liveQuery', [request()->input('query')]);
-        $repository = new ('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $this->type)();
+        $repository = App::make('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $this->type);
 
         return response()->json(
             JsonApi::renderItem(

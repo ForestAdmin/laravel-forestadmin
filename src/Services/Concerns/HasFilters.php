@@ -182,7 +182,11 @@ trait HasFilters
             throw new ForestException("The operator $operator is not allowed to the field type : $type");
         }
 
-        if (in_array($type, ['Date', 'Dateonly'], true) && in_array($operator, $this->dateOperators, true)) {
+        $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($this->model)));
+        if (isset($smartFields[Str::after($field, '.')])) {
+            $smartField = $smartFields[Str::after($field, '.')];
+            call_user_func($this->model->{$smartField['field']}()->filter, $query, $value, $operator, $this->aggregator);
+        } elseif (in_array($type, ['Date', 'Dateonly'], true) && in_array($operator, $this->dateOperators, true)) {
             $this->dateFilters($query, $field, $operator, $value);
         } else {
             $this->mainFilters($query, $field, $operator, $value, $type);
@@ -205,7 +209,7 @@ trait HasFilters
                 $query->where(
                     function ($query) use ($field, $type, $operator) {
                         $operator === 'blank' ? $query->whereNull($field) : $query->whereNotNull($field);
-                        if (!in_array($type, ['Boolean', 'Uuid', 'Json', 'Date', 'Dateonly'], true)) {
+                        if (!in_array($type, ['Boolean', 'Uuid', 'Json', 'Date', 'Dateonly', 'Number'], true)) {
                             $symbol = $operator === 'blank' ? '=' : '!=';
                             $query->orWhere($field, $symbol, '');
                         }

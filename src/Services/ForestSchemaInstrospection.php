@@ -51,6 +51,54 @@ class ForestSchemaInstrospection
 
     /**
      * @param string $collection
+     * @return array
+     */
+    public function getSmartFields(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.is_virtual == true and @.reference == null)]");
+
+        return $data ? collect($data)->mapWithKeys(fn($item) => [$item['field'] => $item])->all() : [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getSmartActions(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].actions[*]");
+
+        return $data ?: [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getSmartSegments(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].segments[*]");
+
+        return $data ?: [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getSmartRelationships(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.is_virtual == true and @.reference != null)]");
+
+        return $data ? collect($data)->mapWithKeys(fn($item) => [$item['field'] => $item])->all() : [];
+    }
+
+    /**
+     * @param string $collection
      * @param string $field
      * @return string|null
      */
@@ -70,6 +118,12 @@ class ForestSchemaInstrospection
     {
         $collection = Str::camel($collection);
         $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.relationship == 'HasMany' or @.relationship == 'BelongsToMany')].field");
+        $smartRelationships = $this->getSmartRelationships($collection);
+        foreach ($smartRelationships as $relationship) {
+            if (is_array($relationship['type'])) {
+                $data[] = $relationship['field'];
+            }
+        }
 
         return $data ?: [];
     }

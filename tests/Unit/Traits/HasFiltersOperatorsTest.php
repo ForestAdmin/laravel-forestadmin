@@ -5,7 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Mockery as m;
@@ -69,7 +69,6 @@ class HasFiltersOperatorsTest extends TestCase
             ],
             'Number'   => [
                 ['type' => 'NotNull', 'column' => 'amount', 'boolean' => 'and',],
-                ['type' => 'Basic', 'column' => 'amount', 'operator' => '!=', 'value' => '', 'boolean' => 'or',],
             ],
             'String'   => [
                 ['type' => 'NotNull', 'column' => 'label', 'boolean' => 'and',],
@@ -129,7 +128,6 @@ class HasFiltersOperatorsTest extends TestCase
             ],
             'Number'   => [
                 ['type' => 'Null', 'column' => 'amount', 'boolean' => 'and',],
-                ['type' => 'Basic', 'column' => 'amount', 'operator' => '=', 'value' => '', 'boolean' => 'or',],
             ],
             'String'   => [
                 ['type' => 'Null', 'column' => 'label', 'boolean' => 'and',],

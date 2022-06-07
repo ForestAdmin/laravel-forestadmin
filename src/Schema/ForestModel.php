@@ -7,6 +7,10 @@ use Doctrine\DBAL\Types\Types;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\CustomFields;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\DataTypes;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -113,7 +117,8 @@ class ForestModel
             'only_for_relationships' => $this->isOnlyForRelationships(),
             'pagination_type'        => $this->getPaginationType(),
             'fields'                 => $this->getFields(),
-            'actions'                => $this->getSmartActions(),
+            'segments'               => $this->fetchSmartFeatures(SmartSegment::class)->toArray(),
+            'actions'                => $this->fetchSmartFeatures(SmartAction::class)->toArray(),
         ];
     }
 
@@ -124,6 +129,8 @@ class ForestModel
     public function getFields(): array
     {
         $fields = $this->fetchFieldsFromTable();
+        $fields = $fields->merge($this->fetchSmartFeatures(SmartField::class));
+        $fields = $fields->merge($this->fetchSmartFeatures(SmartRelationship::class));
 
         $schemaFields = method_exists($this->model, 'schemaFields') ? $this->model->schemaFields() : [];
         foreach ($schemaFields as $field) {
@@ -135,21 +142,6 @@ class ForestModel
         }
 
         return $fields->values()->toArray();
-    }
-
-    /**
-     * @return array
-     * @throws Exception
-     */
-    public function getSmartActions(): array
-    {
-        $schemaSmartActions = [];
-        $smartActions = method_exists($this->model, 'smartActions') ? $this->model->smartActions() : [];
-        foreach ($smartActions as $smartAction) {
-            $schemaSmartActions[] = $smartAction->serialize();
-        }
-
-        return $schemaSmartActions;
     }
 
     /**
@@ -348,6 +340,9 @@ class ForestModel
     {
         $fields = new Collection();
         $connexion = $this->model->getConnection()->getDoctrineSchemaManager();
+        if ($connexion->getDatabasePlatform()) {
+            $connexion->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+        }
         $columns = $connexion->listTableColumns($this->table, $this->database);
 
         if ($columns) {
@@ -367,6 +362,24 @@ class ForestModel
     }
 
     /**
+     * @param string $class
+     * @return Collection
+     */
+    public function fetchSmartFeatures(string $class): Collection
+    {
+        $methods = (new \ReflectionClass($this->model))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartFeatures = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === $class && $method->getName() !== lcfirst(class_basename($class))) {
+                $smartFeatures->push($this->model->{$method->getName()}()->serialize());
+            }
+        }
+
+        return $smartFeatures;
+    }
+
+    /**
      * @param Collection $fields
      * @param array      $relations
      * @return Collection
@@ -376,28 +389,30 @@ class ForestModel
         foreach ($relations as $name => $type) {
             $relation = $this->model->$name();
             $related = Str::camel(class_basename($relation->getRelated()));
-
             switch ($type) {
                 case BelongsTo::class:
                 case BelongsToMany::class:
                     $field = $type === BelongsTo::class ? $fields->firstWhere('field', $relation->getForeignKeyName()) : $this->fieldDefaultValues();
+                    // @codeCoverageIgnoreStart
+                    if ($field === null) {
+                        continue 2;
+                    }
+                    // @codeCoverageIgnoreEnd
                     $field = array_merge(
                         $field,
                         [
-                            'field'      => $relation->getRelationName(),
+                            'field' => $relation->getRelationName(),
                         ]
                     );
-                    $name = $type === BelongsTo::class ? $relation->getForeignKeyName() : $relation->getRelationName();
                     break;
                 case HasMany::class:
                 case HasOne::class:
                     $field = array_merge(
                         $this->fieldDefaultValues(),
                         [
-                            'field'      => $name,
+                            'field' => $name,
                         ]
                     );
-                    $name = $relation->getRelated()->getTable();
                     break;
             }
 
@@ -410,7 +425,7 @@ class ForestModel
             $field['reference'] = $related . '.' . $relation->getRelated()->getKeyName();
             $field['relationship'] = $this->mapRelationships($type);
             $field['inverse_of'] = Str::camel($this->getName());
-            $fields->put($name, $field);
+            $fields->push($field);
         }
 
         return $fields;
@@ -424,7 +439,7 @@ class ForestModel
     {
         return [
             'field'         => $name,
-            'type'          => 'string',
+            'type'          => 'String',
             'default_value' => null,
             'enums'         => null,
             'integration'   => null,

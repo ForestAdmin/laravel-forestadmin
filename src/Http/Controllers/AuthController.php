@@ -10,7 +10,6 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestApiException;
 use ForestAdmin\LaravelForestAdmin\Utils\ErrorMessages;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Controller;
 use JsonException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
@@ -21,7 +20,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class AuthController extends Controller
+class AuthController extends ForestController
 {
     /**
      * @var AuthManager
@@ -47,9 +46,17 @@ class AuthController extends Controller
 
         return response()->json(
             [
-                'authorizationUrl' => $this->auth->start(route('forest.auth.callback'), $renderingId),
+                'authorizationUrl' => $this->auth->start(config('app.url') . route('forest.auth.callback', [], false), $renderingId),
             ]
         );
+    }
+
+    /**
+     * @return \Illuminate\Http\Response
+     */
+    public function logout()
+    {
+        return response()->noContent();
     }
 
     /**
@@ -60,7 +67,7 @@ class AuthController extends Controller
      */
     public function callback()
     {
-        $token = $this->auth->verifyCodeAndGenerateToken(route('forest.auth.callback'), request()->all());
+        $token = $this->auth->verifyCodeAndGenerateToken(config('app.url') . route('forest.auth.callback', [], false), request()->all());
         $tokenData = JWT::decode($token, new Key(config('forest.api.auth-secret'), 'HS256'));
 
         return response()->json(compact('token', 'tokenData'));

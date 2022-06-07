@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Policies;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Str;
 
 /**
  * Class PermissionPolicy
@@ -94,6 +95,6 @@ class PermissionPolicy
      */
     private function getCollectionName($collection): string
     {
-        return strtolower(class_basename(get_class($collection)));
+        return Str::camel((class_basename(get_class($collection))));
     }
 }

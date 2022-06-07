@@ -2,10 +2,12 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
+use Illuminate\Support\Facades\File;
 use League\Fractal\Resource\Item;
 
 /**
@@ -17,6 +19,8 @@ use League\Fractal\Resource\Item;
  */
 class BaseTransformerTest extends TestCase
 {
+    use FakeSchema;
+
     /**
      * @return void
      * @throws \ReflectionException
@@ -43,9 +47,12 @@ class BaseTransformerTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
     public function testTransform(): void
     {
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
         $category = new Category();
         $category->id = 1;
         $category->label = 'bar';

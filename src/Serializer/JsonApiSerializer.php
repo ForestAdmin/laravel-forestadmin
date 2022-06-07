@@ -18,14 +18,14 @@ class JsonApiSerializer extends FractalJsonApiSerializer
     /**
      * {@inheritDoc}
      */
-    public function item(string $resourceKey, array $data): array
+    public function item(?string $resourceKey, array $data): array
     {
         $id = $this->getIdFromData($data);
 
         $resource = [
             'data' => [
-                'type' => $resourceKey,
-                'id' => "$id",
+                'type'       => $resourceKey,
+                'id'         => "$id",
                 'attributes' => $data,
             ],
         ];

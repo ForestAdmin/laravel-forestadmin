@@ -5,6 +5,7 @@ namespace ForestAdmin\LaravelForestAdmin\Schema;
 use Composer\Autoload\ClassMapGenerator;
 use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Utils\Database;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\FormatGuzzle;
 use GuzzleHttp\Exception\GuzzleException;
@@ -12,7 +13,6 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -31,7 +31,7 @@ class Schema
 
     public const LIANA_NAME = 'laravel-forestadmin';
 
-    public const LIANA_VERSION = '0.0.1';
+    public const LIANA_VERSION = '1.0.0-beta.23';
 
     /**
      * @var string
@@ -90,6 +90,23 @@ class Schema
     }
 
     /**
+     * @param string $modelName
+     * @return bool
+     */
+    public function modelIncluded(string $modelName): bool
+    {
+        if (empty(config('forest.included_models')) && empty(config('forest.excluded_models'))) {
+            return true;
+        }
+
+        if (!empty(config('forest.included_models'))) {
+            return in_array($modelName, config('forest.included_models'), true);
+        } else {
+            return !in_array($modelName, config('forest.excluded_models'), true);
+        }
+    }
+
+    /**
      * @return array
      * @throws BindingResolutionException
      * @throws Exception
@@ -104,10 +121,13 @@ class Schema
         foreach ($files as $file) {
             if (class_exists($file)) {
                 $class = (new \ReflectionClass($file));
-                if ($class->isSubclassOf(Model::class) && $class->isInstantiable()) {
+                if ($class->isSubclassOf(Model::class) && $class->isInstantiable() && $this->modelIncluded($file)) {
                     $model = app()->make($file);
                     $forestModel = new ForestModel($model);
                     $collections[] = $forestModel->serialize();
+                } elseif ($class->isSubclassOf(SmartCollection::class) && $class->isInstantiable()) {
+                    $smartCollection = app()->make($file);
+                    $collections[] = $smartCollection->serialize();
                 }
             }
         }
@@ -131,8 +151,11 @@ class Schema
 
         foreach ($schema['collections'] as $collection) {
             $collectionActions = $collection['actions'];
-            unset($collection['actions']);
-            $included[] = $this->getActionsByCollection($collectionActions, true);
+            $collectionSegments = $collection['segments'];
+            unset($collection['actions'], $collection['segments']);
+
+            $included[] = $this->getSmartFeaturesByCollection('actions', $collectionActions, true);
+            $included[] = $this->getSmartFeaturesByCollection('segments', $collectionSegments, true);
 
             $data[] = [
                 'id'            => $collection['name'],
@@ -140,10 +163,10 @@ class Schema
                 'attributes'    => $collection,
                 'relationships' => [
                     'actions'  => [
-                        'data' => $this->getActionsByCollection($collectionActions)
+                        'data' => $this->getSmartFeaturesByCollection('actions', $collectionActions)
                     ],
                     'segments' => [
-                        'data' => []
+                        'data' => $this->getSmartFeaturesByCollection('segments', $collectionSegments)
                     ]
                 ]
             ];
@@ -157,27 +180,29 @@ class Schema
     }
 
     /**
-     * @param array $data
-     * @param bool  $withAttributes
+     * @param string $type
+     * @param array  $data
+     * @param bool   $withAttributes
      * @return array
      */
-    private function getActionsByCollection(array $data, bool $withAttributes = false): array
+    private function getSmartFeaturesByCollection(string $type, array $data, bool $withAttributes = false): array
     {
-        $actions = [];
+        $smartFeatures = [];
 
         foreach ($data as $value) {
-            $action = [
+            $smartFeature = [
                 'id'   => $value['id'],
-                'type' => 'actions',
+                'type' => $type,
             ];
             if ($withAttributes) {
-                $action['attributes'] = $value;
+                $smartFeature['attributes'] = $value;
             }
-            $actions[] = $action;
+            $smartFeatures[] = $smartFeature;
         }
 
-        return $actions;
+        return $smartFeatures;
     }
+
 
     /**
      * Fetch all files in the model directory
@@ -204,12 +229,14 @@ class Schema
      */
     private function metadata(): array
     {
+        $connection = $this->config->get('database.default');
+
         return [
             'meta' => [
                 'liana'         => self::LIANA_NAME,
                 'liana_version' => self::LIANA_VERSION,
                 'stack'         => [
-                    'database_type' => Database::getSource($this->config->get('database.default')),
+                    'database_type' => Database::getSource($this->config->get("database.connections.$connection.driver")),
                     'orm_version'   => app()->version(),
                 ],
             ],

@@ -8,6 +8,7 @@ use ForestAdmin\LaravelForestAdmin\Services\ForestApiRequester;
 use ForestAdmin\LaravelForestAdmin\Services\ScopeManager;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Application;
@@ -30,16 +31,7 @@ class ScopesControllerTest extends TestCase
     use ProphecyTrait;
     use MockForestUserFactory;
     use ScopeManagerFactory;
-
-    /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
+    use MockIpWhitelist;
 
     /**
      * @return void
@@ -85,6 +77,7 @@ class ScopesControllerTest extends TestCase
         );
 
         $this->makeScopeManager($forestUser, $this->getScopesFromApi());
+        $this->mockIpWhitelist();
     }
 
 

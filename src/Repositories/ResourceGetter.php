@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use Doctrine\DBAL\Exception;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +26,7 @@ class ResourceGetter extends BaseRepository
 
     /**
      * @param Model $model
+     * @throws \Exception
      */
     public function __construct(Model $model)
     {

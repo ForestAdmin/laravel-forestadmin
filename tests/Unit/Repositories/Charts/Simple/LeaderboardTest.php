@@ -6,15 +6,12 @@ use Doctrine\DBAL\Exception;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Leaderboard;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
@@ -28,7 +25,6 @@ use Mockery as m;
  */
 class LeaderboardTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use ScopeManagerFactory;
 
@@ -40,6 +36,7 @@ class LeaderboardTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(RelatedDataSeeder::class);
         $forestUser = new ForestUser(
             [
                 'id'           => 1,
@@ -63,9 +60,8 @@ class LeaderboardTest extends TestCase
      */
     public function testGetCountHasMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->makeBooks();
 
         $params = '{
             "type": "Leaderboard",
@@ -80,20 +76,13 @@ class LeaderboardTest extends TestCase
         app()->instance('request', $request);
         $repository = new Leaderboard(Book::first());
         $get = $repository->get();
-        $result = [
-            [
-                'key'   => 'test book 10',
-                'value' => '10',
-            ],
-            [
-                'key'   => 'test book 9',
-                'value' => '9',
-            ],
-            [
-                'key'   => 'test book 8',
-                'value' => '8',
-            ],
-        ];
+
+        $result = Book::selectRaw('books.label as key, count(comments.id) as value')
+            ->leftJoin('comments', 'books.id', '=', 'comments.book_id')
+            ->groupBy('books.label')
+            ->limit(3)
+            ->orderBy('value', 'desc')
+            ->get()->toArray();
 
         $this->assertIsArray($get);
         $this->assertEquals($result, $get);
@@ -106,9 +95,8 @@ class LeaderboardTest extends TestCase
      */
     public function testGetCountBelongsToMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->makeBooks();
 
         $params = '{
             "type": "Leaderboard",
@@ -123,20 +111,12 @@ class LeaderboardTest extends TestCase
         app()->instance('request', $request);
         $repository = new Leaderboard(Book::first());
         $get = $repository->get();
-        $result = [
-            [
-                'key'   => 'test book 10',
-                'value' => '10',
-            ],
-            [
-                'key'   => 'test book 9',
-                'value' => '9',
-            ],
-            [
-                'key'   => 'test book 8',
-                'value' => '8',
-            ],
-        ];
+        $result = Book::selectRaw('books.label as key, count(comments.id) as value')
+            ->leftJoin('comments', 'books.id', '=', 'comments.book_id')
+            ->groupBy('books.label')
+            ->limit(3)
+            ->orderBy('value', 'desc')
+            ->get()->toArray();
 
         $this->assertIsArray($get);
         $this->assertEquals($result, $get);
@@ -149,9 +129,8 @@ class LeaderboardTest extends TestCase
      */
     public function testGetSumHasMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->makeBooks();
 
         $params = '{
             "type": "Leaderboard",
@@ -168,20 +147,12 @@ class LeaderboardTest extends TestCase
         $repository = new Leaderboard(Book::first());
         $get = $repository->get();
 
-        $result = [
-            [
-                'key'   => 'test book 10',
-                'value' => Book::find(10)->comments()->sum('comments.id'),
-            ],
-            [
-                'key'   => 'test book 9',
-                'value' => Book::find(9)->comments()->sum('comments.id'),
-            ],
-            [
-                'key'   => 'test book 8',
-                'value' => Book::find(8)->comments()->sum('comments.id'),
-            ],
-        ];
+        $result = Book::selectRaw('books.label as key, sum(comments.id) as value')
+            ->leftJoin('comments', 'books.id', '=', 'comments.book_id')
+            ->groupBy('books.label')
+            ->limit(3)
+            ->orderBy('value', 'desc')
+            ->get()->toArray();
 
         $this->assertIsArray($get);
         $this->assertEquals($result, $get);
@@ -194,9 +165,8 @@ class LeaderboardTest extends TestCase
      */
     public function testGetSumBelongsToMany(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->makeBooks();
 
         $params = '{
             "type": "Leaderboard",
@@ -213,20 +183,15 @@ class LeaderboardTest extends TestCase
         $repository = new Leaderboard(Book::first());
         $get = $repository->get();
 
-        $result = [
-            [
-                'key'   => 'test book 10',
-                'value' => Book::find(10)->ranges()->sum('ranges.id'),
-            ],
-            [
-                'key'   => 'test book 9',
-                'value' => Book::find(9)->ranges()->sum('ranges.id'),
-            ],
-            [
-                'key'   => 'test book 8',
-                'value' => Book::find(8)->ranges()->sum('ranges.id'),
-            ],
-        ];
+        //select inner join "ranges" on "ranges"."id" = "book_range"."id" group by "books"."label" order by "sum" desc limit 3
+        $result = Book::selectRaw('books.label as key, sum(ranges.id) as value')
+            ->join('book_range', 'books.id', '=', 'book_range.book_id')
+            ->join('ranges', 'book_range.range_id', '=', 'ranges.id')
+            ->groupBy('books.label')
+            ->limit(3)
+            ->orderBy('value', 'desc')
+            ->get()
+            ->toArray();
 
         $this->assertIsArray($get);
         $this->assertEquals($result, $get);
@@ -239,9 +204,8 @@ class LeaderboardTest extends TestCase
      */
     public function testGetException(): void
     {
-        App::shouldReceive('basePath')->andReturn(null);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->makeBooks();
 
         $params = '{
             "type": "Leaderboard",
@@ -275,43 +239,5 @@ class LeaderboardTest extends TestCase
 
         $this->assertIsArray($serialize);
         $this->assertEquals([['key' => 'foo', 'value' => 10], ['key' => 'bar', 'value' => 20]], $serialize);
-    }
-
-    /**
-     * @return void
-     */
-    public function makeBooks(): void
-    {
-        for ($i = 0; $i < 10; $i++) {
-            $book = Book::create(
-                [
-                    'label'        => 'test book ' . $i + 1,
-                    'comment'      => '',
-                    'difficulty'   => 'easy',
-                    'amount'       => 1000,
-                    'options'      => [],
-                    'category_id'  => 1,
-                    'published_at' => Carbon::today()->subDays(rand(0, 1)),
-                ]
-            );
-
-            for ($j = 0; $j < $i + 1; $j++) {
-                Comment::create(
-                    [
-                        'body'    => 'Test comment',
-                        'user_id' => 1,
-                        'book_id' => $book->id,
-                    ]
-                );
-            }
-
-            for ($j = 0; $j < $i + 1; $j++) {
-                Range::create(
-                    [
-                        'label' => 'Test range',
-                    ]
-                )->books()->save($book);
-            }
-        }
     }
 }

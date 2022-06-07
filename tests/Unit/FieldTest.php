@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\Field;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartActionField;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 
 /**
@@ -20,7 +20,7 @@ class FieldTest extends TestCase
      */
     public function testGetField(): void
     {
-        $field = new Field(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
+        $field = new SmartActionField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
 
         $this->assertEquals('foo', $field->getField());
     }
@@ -30,7 +30,7 @@ class FieldTest extends TestCase
      */
     public function testGetHook(): void
     {
-        $field = new Field(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'hook' => 'onFooChange']);
+        $field = new SmartActionField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'hook' => 'onFooChange']);
 
         $this->assertEquals('onFooChange', $field->getHook());
     }
@@ -41,7 +41,7 @@ class FieldTest extends TestCase
      */
     public function testMerge(): void
     {
-        $field = new Field(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
+        $field = new SmartActionField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
 
         $data = ['value' => 'new value'];
         $field->merge($data);
@@ -54,7 +54,7 @@ class FieldTest extends TestCase
      */
     public function testValidEnum(): void
     {
-        $field = new Field(['field' => 'foo', 'type' => 'Enum', 'is_required' => true, 'enums' => [1, 2, 3]]);
+        $field = new SmartActionField(['field' => 'foo', 'type' => 'Enum', 'is_required' => true, 'enums' => [1, 2, 3]]);
 
         $this->assertTrue($field->validEnum());
     }
@@ -67,7 +67,7 @@ class FieldTest extends TestCase
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage('🌳🌳🌳 You must add enums choices on your field foo');
 
-        new Field(['field' => 'foo', 'type' => 'Enum', 'is_required' => true]);
+        new SmartActionField(['field' => 'foo', 'type' => 'Enum', 'is_required' => true]);
     }
 
     /**
@@ -75,12 +75,12 @@ class FieldTest extends TestCase
      */
     public function testSerialize(): void
     {
-        $field = new Field(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
+        $field = new SmartActionField(['field' => 'foo', 'type' => 'string', 'is_required' => true, 'is_read_only' => false, 'value' => 'foo']);
         $serialize = $field->serialize();
 
         $result = [
             'field'         => 'foo',
-            'type'          => 'string',
+            'type'          => 'String',
             'is_required'   => true,
             'is_read_only'  => false,
             'default_value' => null,

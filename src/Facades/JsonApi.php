@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Facades;
 
 use ForestAdmin\LaravelForestAdmin\Services\JsonApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -12,8 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  *
- * @method static array render($class, string $name)
+ * @method static array render($class, string $name, array $metadata = [])
  * @method static array renderItem($class, string $name, string $transformer)
+ * @method static JsonResponse deactivateCountResponse()
  *
  * @see JsonApiResponse
  */

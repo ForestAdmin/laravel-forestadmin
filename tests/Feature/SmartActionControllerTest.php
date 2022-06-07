@@ -6,19 +6,16 @@ use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Exports\CollectionExport;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockIpWhitelist;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -30,25 +27,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SmartActionControllerTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use MockForestUserFactory;
     use ScopeManagerFactory;
+    use MockIpWhitelist;
 
     /**
      * @var ForestUser
      */
     private ForestUser $forestUser;
-
-    /**
-     * @param Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app): void
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
-    }
 
     /**
      * @return void
@@ -85,6 +72,7 @@ class SmartActionControllerTest extends TestCase
 
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
+        $this->mockIpWhitelist();
     }
 
     /**
@@ -140,9 +128,6 @@ class SmartActionControllerTest extends TestCase
      */
     public function testSmartActionBulkAllRecords(): void
     {
-        for ($i = 0; $i < 3; $i++) {
-            $this->getBook()->save();
-        }
         $this->makeScopeManager($this->forestUser);
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -155,10 +140,11 @@ class SmartActionControllerTest extends TestCase
                 ],
             ],
         ];
+        $books = Book::where('id', '!=', 2)->orderBy('id', 'asc')->pluck('id')->toArray();
         $call = $this->postJson('/forest/smart-actions/book_smart-action-bulk', $payload);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
-            'success' => 'ids => 1,3'
+            'success' => 'ids => ' . implode(',', $books)
         ];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -189,6 +175,7 @@ class SmartActionControllerTest extends TestCase
      */
     public function testSmartActionNotFoundException(): void
     {
+        $this->withoutExceptionHandling();
         $this->makeScopeManager($this->forestUser);
         App::partialMock()->shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
@@ -214,7 +201,7 @@ class SmartActionControllerTest extends TestCase
             'fields' => [
                 [
                     'field'         => 'token',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,
@@ -226,7 +213,7 @@ class SmartActionControllerTest extends TestCase
                 ],
                 [
                     'field'         => 'foo',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,

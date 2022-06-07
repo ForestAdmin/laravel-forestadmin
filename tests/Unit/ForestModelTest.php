@@ -8,11 +8,16 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Schema\ForestModel;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -63,7 +68,7 @@ class ForestModelTest extends TestCase
                         'widget'        => null,
                         'validations'   => [],
 
-                    ]
+                    ],
                 ]
             );
 
@@ -125,7 +130,7 @@ class ForestModelTest extends TestCase
                             'inverse_of'    => null,
                             'widget'        => null,
                             'validations'   => [],
-                        ]
+                        ],
                     ]
                 )
             );
@@ -455,6 +460,81 @@ class ForestModelTest extends TestCase
     }
 
     /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartAction(): void
+    {
+        $book = Book::first();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartAction::class);
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(2, $value->count());
+        $this->assertEquals('Book.smart action bulk', $value->first()['id']);
+        $this->assertEquals('Book.smart action single', $value->last()['id']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartRelationship(): void
+    {
+        $book = Book::first();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartRelationship::class);
+        $smartRelationship = new SmartRelationship(
+            [
+                'type'      => ['String'],
+                'reference' => 'bookstore.id',
+                'field'     => 'smartBookstores',
+            ]
+        );
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartRelationship->serialize(), $value->first());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartField(): void
+    {
+        $book = Book::first();
+        $forestModel = m::mock(ForestModel::class, [$book])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartField::class);
+        $smartField = new SmartField(['type' => 'String', 'field' => 'reference', 'is_filterable' => true]);
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartField->serialize(), $value->first());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFetchSmartFeaturesWithSmartSegment(): void
+    {
+        $category = Category::first();
+        $forestModel = m::mock(ForestModel::class, [$category])
+            ->makePartial();
+        $value = $forestModel->fetchSmartFeatures(SmartSegment::class);
+        $smartSegment = new SmartSegment(
+            class_basename($category),
+            'bestName',
+            'bestCategories',
+            fn(Builder $query) => $query->where('id', '<', 3),
+        );
+
+        $this->assertInstanceOf(Collection::class, $value);
+        $this->assertEquals(1, $value->count());
+        $this->assertEquals($smartSegment->serialize(), $value->first());
+    }
+
+    /**
      * @return object
      * @throws Exception
      * @throws SchemaException
@@ -462,6 +542,7 @@ class ForestModelTest extends TestCase
     public function getLaravelModel()
     {
         $schemaManager = $this->prophesize(AbstractSchemaManager::class);
+        $schemaManager->getDatabasePlatform()->willReturn(null);
         $schemaManager->listTableColumns(Argument::any(), Argument::any())
             ->willReturn(
                 [

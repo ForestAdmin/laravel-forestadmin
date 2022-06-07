@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Schema\Concerns\Relationships;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;
@@ -49,10 +50,18 @@ abstract class BaseRepository
      */
     protected function setAttributes($model, $data): void
     {
+        $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($model)));
         $attributes = $data['attributes'];
         $relationships = $data['relationships'] ?? [];
         foreach ($attributes as $key => $value) {
-            $model->$key = $value;
+            if (isset($smartFields[$key])) {
+                $model = $model
+                    ->{$key}()
+                    ->set
+                    ->call($model, $value);
+            } else {
+                $model->$key = $value;
+            }
         }
 
         foreach ($relationships as $key => $value) {

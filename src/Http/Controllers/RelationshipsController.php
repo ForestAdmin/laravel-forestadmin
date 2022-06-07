@@ -13,7 +13,6 @@ use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
 
 /**
  * Class RelationshipsController
@@ -22,7 +21,7 @@ use Illuminate\Routing\Controller;
  * @license GNU https://www.gnu.org/licenses/licenses.html
  * @link    https://github.com/ForestAdmin/laravel-forestadmin
  */
-class RelationshipsController extends Controller
+class RelationshipsController extends ForestController
 {
     use Schema;
 
@@ -52,16 +51,20 @@ class RelationshipsController extends Controller
     protected string $parentId;
 
     /**
+     * @param $method
+     * @param $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function __construct()
+    public function callAction($method, $parameters)
     {
-        [$collection, $parentId, $relation] = array_values(request()->route()->parameters());
-        $this->model = $this->getModel(ucfirst($collection));
+        $this->model = $this->getModel(ucfirst($parameters['collection']));
         $this->name = (class_basename($this->model));
-        $this->relationship = $relation;
-        $this->relationName = (class_basename($this->model->$relation()->getRelated()));
-        $this->parentId = $parentId;
+        $this->relationship = $parameters['association_name'];
+        $this->relationName = (class_basename($this->model->{$this->relationship}()->getRelated()));
+        $this->parentId = $parameters['id'];
+
+        return parent::callAction($method, $parameters);
     }
 
     /**

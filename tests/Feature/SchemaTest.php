@@ -35,7 +35,7 @@ class SchemaTest extends TestCase
      */
     public function testHandle(): void
     {
-        App::partialMock()->shouldReceive('basePath')->andReturn(__DIR__ . '/../Feature/Models');
+        App::partialMock()->shouldReceive('basePath')->andReturn(__DIR__ . '/../Utils/Models');
         $schema = new Schema($this->getConfig(), $this->forestApiPost(204), $this->getConsole('<info>Apimap Received<info>'));
         File::shouldReceive('put')->andReturn(true);
 
@@ -50,7 +50,7 @@ class SchemaTest extends TestCase
      */
     public function testHandleException(): void
     {
-        App::partialMock()->shouldReceive('basePath')->andReturn(__DIR__ . '/../Feature/Models');
+        App::partialMock()->shouldReceive('basePath')->andReturn(__DIR__ . '/../Utils/Models');
         $schema = new Schema($this->getConfig(), $this->forestApiPost(404), $this->getConsole('<error>Cannot send the apimap to Forest. Are you online?</error>'));
         File::shouldReceive('put')->andReturn(true);
 
@@ -82,6 +82,9 @@ class SchemaTest extends TestCase
         $config = $this->prophesize(Repository::class);
         $config
             ->get('database.default')
+            ->willReturn('sqlite');
+        $config
+            ->get('database.connections.sqlite.driver')
             ->willReturn('sqlite');
         $config
             ->get('forest.models_directory')

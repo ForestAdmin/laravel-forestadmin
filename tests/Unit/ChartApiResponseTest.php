@@ -4,7 +4,6 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Services\ChartApiResponse;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use Illuminate\Http\JsonResponse;
 
 /**
  * Class ChartApiResponseTest

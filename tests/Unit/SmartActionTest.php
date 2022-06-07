@@ -3,8 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\Field;
-use ForestAdmin\LaravelForestAdmin\Services\SmartActions\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartActionField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Support\Facades\App;
 
@@ -36,7 +36,7 @@ class SmartActionTest extends TestCase
         $result = [
             'foo' => [
                 'field'         => 'foo',
-                'type'          => 'string',
+                'type'          => 'String',
                 'is_required'   => true,
                 'is_read_only'  => false,
                 'default_value' => null,
@@ -48,7 +48,7 @@ class SmartActionTest extends TestCase
             ],
             'bar' => [
                 'field'         => 'bar',
-                'type'          => 'string',
+                'type'          => 'String',
                 'is_required'   => true,
                 'is_read_only'  => false,
                 'default_value' => null,
@@ -70,7 +70,7 @@ class SmartActionTest extends TestCase
     {
         $field = $this->buildSmartAction()->getField('foo');
 
-        $this->assertInstanceOf(Field::class, $field);
+        $this->assertInstanceOf(SmartActionField::class, $field);
         $this->assertEquals('foo', $field->getField());
     }
 
@@ -174,12 +174,13 @@ class SmartActionTest extends TestCase
     {
         $serialize = $this->buildSmartAction()->serialize();
         $result = [
-            'id'       => 'SmartActionTest.smart action',
-            'name'     => 'smart action',
-            'fields'   => [
+            'id'         => 'SmartActionTest.smart action',
+            'name'       => 'smart action',
+            'methodName' => 'smartAction',
+            'fields'     => [
                 [
                     'field'         => 'foo',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,
@@ -191,7 +192,7 @@ class SmartActionTest extends TestCase
                 ],
                 [
                     'field'         => 'bar',
-                    'type'          => 'string',
+                    'type'          => 'String',
                     'is_required'   => true,
                     'is_read_only'  => false,
                     'default_value' => null,
@@ -202,10 +203,10 @@ class SmartActionTest extends TestCase
                     'value'         => null,
                 ],
             ],
-            'endpoint' => '/forest/smart-actions/smartactiontest_smart-action',
-            'type'     => 'single',
-            'download' => false,
-            'hooks'    => [
+            'endpoint'   => '/forest/smart-actions/smartactiontest_smart-action',
+            'type'       => 'single',
+            'download'   => false,
+            'hooks'      => [
                 'load'   => true,
                 'change' => ['onFooChange'],
             ],
@@ -228,6 +229,7 @@ class SmartActionTest extends TestCase
                 'execute' => function () {
                     return ['success' => true];
                 },
+                'methodName' => 'smartAction',
             ]
         )
             ->load(

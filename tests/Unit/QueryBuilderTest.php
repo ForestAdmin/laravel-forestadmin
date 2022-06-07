@@ -9,9 +9,8 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Services\QueryBuilder;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentQueryBuilder;
@@ -32,7 +31,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class QueryBuilderTest extends TestCase
 {
     use ProphecyTrait;
-    use FakeData;
     use ScopeManagerFactory;
 
     /**
@@ -240,7 +238,7 @@ class QueryBuilderTest extends TestCase
     public function handleSearchField($field, $fieldType, $value)
     {
         $model = $this->getLaravelModel();
-        $field = ['field' => $field, 'type' => $fieldType];
+        $field = ['field' => $field, 'type' => $fieldType, 'is_virtual' => false];
         $data = ['search' => $value];
         $queryBuilder = m::mock(QueryBuilder::class, [$model, $data])->makePartial();
         $builder = new EloquentQueryBuilder(new Builder($model->getConnection()));

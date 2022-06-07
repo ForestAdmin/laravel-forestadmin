@@ -10,10 +10,9 @@ use Doctrine\DBAL\Types\Type;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ChartRepository;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Database\Connection;
@@ -34,7 +33,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class ChartRepositoryTest extends TestCase
 {
-    use FakeData;
     use FakeSchema;
     use ProphecyTrait;
     use ScopeManagerFactory;
@@ -106,7 +104,6 @@ class ChartRepositoryTest extends TestCase
     {
         App::shouldReceive('basePath')->andReturn(null);
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $this->getBook()->save();
 
         $params = '{
             "type": "Objective",
@@ -123,7 +120,7 @@ class ChartRepositoryTest extends TestCase
                 'id'         => '14ceceef-7f97-47ea-b6c9-edcadac232b0',
                 'attributes' => [
                     'value' => [
-                        'value' => 1,
+                        'value' => Book::count(),
                     ],
                 ],
             ],
@@ -131,7 +128,7 @@ class ChartRepositoryTest extends TestCase
 
         $repository = m::mock(ChartRepository::class, [Book::first()])
             ->makePartial();
-        $repository->shouldReceive('serialize')->with(1)->andReturn($result);
+        $repository->shouldReceive('serialize')->with(Book::count())->andReturn($result);
         $get = $repository->get();
 
         $this->assertIsArray($get);
@@ -143,7 +140,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testHandleGroupByField(): void
     {
-        $this->getBook()->save();
         $repository = m::mock(ChartRepository::class, [Book::first()])
             ->makePartial();
         $handleField = $repository->handleGroupByField('label');
@@ -157,7 +153,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testHandleGroupByFieldOnRelation(): void
     {
-        $this->getBook()->save();
         $repository = m::mock(ChartRepository::class, [Book::first()])
             ->makePartial();
         $handleField = $repository->handleGroupByField('category:label');
@@ -178,7 +173,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testQuery(): void
     {
-        $this->getBook()->save();
         $repository = m::mock(ChartRepository::class, [Book::first()])
             ->makePartial();
         $query = $this->invokeMethod($repository, 'query');
@@ -191,7 +185,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testFetchFieldsOnRelationBelongsTo(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();
@@ -207,7 +200,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testFetchFieldsOnRelationHasOne(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();
@@ -223,7 +215,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testFetchFieldsOnUnknownRelationException(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();
@@ -239,7 +230,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testFetchFieldsOnRelationNotAuthorizedExceptino(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();
@@ -255,7 +245,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testHandleField(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();
@@ -269,7 +258,6 @@ class ChartRepositoryTest extends TestCase
      */
     public function testHandleFieldException(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(ChartRepository::class, [$book])
             ->makePartial();

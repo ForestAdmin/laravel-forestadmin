@@ -4,16 +4,13 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\HasManyDissociator;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Comment;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Movie;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Range;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Sequel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\RelatedDataSeeder;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Comment;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Range;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Sequel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Mockery as m;
 
 /**
@@ -25,14 +22,20 @@ use Mockery as m;
  */
 class HasManyDissociatorTest extends TestCase
 {
-    use FakeData;
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(RelatedDataSeeder::class);
+    }
 
     /**
      * @return void
      */
     public function testRemoveRelationHasMany(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $movie = Movie::create(['body' => 'test movie', 'book_id' => $book->id]);
 
@@ -48,7 +51,6 @@ class HasManyDissociatorTest extends TestCase
      */
     public function testRemoveRelationMorphMany(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $sequel = Sequel::create(['label' => 'test movie', 'sequelable_type' => Book::class, 'sequelable_id' => $book->id]);
 
@@ -64,8 +66,6 @@ class HasManyDissociatorTest extends TestCase
      */
     public function testRemoveRelationBelongsToMany(): void
     {
-        $this->getBook()->save();
-        $this->getRanges();
         $book = Book::first();
 
         $repository = m::mock(HasManyDissociator::class, [$book, 'ranges', $book->id])
@@ -80,7 +80,6 @@ class HasManyDissociatorTest extends TestCase
      */
     public function testRemoveRelationExceptionRecordNotFound(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
         $repository = m::mock(HasManyDissociator::class, [$book, 'movies', $book->id])
             ->makePartial();
@@ -96,8 +95,6 @@ class HasManyDissociatorTest extends TestCase
      */
     public function testRemoveRelationExceptionCannotDissociate(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
         $book = Book::first();
 
         $repository = m::mock(HasManyDissociator::class, [$book, 'comments', $book->id])
@@ -114,8 +111,6 @@ class HasManyDissociatorTest extends TestCase
      */
     public function testRemoveRelationWithDelete(): void
     {
-        $this->getBook()->save();
-        $this->getComments();
         $book = Book::first();
 
         $repository = m::mock(HasManyDissociator::class, [$book, 'comments', $book->id])

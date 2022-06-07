@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests;
 
 use ForestAdmin\LaravelForestAdmin\ForestServiceProvider;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +19,13 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
  */
 class TestCase extends OrchestraTestCase
 {
+    /**
+     * Indicates whether the default seeder should run before each test.
+     *
+     * @var bool
+     */
+    protected $seed = true;
+
     /**
      * Call protected/private method of a class.
      * @param object $object
@@ -74,6 +82,8 @@ class TestCase extends OrchestraTestCase
         $db->setAsGlobal();
         $db->bootEloquent();
         $this->migrate();
+
+        $this->seed(DatabaseSeeder::class);
     }
 
     /**
@@ -85,8 +95,11 @@ class TestCase extends OrchestraTestCase
         parent::getEnvironmentSetUp($app);
         $config = $app['config'];
         $config->set('app.debug', true);
+        $config->set('database.default', 'sqlite');
+        $config->set('database.connections.sqlite.database', ':memory:');
         $config->set('forest.api.secret', 'my-secret-key');
         $config->set('forest.api.auth-secret', 'auth-secret-key');
+        $config->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
     }
 
     /**
@@ -100,7 +113,6 @@ class TestCase extends OrchestraTestCase
     {
         return [
             ForestServiceProvider::class,
-            ExcelServiceProvider::class,
         ];
     }
 
@@ -234,7 +246,7 @@ class TestCase extends OrchestraTestCase
             function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
-                $table->foreignId('book_id')->constrained()->onDelete('cascade');
+                $table->foreignId('book_id')->nullable()->constrained()->onDelete('cascade');
                 $table->timestamps();
             }
         );

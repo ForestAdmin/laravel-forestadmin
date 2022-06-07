@@ -30,7 +30,7 @@ class SchemaTest extends TestCase
      */
     public function testFetchFiles(): void
     {
-        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
         $this->invokeProperty($schema, 'directory', __DIR__ . '/../Feature/Models');
         $files = $this->invokeMethod($schema, 'fetchFiles');
 
@@ -55,7 +55,7 @@ class SchemaTest extends TestCase
      */
     public function testMetadata(): void
     {
-        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
         $metadata = $this->invokeMethod($schema, 'metadata');
 
         $this->assertIsArray($metadata);
@@ -75,9 +75,7 @@ class SchemaTest extends TestCase
      */
     public function testGenerate(): void
     {
-        App::partialMock()->shouldReceive('basePath')
-            ->andReturn(__DIR__ . '/../Feature/Models');
-        $schema = new Schema($this->getConfig(), $this->getForestApi(), $this->getConsole());
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
         File::shouldReceive('put')->andReturn(true);
         $generate = $this->invokeMethod($schema, 'generate');
 
@@ -87,30 +85,42 @@ class SchemaTest extends TestCase
     }
 
     /**
-     * @return object
+     * @return void
      */
-    private function getForestApi()
+    public function testModelIncludedWithoutIncludedOrExcludedModels(): void
     {
-        return $this->prophesize(ForestApiRequester::class)->reveal();
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
+        $this->assertTrue($schema->modelIncluded('foo'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testModelIncludedWithIncludedModelsConfig(): void
+    {
+        config()->set('forest.included_models', ['foo', 'bar']);
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
+        $this->assertTrue($schema->modelIncluded('foo'));
+        $this->assertFalse($schema->modelIncluded('foo2'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testModelIncludedWithExcludedModelsConfig(): void
+    {
+        config()->set('forest.excluded_models', ['foo', 'bar']);
+        $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
+        $this->assertFalse($schema->modelIncluded('foo'));
+        $this->assertTrue($schema->modelIncluded('foo2'));
     }
 
     /**
      * @return object
      */
-    private function getConfig()
+    private function getForestApi()
     {
-        $config = $this->prophesize(Repository::class);
-        $config
-            ->get('database.default')
-            ->willReturn('sqlite');
-        $config
-            ->get('forest.models_directory')
-            ->willReturn(__DIR__ . '/../Feature/Models');
-        $config
-            ->get('forest.json_file_path')
-            ->willReturn('.forestadmin-schema.json');
-
-        return $config->reveal();
+        return $this->prophesize(ForestApiRequester::class)->reveal();
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Repositories\Charts;
 
 use ForestAdmin\LaravelForestAdmin\Repositories\Charts\Simple\Objective;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Mockery as m;
 

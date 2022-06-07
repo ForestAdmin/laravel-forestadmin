@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Laracsv\Export;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -46,22 +47,29 @@ class ResourcesController extends ForestController
     protected string $requestFormat = 'json';
 
     /**
+     * @param $method
+     * @param $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function __construct()
+    public function callAction($method, $parameters)
     {
-        $this->name = request()->route()->parameter('collection');
+        $this->name = $parameters['collection'];
         if (Str::endsWith($this->name, '.csv')) {
             $this->name = Str::replaceLast('.csv', '', $this->name);
             $this->requestFormat = 'csv';
         }
         $this->model = $this->getModel(ucfirst($this->name));
+
+        return parent::callAction($method, $parameters);
     }
 
     /**
-     * @return CollectionExport|JsonResponse
-     * @throws Exception
+     * @return JsonResponse|Response
      * @throws AuthorizationException
+     * @throws Exception
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \League\Csv\Exception
      */
     public function index()
     {
@@ -71,10 +79,20 @@ class ResourcesController extends ForestController
         $repository = new ResourceGetter($this->model);
 
         if ($this->requestFormat === 'csv') {
-            return new CollectionExport(
+            $filename = request()->input('filename', $this->name) . '.csv';
+            $csvExporter = new Export();
+            $export = $csvExporter->build(
                 $repository->all(false),
-                request()->input('filename', $this->name),
-                request()->input('header')
+                explode(',', request()->input('header'))
+            )->getReader()->toString();
+
+            return response(
+                $export,
+                200,
+                [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                ]
             );
         } else {
             return response()->json(

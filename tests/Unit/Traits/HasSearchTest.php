@@ -4,7 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\Concerns\HasSearch;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Mock\CustomModel;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Mock\CustomModel;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -71,8 +71,8 @@ class HasSearchTest extends TestCase
 
         $getFields = $this->invokeMethod($trait, 'getFieldsToSearch', [$model]);
 
-        $this->assertCount(3, $getFields);
-        $this->assertEquals([$fields[0], $fields[1], $fields[2]], $getFields);
+        $this->assertCount(4, $getFields);
+        $this->assertEquals([$fields[0], $fields[1], $fields[2], $fields[3]], $getFields);
     }
 
     /**

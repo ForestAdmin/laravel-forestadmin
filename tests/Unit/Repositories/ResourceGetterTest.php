@@ -7,13 +7,15 @@ use Doctrine\DBAL\Schema\SchemaException;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Repositories\ResourceGetter;
-use ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\Book;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
-use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeData;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\ScopeManagerFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Mockery as m;
 
 /**
@@ -25,8 +27,8 @@ use Mockery as m;
  */
 class ResourceGetterTest extends TestCase
 {
-    use FakeData;
     use ScopeManagerFactory;
+    use FakeSchema;
 
     /**
      * @return void
@@ -57,8 +59,7 @@ class ResourceGetterTest extends TestCase
      */
     public function testAll(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(ResourceGetter::class, [Book::first(), 'Book'])
+        $repository = m::mock(ResourceGetter::class, [Book::first()])
             ->makePartial();
         $data = $repository->all();
 
@@ -71,9 +72,8 @@ class ResourceGetterTest extends TestCase
      */
     public function testGet(): void
     {
-        $this->getBook()->save();
         $book = Book::first();
-        $repository = m::mock(ResourceGetter::class, [$book, 'Book'])
+        $repository = m::mock(ResourceGetter::class, [$book])
             ->makePartial();
         $data = $repository->get($book->id);
 
@@ -86,8 +86,7 @@ class ResourceGetterTest extends TestCase
      */
     public function testGetExceptionNotFound(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(ResourceGetter::class, [new Book(), 'Book'])
+        $repository = m::mock(ResourceGetter::class, [new Book()])
             ->makePartial();
 
         $this->expectException(ForestException::class);
@@ -101,11 +100,10 @@ class ResourceGetterTest extends TestCase
      */
     public function testCount(): void
     {
-        $this->getBook()->save();
-        $repository = m::mock(ResourceGetter::class, [Book::first(), 'Book'])
+        $repository = m::mock(ResourceGetter::class, [Book::first()])
             ->makePartial();
 
-        $this->assertEquals(1, $repository->count());
+        $this->assertEquals(Book::count(), $repository->count());
     }
 
     /**
@@ -116,7 +114,7 @@ class ResourceGetterTest extends TestCase
     public function testQuery(): void
     {
         $this->getRequest();
-        $repository = new ResourceGetter($this->getBook(), 'Book');
+        $repository = new ResourceGetter(Book::first());
         $query = $this->invokeMethod($repository, 'query');
 
         $this->assertInstanceOf(Builder::class, $query);
@@ -124,8 +122,27 @@ class ResourceGetterTest extends TestCase
 
     /**
      * @return void
+     * @throws \JsonException
      */
-    public function getRequest(): void
+    public function testAllWithSegmentException(): void
+    {
+        $this->getRequest(true);
+        $repository = m::mock(ResourceGetter::class, [Book::first()])
+            ->makePartial();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+
+        $this->expectException(ForestException::class);
+        $this->expectExceptionMessage("🌳🌳🌳 There is no smart-segment foo");
+
+        $repository->all();
+    }
+
+    /**
+     * @param bool $withSegment
+     * @return void
+     */
+    public function getRequest($withSegment = false): void
     {
         $params = [
             'fields' => [
@@ -139,6 +156,11 @@ class ResourceGetterTest extends TestCase
                 'size'   => 15,
             ],
         ];
+
+        if ($withSegment) {
+            $params['segment'] = 'foo';
+        }
+
         $request = Request::create('/', 'GET', $params);
         app()->instance('request', $request);
     }
