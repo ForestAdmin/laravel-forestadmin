@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0...v1.0.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* **security:** update guzzle version to 7.4.3 ([#52](https://github.com/ForestAdmin/laravel-forestadmin/issues/52)) ([f9806e3](https://github.com/ForestAdmin/laravel-forestadmin/commit/f9806e3711f22b7e8e1362450cffcaca937bffe2))
+
 # 1.0.0 (2022-06-07)
 
 
