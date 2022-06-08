@@ -38,6 +38,20 @@ class ForestSchemaIntrospectionTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testGetNamespace(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getNamespace('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['namespace'];
+
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testGetFields(): void
     {
         $forestSchema = $this->makeForestSchema();

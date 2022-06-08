@@ -78,6 +78,8 @@ class RelationshipsControllerTest extends TestCase
         $this->mockForestUserFactory();
         $this->makeScopeManager($forestUser);
         $this->mockIpWhitelist();
+
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
     }
 
     /**
@@ -87,7 +89,6 @@ class RelationshipsControllerTest extends TestCase
     public function testIndex(): void
     {
         App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $params = ['fields' => ['comment' => 'id,body']];
         $call = $this->get('/forest/book/1/relationships/comments?' . http_build_query($params));
@@ -110,7 +111,6 @@ class RelationshipsControllerTest extends TestCase
         Bookstore::factory(1)->create();
 
         App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $call = $this->get('/forest/book/1/relationships/smartBookstores');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);

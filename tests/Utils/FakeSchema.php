@@ -21,8 +21,9 @@ trait FakeSchema
         $schema = [
             "collections" => [
                 [
-                    "name"    => "book",
-                    "fields"  => [
+                    "name"      => "book",
+                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
+                    "fields"    => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -181,7 +182,7 @@ trait FakeSchema
                             "validations"   => [],
                         ],
                     ],
-                    "actions" => [
+                    "actions"   => [
                         [
                             "id"         => "Book.smart action single",
                             "name"       => "smart action single",
@@ -211,8 +212,9 @@ trait FakeSchema
                     ],
                 ],
                 [
-                    "name"   => "editor",
-                    "fields" => [
+                    "name"      => "editor",
+                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
+                    "fields"    => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -264,8 +266,9 @@ trait FakeSchema
                     ],
                 ],
                 [
-                    "name"    => "movie",
-                    "fields"  => [
+                    "name"      => "movie",
+                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
+                    "fields"    => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -335,18 +338,18 @@ trait FakeSchema
                             "validations"   => [],
                         ],
                     ],
-                    "actions" => [],
+                    "actions"   => [],
                 ],
                 [
                     "name"                   => "category",
-                    "old_name"               => "category",
+                    "namespace"              => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
                     "icon"                   => null,
                     "is_read_only"           => false,
                     "is_virtual"             => false,
                     "is_searchable"          => true,
                     "only_for_relationships" => false,
                     "pagination_type"        => "page",
-                    "fields" => [
+                    "fields"                 => [
                         [
                             "field"         => "id",
                             "type"          => "Number",

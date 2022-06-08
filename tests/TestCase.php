@@ -99,7 +99,7 @@ class TestCase extends OrchestraTestCase
         $config->set('database.connections.sqlite.database', ':memory:');
         $config->set('forest.api.secret', 'my-secret-key');
         $config->set('forest.api.auth-secret', 'auth-secret-key');
-        $config->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
+        //$config->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
     }
 
     /**
