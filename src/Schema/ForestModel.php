@@ -109,6 +109,7 @@ class ForestModel
     {
         return [
             'name'                   => Str::camel($this->getName()),
+            'namespace'              => (new \ReflectionClass($this->model))->getNamespaceName(),
             'old_name'               => Str::camel($this->getOldName()),
             'icon'                   => $this->getIcon(),
             'is_read_only'           => $this->isReadOnly(),

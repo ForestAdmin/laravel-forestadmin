@@ -34,9 +34,9 @@ class Schema
     public const LIANA_VERSION = '1.0.1';
 
     /**
-     * @var string
+     * @var array
      */
-    protected string $directory;
+    protected array $directories;
 
     /**
      * @var Config
@@ -61,7 +61,7 @@ class Schema
     public function __construct(Config $config, ForestApiRequester $forestApi, ConsoleOutput $console)
     {
         $this->config = $config;
-        $this->directory = App::basePath($config->get('forest.models_directory'));
+        $this->directories = $config->get('forest.models_directories');
         $this->forestApi = $forestApi;
         $this->console = $console;
     }
@@ -114,20 +114,23 @@ class Schema
      */
     private function generate(): array
     {
-        $files = $this->fetchFiles();
         $schema = new Collection($this->metadata());
         $collections = [];
+        foreach ($this->directories as $directory) {
+            $path = App::basePath($directory);
+            $files = $this->fetchFiles($path);
 
-        foreach ($files as $file) {
-            if (class_exists($file)) {
-                $class = (new \ReflectionClass($file));
-                if ($class->isSubclassOf(Model::class) && $class->isInstantiable() && $this->modelIncluded($file)) {
-                    $model = app()->make($file);
-                    $forestModel = new ForestModel($model);
-                    $collections[] = $forestModel->serialize();
-                } elseif ($class->isSubclassOf(SmartCollection::class) && $class->isInstantiable()) {
-                    $smartCollection = app()->make($file);
-                    $collections[] = $smartCollection->serialize();
+            foreach ($files as $file) {
+                if (class_exists($file)) {
+                    $class = (new \ReflectionClass($file));
+                    if ($class->isSubclassOf(Model::class) && $class->isInstantiable() && $this->modelIncluded($file)) {
+                        $model = app()->make($file);
+                        $forestModel = new ForestModel($model);
+                        $collections[] = $forestModel->serialize();
+                    } elseif ($class->isSubclassOf(SmartCollection::class) && $class->isInstantiable()) {
+                        $smartCollection = app()->make($file);
+                        $collections[] = $smartCollection->serialize();
+                    }
                 }
             }
         }
@@ -206,13 +209,15 @@ class Schema
 
     /**
      * Fetch all files in the model directory
+     *
+     * @param string $directory
      * @return Collection
      */
-    private function fetchFiles(): Collection
+    private function fetchFiles(string $directory): Collection
     {
         $files = new Collection();
 
-        foreach (glob($this->directory, GLOB_ONLYDIR) as $dir) {
+        foreach (glob($directory, GLOB_ONLYDIR) as $dir) {
             if (file_exists($dir)) {
                 $fileClass = ClassMapGenerator::createMap($dir);
                 foreach (array_keys($fileClass) as $file) {
