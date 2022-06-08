@@ -39,6 +39,18 @@ class ForestSchemaInstrospection
 
     /**
      * @param string $collection
+     * @return string
+     */
+    public function getNamespace(string $collection): string
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].namespace");
+
+        return $data ? $data[0] : '';
+    }
+
+    /**
+     * @param string $collection
      * @return array
      */
     public function getFields(string $collection): array

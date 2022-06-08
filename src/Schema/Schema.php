@@ -61,7 +61,7 @@ class Schema
     public function __construct(Config $config, ForestApiRequester $forestApi, ConsoleOutput $console)
     {
         $this->config = $config;
-        $this->directories = $config->get('forest.models_directories');
+        $this->directories = is_string($config->get('forest.models_directory')) ? [$config->get('forest.models_directory')] : $config->get('forest.models_directory');
         $this->forestApi = $forestApi;
         $this->console = $console;
     }

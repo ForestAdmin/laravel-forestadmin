@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'models_directories'    => ['app/Models/'],
+    'models_directory'    => ['app/Models'],
     'json_file_path'        => env('JSON_FILE_PATH', '.forestadmin-schema.json'),
     'send_apimap_automatic' => env('FOREST_SEND_APIMAP_AUTOMATIC', false),
     'api'                   => [
