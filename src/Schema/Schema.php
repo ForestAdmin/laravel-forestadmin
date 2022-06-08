@@ -126,15 +126,15 @@ class Schema
                     if ($class->isSubclassOf(Model::class) && $class->isInstantiable() && $this->modelIncluded($file)) {
                         $model = app()->make($file);
                         $forestModel = new ForestModel($model);
-                        $collections[] = $forestModel->serialize();
+                        $collections[$class->getName()] = $forestModel->serialize();
                     } elseif ($class->isSubclassOf(SmartCollection::class) && $class->isInstantiable()) {
                         $smartCollection = app()->make($file);
-                        $collections[] = $smartCollection->serialize();
+                        $collections[$class->getName()] = $smartCollection->serialize();
                     }
                 }
             }
         }
-        $schema->put('collections', $collections);
+        $schema->put('collections', array_values($collections));
         File::put($this->config->get('forest.json_file_path'), json_encode($schema, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
 
         return $schema->toArray();
