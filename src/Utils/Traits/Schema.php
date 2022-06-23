@@ -22,7 +22,7 @@ trait Schema
     public static function getModel(string $collection): Model
     {
         try {
-            $model = app()->make(ForestSchema::getNamespace($collection) . '\\' . $collection);
+            $model = app()->make(ForestSchema::getClass($collection));
         } catch (\Exception $e) {
             throw new ForestException("No model found for collection $collection");
         }

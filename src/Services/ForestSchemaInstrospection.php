@@ -41,10 +41,10 @@ class ForestSchemaInstrospection
      * @param string $collection
      * @return string
      */
-    public function getNamespace(string $collection): string
+    public function getClass(string $collection): string
     {
         $collection = Str::camel($collection);
-        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].namespace");
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].class");
 
         return $data ? $data[0] : '';
     }
