@@ -21,9 +21,9 @@ trait FakeSchema
         $schema = [
             "collections" => [
                 [
-                    "name"      => "book",
-                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
-                    "fields"    => [
+                    "name"    => "book",
+                    "class"   => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book",
+                    "fields"  => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -182,7 +182,7 @@ trait FakeSchema
                             "validations"   => [],
                         ],
                     ],
-                    "actions"   => [
+                    "actions" => [
                         [
                             "id"         => "Book.smart action single",
                             "name"       => "smart action single",
@@ -212,9 +212,9 @@ trait FakeSchema
                     ],
                 ],
                 [
-                    "name"      => "editor",
-                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
-                    "fields"    => [
+                    "name"   => "editor",
+                    "class"  => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Editor",
+                    "fields" => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -266,9 +266,9 @@ trait FakeSchema
                     ],
                 ],
                 [
-                    "name"      => "movie",
-                    "namespace" => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
-                    "fields"    => [
+                    "name"    => "movie",
+                    "class"   => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie",
+                    "fields"  => [
                         [
                             "field"         => "id",
                             "type"          => "Number",
@@ -338,11 +338,11 @@ trait FakeSchema
                             "validations"   => [],
                         ],
                     ],
-                    "actions"   => [],
+                    "actions" => [],
                 ],
                 [
                     "name"                   => "category",
-                    "namespace"              => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models",
+                    "class"                  => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category",
                     "icon"                   => null,
                     "is_read_only"           => false,
                     "is_virtual"             => false,
