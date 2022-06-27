@@ -357,7 +357,7 @@ class ForestModel
             }
         }
 
-        $fields = $fields->reject(fn($item) => $item['type'] === 'unknown');
+        $fields = $fields->reject(fn ($item) => $item['type'] === 'unknown');
 
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
     }
@@ -462,7 +462,6 @@ class ForestModel
      */
     protected function initName(LaravelModel $model): string
     {
-        return  method_exists($model, 'forestName') && null !== $model->forestName() ?
-            $model->forestName() : class_basename($model);
+        return method_exists($model, 'forestName') && null !== $model->forestName() ? $model->forestName() : class_basename($model);
     }
 }
