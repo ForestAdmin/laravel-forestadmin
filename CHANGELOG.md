@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.0...v1.1.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* add database type timestamp for schema generation ([#57](https://github.com/ForestAdmin/laravel-forestadmin/issues/57)) ([f645277](https://github.com/ForestAdmin/laravel-forestadmin/commit/f645277d77abab1a6a78fc5acf45167d9ece2bb6))
+
 # [1.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.1...v1.1.0) (2022-06-27)
 
 
