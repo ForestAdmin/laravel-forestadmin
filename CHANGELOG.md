@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.1...v1.1.0) (2022-06-27)
+
+
+### Features
+
+* add support for multiple models directories ([#56](https://github.com/ForestAdmin/laravel-forestadmin/issues/56)) ([5947782](https://github.com/ForestAdmin/laravel-forestadmin/commit/59477821a4ab26a3f9c26ae1e9e82a7d6dc69269))
+
 ## [1.0.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0...v1.0.1) (2022-06-07)
 
 
