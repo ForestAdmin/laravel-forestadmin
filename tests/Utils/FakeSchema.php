@@ -22,6 +22,7 @@ trait FakeSchema
             "collections" => [
                 [
                     "name"    => "book",
+                    "class"   => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book",
                     "fields"  => [
                         [
                             "field"         => "id",
@@ -212,6 +213,7 @@ trait FakeSchema
                 ],
                 [
                     "name"   => "editor",
+                    "class"  => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Editor",
                     "fields" => [
                         [
                             "field"         => "id",
@@ -265,6 +267,7 @@ trait FakeSchema
                 ],
                 [
                     "name"    => "movie",
+                    "class"   => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Movie",
                     "fields"  => [
                         [
                             "field"         => "id",
@@ -339,14 +342,14 @@ trait FakeSchema
                 ],
                 [
                     "name"                   => "category",
-                    "old_name"               => "category",
+                    "class"                  => "ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category",
                     "icon"                   => null,
                     "is_read_only"           => false,
                     "is_virtual"             => false,
                     "is_searchable"          => true,
                     "only_for_relationships" => false,
                     "pagination_type"        => "page",
-                    "fields" => [
+                    "fields"                 => [
                         [
                             "field"         => "id",
                             "type"          => "Number",

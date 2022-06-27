@@ -88,7 +88,7 @@ class SchemaTest extends TestCase
             ->willReturn('sqlite');
         $config
             ->get('forest.models_directory')
-            ->willReturn(__DIR__ . '/../Feature/Models');
+            ->willReturn([__DIR__ . '/../Feature/Models']);
         $config
             ->get('forest.json_file_path')
             ->willReturn('.forestadmin-schema.json');

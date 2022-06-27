@@ -24,7 +24,7 @@ use Prophecy\Argument;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * Class ResourcesControllerTest
+ * Class RouteMatchedTest
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
@@ -48,7 +48,6 @@ class RouteMatchedTest extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
         $app['config']->set('forest.send_apimap_automatic', true);
     }
 

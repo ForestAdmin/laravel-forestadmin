@@ -23,6 +23,14 @@ use Illuminate\Support\Str;
 trait ForestCollection
 {
     /**
+     * @return string|null
+     */
+    public function forestName(): ?string
+    {
+        return null;
+    }
+
+    /**
      * @return array
      * @codeCoverageIgnore
      */
