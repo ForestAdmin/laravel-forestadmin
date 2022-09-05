@@ -98,14 +98,14 @@ class OidcClientManagerTest extends TestCase
      */
     public function testGetClientForCallbackUrl(): void
     {
-        $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost(json_encode(['client_id' => 1], JSON_THROW_ON_ERROR)));
-        $clientForCallbackUrl = $this->oidc->getClientForCallbackUrl('mock_host/foo');
+        $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost(json_encode(['client_id' => 1, 'redirect_uris' => ['http://backend.api']], JSON_THROW_ON_ERROR)));
+        $clientForCallbackUrl = $this->oidc->getClientForCallbackUrl();
 
         $this->assertInstanceOf(ForestProvider::class, $clientForCallbackUrl);
-        $this->assertIsArray(Cache::get('mock_host/foo-' . config('forest.api.secret') . '-client-data'));
+        $this->assertIsArray(Cache::get(config('forest.api.secret') . '-client-data'));
         $this->assertSame(
-            Cache::get('mock_host/foo-' . config('forest.api.secret') . '-client-data'),
-            ['client_id' => 1, 'issuer' => self::mockedConfig()['issuer']]
+            Cache::get(config('forest.api.secret') . '-client-data'),
+            ['client_id' => 1, 'issuer' => self::mockedConfig()['issuer'], 'redirect_uri' => 'http://backend.api']
         );
     }
 
@@ -119,7 +119,7 @@ class OidcClientManagerTest extends TestCase
         $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost());
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::REGISTRATION_FAILED);
-        $this->oidc->getClientForCallbackUrl('mock_host/foo');
+        $this->oidc->getClientForCallbackUrl();
     }
 
     /**
@@ -251,7 +251,7 @@ class OidcClientManagerTest extends TestCase
             );
 
         $forestApi
-            ->post(Argument::type('string'), Argument::size(0), Argument::size(4), Argument::size(1))
+            ->post(Argument::type('string'), Argument::size(0), Argument::size(3), Argument::size(1))
             ->shouldBeCalled()
             ->willReturn(
                 new Response(200, [], $body)
