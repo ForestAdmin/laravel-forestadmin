@@ -96,10 +96,10 @@ class OidcClientManagerTest extends TestCase
      * @throws \JsonException
      * @return void
      */
-    public function testGetClientForCallbackUrl(): void
+    public function testMakeForestProvider(): void
     {
         $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost(json_encode(['client_id' => 1, 'redirect_uris' => ['http://backend.api']], JSON_THROW_ON_ERROR)));
-        $clientForCallbackUrl = $this->oidc->getClientForCallbackUrl();
+        $clientForCallbackUrl = $this->oidc->makeForestProvider();
 
         $this->assertInstanceOf(ForestProvider::class, $clientForCallbackUrl);
         $this->assertIsArray(Cache::get(config('forest.api.secret') . '-client-data'));
@@ -114,12 +114,12 @@ class OidcClientManagerTest extends TestCase
      * @throws \JsonException
      * @return void
      */
-    public function testGetClientForCallbackUrlException(): void
+    public function testMakeForestProviderException(): void
     {
         $this->oidc = new OidcClientManager($this->makeForestApiGetAndPost());
         $this->expectException(ForestApiException::class);
         $this->expectExceptionMessage(ErrorMessages::REGISTRATION_FAILED);
-        $this->oidc->getClientForCallbackUrl();
+        $this->oidc->makeForestProvider();
     }
 
     /**

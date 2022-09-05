@@ -184,7 +184,7 @@ class AuthManagerTest extends TestCase
 
         $oidc = $this->prophesize(OidcClientManager::class);
         $oidc
-            ->getClientForCallbackUrl()
+            ->makeForestProvider()
             ->shouldBeCalled()
             ->willReturn(
                 $provider->reveal()

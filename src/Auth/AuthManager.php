@@ -43,7 +43,7 @@ class AuthManager
      */
     public function start(int $renderingId)
     {
-        $client = $this->oidc->getClientForCallbackUrl();
+        $client = $this->oidc->makeForestProvider();
 
         return $client->getAuthorizationUrl(
             [
@@ -63,7 +63,7 @@ class AuthManager
     {
         $this->stateIsValid($params);
 
-        $forestProvider = $this->oidc->getClientForCallbackUrl();
+        $forestProvider = $this->oidc->makeForestProvider();
         $forestProvider->setRenderingId($this->getRenderingIdFromState($params['state']));
         if (config('app.debug')) {
             // @codeCoverageIgnoreStart

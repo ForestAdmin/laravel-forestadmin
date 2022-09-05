@@ -41,7 +41,7 @@ class OidcClientManager
      * @return ForestProvider
      * @throws GuzzleException
      */
-    public function getClientForCallbackUrl()
+    public function makeForestProvider()
     {
         $cacheKey = config('forest.api.secret') . '-client-data';
 
