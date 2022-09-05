@@ -42,20 +42,402 @@ class ChartsControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
-    public function setUp(): void
+    public function testLiveQueryTypeException(): void
     {
-        parent::setUp();
+        $this->setUpForestUser('admin');
+        $data = $this->getTestingDataLiveQueries('Value');
+        //--- Override type for testing throw exception ---//
+        $data['payloadQuery']['type'] = 'Foo';
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $call->baseResponse->getStatusCode());
+        $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
+    }
 
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryPermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Value');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryValueWithPermissionLevel(): void
+    {
+        $this->setUpForestUser('admin');
+        $data = $this->getTestingDataLiveQueries('Value');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryValue(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Value');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryObjective(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Objective');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryPie(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Pie');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryLine(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Line');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testLiveQueryLeaderboard(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $data = $this->getTestingDataLiveQueries('Leaderboard');
+        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
+        $permission = [
+            'stats' => [
+                'queries' => [$data['payloadQuery']['query']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexValue(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Value');
+        $permission = [
+            'stats' => [
+                'values' => [$data['permission']],
+            ],
+        ];
+
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexValuePermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Value');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexObjective(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Objective');
+        //-- unset this key because, it's only present when is a liveQuery chart --//
+        unset($data['expected']['objective']);
+        $permission = [
+            'stats' => [
+                'objectives' => [$data['permission']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexObjectivePermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Objective');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexPie(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Pie');
+        $permission = [
+            'stats' => [
+                'pies' => [$data['permission']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexPiePermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Pie');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLine(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Line');
+        $permission = [
+            'stats' => [
+                'lines' => [$data['permission']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLinePermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Line');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLeaderboard(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        $this->makeScopeManager($this->forestUser);
+        $this->makeBooks();
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Leaderboard');
+        $permission = [
+            'stats' => [
+                'leaderboards' => [$data['permission']],
+            ],
+        ];
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexLeaderboardPermissionDenied(): void
+    {
+        $this->setUpForestUser('PERMISSION-TEST');
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Leaderboard');
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
+        $this->assertEquals('This action is unauthorized.', $response['message']);
+    }
+
+    /**
+     * @param string $permission
+     * @return void
+     * @throws \JsonException
+     * @throws \ReflectionException
+     */
+    public function setUpForestUser(string $permission): void
+    {
         $this->forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => $permission,
             ]
         );
 
@@ -74,348 +456,6 @@ class ChartsControllerTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
         $this->mockIpWhitelist();
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryTypeException(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Value');
-        //--- Override type for testing throw exception ---//
-        $data['payloadQuery']['type'] = 'Foo';
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $call->baseResponse->getStatusCode());
-        $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryPermissionDenied(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Value');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryValue(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Value');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $permission = [
-            'stats' => [
-                'queries' => [$data['payloadQuery']['query']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryObjective(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Objective');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $permission = [
-            'stats' => [
-                'queries' => [$data['payloadQuery']['query']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryPie(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Pie');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $permission = [
-            'stats' => [
-                'queries' => [$data['payloadQuery']['query']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryLine(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Line');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $permission = [
-            'stats' => [
-                'queries' => [$data['payloadQuery']['query']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testLiveQueryLeaderboard(): void
-    {
-        $data = $this->getTestingDataLiveQueries('Leaderboard');
-        DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $permission = [
-            'stats' => [
-                'queries' => [$data['payloadQuery']['query']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexValue(): void
-    {
-        $this->makeScopeManager($this->forestUser);
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Value');
-        $permission = [
-            'stats' => [
-                'values' => [$data['permission']],
-            ]
-        ];
-
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexValuePermissionDenied(): void
-    {
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Value');
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexObjective(): void
-    {
-        $this->makeScopeManager($this->forestUser);
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Objective');
-        //-- unset this key because, it's only present when is a liveQuery chart --//
-        unset($data['expected']['objective']);
-        $permission = [
-            'stats' => [
-                'objectives' => [$data['permission']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexObjectivePermissionDenied(): void
-    {
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Objective');
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexPie(): void
-    {
-        $this->makeScopeManager($this->forestUser);
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Pie');
-        $permission = [
-            'stats' => [
-                'pies' => [$data['permission']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexPiePermissionDenied(): void
-    {
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Pie');
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexLine(): void
-    {
-        $this->makeScopeManager($this->forestUser);
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Line');
-        $permission = [
-            'stats' => [
-                'lines' => [$data['permission']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexLinePermissionDenied(): void
-    {
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Line');
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexLeaderboard(): void
-    {
-        $this->makeScopeManager($this->forestUser);
-        $this->makeBooks();
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Leaderboard');
-        $permission = [
-            'stats' => [
-                'leaderboards' => [$data['permission']],
-            ]
-        ];
-        $this->mockForestUserFactory(true, $permission);
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertChartResponse($data['expected'], $response);
-    }
-
-    /**
-     * @return void
-     * @throws \JsonException
-     */
-    public function testIndexLeaderboardPermissionDenied(): void
-    {
-        App::partialMock()->shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
-        $data = $this->getTestingDataLiveQueries('Leaderboard');
-        $call = $this->postJson('/forest/stats/book', $data['payload']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $call->baseResponse->getStatusCode());
-        $this->assertEquals('This action is unauthorized.', $response['message']);
     }
 
     /**
@@ -442,73 +482,73 @@ class ChartsControllerTest extends TestCase
     {
         $testingData = [
             'Value'       => [
-                'payloadQuery'     => [
+                'payloadQuery' => [
                     'type'  => 'Value',
                     'query' => "select count('*') as value from books where books.label = 'foo'",
                 ],
-                'payload' => [
-                    'type'            => 'Value',
-                    'collection'      => 'book',
-                    'aggregate'       => 'Count',
-                    'filters'         => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}"
+                'payload'      => [
+                    'type'       => 'Value',
+                    'collection' => 'book',
+                    'aggregate'  => 'Count',
+                    'filters'    => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
                 ],
-                'permission' => [
+                'permission'   => [
                     'type'               => 'Value',
                     'sourceCollectionId' => 'book',
                     'aggregator'         => 'Count',
-                    'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}"
+                    'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
                 ],
-                'queryResult' => [
+                'queryResult'  => [
                     (object) ['value' => Book::where('label', 'foo')->count()],
                 ],
-                'expected'    => [
+                'expected'     => [
                     'countCurrent'  => Book::where('label', 'foo')->count(),
                     'countPrevious' => null,
                 ],
             ],
             'Objective'   => [
-                'payloadQuery'     => [
+                'payloadQuery' => [
                     'type'  => 'Objective',
                     'query' => "select count(*) as value, 10 as objective from books",
                 ],
-                'payload' => [
-                    'type'            => 'Objective',
-                    'collection'      => 'book',
-                    'aggregate'       => 'Count',
+                'payload'      => [
+                    'type'       => 'Objective',
+                    'collection' => 'book',
+                    'aggregate'  => 'Count',
                 ],
-                'permission' => [
+                'permission'   => [
                     'type'               => 'Objective',
                     'sourceCollectionId' => 'book',
                     'aggregator'         => 'Count',
                 ],
-                'queryResult' => [
+                'queryResult'  => [
                     (object) ['value' => Book::count(), 'objective' => 10],
                 ],
-                'expected'    => [
+                'expected'     => [
                     'value'     => Book::count(),
                     'objective' => 10,
                 ],
             ],
             'Pie'         => [
-                'payloadQuery'     => [
+                'payloadQuery' => [
                     'type'  => 'Pie',
                     'query' => "select COUNT(books.label) as value, books.label as key from books where label = 'foo' group by books.label",
                 ],
-                'payload' => [
-                    'type'            => 'Pie',
-                    'collection'      => 'book',
-                    'aggregate'       => 'Count',
-                    'group_by_field'  => 'label',
-                    'filters'         => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
+                'payload'      => [
+                    'type'           => 'Pie',
+                    'collection'     => 'book',
+                    'aggregate'      => 'Count',
+                    'group_by_field' => 'label',
+                    'filters'        => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
                 ],
-                'permission' => [
+                'permission'   => [
                     'type'               => 'Pie',
                     'sourceCollectionId' => 'book',
                     'aggregator'         => 'Count',
                     'groupByFieldName'   => 'label',
                     'filter'             => "{\"field\":\"label\",\"operator\":\"equal\",\"value\":\"foo\"}",
                 ],
-                'queryResult' => array_map(
+                'queryResult'  => array_map(
                     static fn ($item) => (object) $item,
                     Book::selectRaw('COUNT(books.label) as value, books.label as key')
                         ->where('label', 'foo')
@@ -516,32 +556,32 @@ class ChartsControllerTest extends TestCase
                         ->get()
                         ->toArray()
                 ),
-                'expected' => Book::selectRaw('COUNT(books.label) as value, books.label as key')
+                'expected'     => Book::selectRaw('COUNT(books.label) as value, books.label as key')
                     ->where('label', 'foo')
                     ->groupBy('label')
                     ->get()
                     ->toArray(),
             ],
             'Line'        => [
-                'payloadQuery'     => [
+                'payloadQuery' => [
                     'type'  => 'Line',
                     'query' => "select count(*) as value, date(created_at, 'dd/mm/yyyy') as label from books group by label",
                 ],
-                'payload' => [
+                'payload'      => [
                     'aggregate'           => 'Count',
                     'collection'          => 'book',
                     'group_by_date_field' => 'created_at',
                     'time_range'          => 'Day',
                     'type'                => 'Line',
                 ],
-                'permission' => [
+                'permission'   => [
                     'type'               => 'Line',
                     'sourceCollectionId' => 'book',
                     'aggregator'         => 'Count',
                     'groupByFieldName'   => 'created_at',
                     'timeRange'          => 'Day',
                 ],
-                'queryResult' => array_map(
+                'queryResult'  => array_map(
                     static fn ($item) => (object) $item,
                     Book::selectRaw("count(*) as value, STRFTIME('%d/%m/%Y', created_at) as key")
                         ->whereNotNull('created_at')
@@ -549,24 +589,24 @@ class ChartsControllerTest extends TestCase
                         ->get()
                         ->toArray()
                 ),
-                'expected' => Book::selectRaw("count(*) as value, STRFTIME('%d/%m/%Y', created_at) as key")
+                'expected'     => Book::selectRaw("count(*) as value, STRFTIME('%d/%m/%Y', created_at) as key")
                     ->whereNotNull('created_at')
                     ->groupBy('created_at')
                     ->get()
                     ->map(
-                        fn($item) => [
-                        'label'  => $item['key'],
-                        'values' => ['value' => $item['value']],
+                        fn ($item) => [
+                            'label'  => $item['key'],
+                            'values' => ['value' => $item['value']],
                         ]
                     )
                     ->toArray(),
             ],
             'Leaderboard' => [
-                'payloadQuery'     => [
+                'payloadQuery' => [
                     'type'  => 'Leaderboard',
                     'query' => "select books.label as key, count(c.id) as value from books left join comments c on books.id = c.book_id GROUP BY books.label LIMIT 3",
                 ],
-                'payload' => [
+                'payload'      => [
                     'type'               => 'Leaderboard',
                     'collection'         => 'book',
                     'label_field'        => 'label',
@@ -575,7 +615,7 @@ class ChartsControllerTest extends TestCase
                     'limit'              => 3,
                     'aggregate'          => 'Count',
                 ],
-                'permission' => [
+                'permission'   => [
                     'type'                  => 'Leaderboard',
                     'sourceCollectionId'    => 'book',
                     'labelFieldName'        => 'label',
@@ -584,12 +624,12 @@ class ChartsControllerTest extends TestCase
                     'limit'                 => 3,
                     'aggregator'            => 'Count',
                 ],
-                'queryResult' => [
+                'queryResult'  => [
                     (object) ['value' => 10, 'key' => 'test book 10'],
                     (object) ['value' => 9, 'key' => 'test book 9'],
                     (object) ['value' => 8, 'key' => 'test book 8'],
                 ],
-                'expected'    => [
+                'expected'     => [
                     ['value' => 10, 'key' => 'test book 10'],
                     ['value' => 9, 'key' => 'test book 9'],
                     ['value' => 8, 'key' => 'test book 8'],

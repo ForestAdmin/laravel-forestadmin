@@ -49,14 +49,15 @@ class ResourcesControllerTest extends TestCase
 
         $this->forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => 'admin',
             ]
         );
 
@@ -454,9 +455,9 @@ class ResourcesControllerTest extends TestCase
         $book = Book::first();
         $params = [
             'data' => [
-                'id'            => $book->id,
-                'attributes'    => [
-                    'reference'  => 'new label-hard',
+                'id'         => $book->id,
+                'attributes' => [
+                    'reference' => 'new label-hard',
                 ],
             ],
             'type' => 'books',
@@ -704,7 +705,7 @@ class ResourcesControllerTest extends TestCase
     public function testDestroyBulkException(): void
     {
         $this->makeScopeManager($this->forestUser);
-        Book::destroy([1,2,3,4,5]);
+        Book::destroy([1, 2, 3, 4, 5]);
         $params = [
             'data' => [
                 'attributes' => [
@@ -935,7 +936,7 @@ class ResourcesControllerTest extends TestCase
         return [
             'book' => [
                 'scope' => [
-                    'filter'             => [
+                    'filter'              => [
                         'aggregator' => 'and',
                         'conditions' => [
                             [

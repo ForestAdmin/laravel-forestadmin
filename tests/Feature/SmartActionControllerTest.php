@@ -47,14 +47,15 @@ class SmartActionControllerTest extends TestCase
 
         $this->forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => 'admin',
             ]
         );
 
@@ -87,7 +88,7 @@ class SmartActionControllerTest extends TestCase
         $call = $this->postJson('/forest/smart-actions/book_smart-action-single');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
-            'success' => 'Test working!'
+            'success' => 'Test working!',
         ];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -105,17 +106,17 @@ class SmartActionControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $payload = [
             'data' => [
-                'attributes'    => [
-                    'ids' => ['1', '2', '3'],
-                    'all_records' => false,
-                    'all_records_ids_excluded' => []
+                'attributes' => [
+                    'ids'                      => ['1', '2', '3'],
+                    'all_records'              => false,
+                    'all_records_ids_excluded' => [],
                 ],
             ],
         ];
         $call = $this->postJson('/forest/smart-actions/book_smart-action-bulk', $payload);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
-            'success' => 'ids => 1,2,3'
+            'success' => 'ids => 1,2,3',
         ];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -133,10 +134,10 @@ class SmartActionControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $payload = [
             'data' => [
-                'attributes'    => [
-                    'ids' => [],
-                    'all_records' => true,
-                    'all_records_ids_excluded' => [2]
+                'attributes' => [
+                    'ids'                      => [],
+                    'all_records'              => true,
+                    'all_records_ids_excluded' => [2],
                 ],
             ],
         ];
@@ -144,7 +145,7 @@ class SmartActionControllerTest extends TestCase
         $call = $this->postJson('/forest/smart-actions/book_smart-action-bulk', $payload);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expected = [
-            'success' => 'ids => ' . implode(',', $books)
+            'success' => 'ids => ' . implode(',', $books),
         ];
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -241,8 +242,8 @@ class SmartActionControllerTest extends TestCase
         File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $payload = [
             'data' => [
-                'attributes'    => [
-                    'fields' => [
+                'attributes' => [
+                    'fields'        => [
                         [
                             'field'         => 'token',
                             'type'          => 'string',

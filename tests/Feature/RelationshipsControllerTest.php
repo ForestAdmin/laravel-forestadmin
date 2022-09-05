@@ -51,14 +51,15 @@ class RelationshipsControllerTest extends TestCase
 
         $forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => 'admin',
             ]
         );
 
@@ -151,8 +152,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $comment->id,
                         'type' => 'comment',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
         $commentIds = Comment::where('book_id', $book->id)
@@ -184,13 +185,13 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $tag->id,
                         'type' => 'tag',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
         $tagIds = Tag::where(
             [
-                'taggable_id' => $book->id,
+                'taggable_id'   => $book->id,
                 'taggable_type' => Book::class,
             ]
         )->pluck('id')->toArray();
@@ -207,7 +208,7 @@ class RelationshipsControllerTest extends TestCase
     public function testAssociateBelongsToMany(): void
     {
         $book = Book::first();
-        $range = Range::whereDoesntHave('books', static fn($query) => $query->where('books.id', $book->id))->first();
+        $range = Range::whereDoesntHave('books', static fn ($query) => $query->where('books.id', $book->id))->first();
 
         $call = $this->post(
             '/forest/book/' . $book->id . '/relationships/ranges',
@@ -216,8 +217,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $range->id,
                         'type' => 'range',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
         $rangeIds = array_values(Range::whereRelation('books', 'books.id', '=', $book->id)->pluck('id')->sort()->toArray());
@@ -242,8 +243,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $movie->id,
                         'type' => 'movie',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -267,8 +268,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $sequel->id,
                         'type' => 'sequel',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -294,8 +295,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $range->id,
                         'type' => 'range',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -319,8 +320,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $comment->id,
                         'type' => 'comments',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -344,8 +345,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => '100',
                         'type' => 'comments',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -370,8 +371,8 @@ class RelationshipsControllerTest extends TestCase
                     [
                         'id'   => $comment->id,
                         'type' => 'comments',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -394,7 +395,7 @@ class RelationshipsControllerTest extends TestCase
                 'data' => [
                     'id'   => $category->id,
                     'type' => 'category',
-                ]
+                ],
             ]
         );
         $book = $book->fresh();
@@ -422,7 +423,7 @@ class RelationshipsControllerTest extends TestCase
                 'data' => [
                     'id'   => $editor->id,
                     'type' => 'editor',
-                ]
+                ],
             ]
         );
         $book = $book->refresh();
@@ -447,7 +448,7 @@ class RelationshipsControllerTest extends TestCase
                 'data' => [
                     'id'   => '100',
                     'type' => 'category',
-                ]
+                ],
             ]
         );
 
@@ -471,7 +472,7 @@ class RelationshipsControllerTest extends TestCase
                 'data' => [
                     'id'   => $advertisementOfBook2->id,
                     'type' => 'advertisement',
-                ]
+                ],
             ]
         );
 
