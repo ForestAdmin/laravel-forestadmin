@@ -10,7 +10,6 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 
 /**
  * Class AuthorizationProvider
