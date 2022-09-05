@@ -77,7 +77,7 @@ class ChartsControllerTest extends TestCase
      * @return void
      * @throws \JsonException
      */
-    public function testLiveQueryValueWithPermissionLevel(): void
+    public function testLiveQueryValueWithAllowedPermissionLevel(): void
     {
         $this->setUpForestUser('admin');
         $data = $this->getTestingDataLiveQueries('Value');
@@ -199,6 +199,31 @@ class ChartsControllerTest extends TestCase
         ];
         $this->mockForestUserFactory(true, $permission);
         $call = $this->postJson('/forest/stats', $data['payloadQuery']);
+        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
+        $this->assertChartResponse($data['expected'], $response);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
+    public function testIndexValueWithAllowedPermissionLevel(): void
+    {
+        $this->setUpForestUser('admin');
+        $this->makeScopeManager($this->forestUser);
+        App::partialMock()->shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
+        $data = $this->getTestingDataLiveQueries('Value');
+        $permission = [
+            'stats' => [
+                'values' => [$data['permission']],
+            ],
+        ];
+
+        $this->mockForestUserFactory(true, $permission);
+        $call = $this->postJson('/forest/stats/book', $data['payload']);
         $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
