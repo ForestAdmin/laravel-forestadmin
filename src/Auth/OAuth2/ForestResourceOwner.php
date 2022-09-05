@@ -70,14 +70,15 @@ class ForestResourceOwner implements ResourceOwnerInterface
     public function makeJwt(): string
     {
         $user = [
-            'id'           => $this->data['id'],
-            'email'        => $this->data['email'],
-            'first_name'   => $this->data['first_name'],
-            'last_name'    => $this->data['last_name'],
-            'team'         => $this->data['teams'][0],
-            'tags'         => $this->data['tags'],
-            'rendering_id' => $this->renderingId,
-            'exp'          => $this->expirationInSeconds(),
+            'id'               => $this->data['id'],
+            'email'            => $this->data['email'],
+            'first_name'       => $this->data['first_name'],
+            'last_name'        => $this->data['last_name'],
+            'team'             => $this->data['teams'][0],
+            'tags'             => $this->data['tags'],
+            'rendering_id'     => $this->renderingId,
+            'exp'              => $this->expirationInSeconds(),
+            'permission_level' => $this->data['permission_level'],
         ];
 
         return JWT::encode($user, config('forest.api.auth-secret'), 'HS256');
