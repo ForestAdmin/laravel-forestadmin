@@ -22,7 +22,7 @@ class OidcClientManager
 {
     use FormatGuzzle;
 
-    public const TTL = 60 * 60 * 24;
+    public const TTL = 3;// 60 * 60 * 24;
 
     /**
      * @var ForestApiRequester
@@ -38,29 +38,27 @@ class OidcClientManager
     }
 
     /**
-     * @param string $callbackUrl
-     * @return ForestProvider|string
+     * @return ForestProvider
      * @throws GuzzleException
      */
-    public function getClientForCallbackUrl(string $callbackUrl)
+    public function getClientForCallbackUrl()
     {
-        $cacheKey = $callbackUrl . '-' . config('forest.api.secret') . '-client-data';
+        $cacheKey = config('forest.api.secret') . '-client-data';
 
         try {
             $config = $this->retrieve();
             Cache::remember(
                 $cacheKey,
                 self::TTL,
-                function () use ($config, $callbackUrl) {
+                function () use ($config) {
                     $clientCredentials = $this->register(
                         [
                             'token_endpoint_auth_method' => 'none',
                             'registration_endpoint'      => $config['registration_endpoint'],
-                            'redirect_uris'              => [$callbackUrl],
                             'application_type'           => 'web'
                         ]
                     );
-                    $clientData = ['client_id' => $clientCredentials['client_id'], 'issuer' => $config['issuer']];
+                    $clientData = ['client_id' => $clientCredentials['client_id'], 'issuer' => $config['issuer'], 'redirect_uri' => $clientCredentials['redirect_uris'][0]];
 
                     return $clientData;
                 }
@@ -73,7 +71,7 @@ class OidcClientManager
             Cache::get($cacheKey)['issuer'],
             [
                 'clientId'     => Cache::get($cacheKey)['client_id'],
-                'redirectUri'  => $callbackUrl,
+                'redirectUri'  => Cache::get($cacheKey)['redirect_uri'],
             ]
         );
     }

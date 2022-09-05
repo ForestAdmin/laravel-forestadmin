@@ -36,15 +36,14 @@ class AuthManager
     }
 
     /**
-     * @param string $callbackUrl
-     * @param int    $renderingId
+     * @param int $renderingId
      * @return string
      * @throws GuzzleException
      * @throws JsonException
      */
-    public function start(string $callbackUrl, int $renderingId)
+    public function start(int $renderingId)
     {
-        $client = $this->oidc->getClientForCallbackUrl($callbackUrl);
+        $client = $this->oidc->getClientForCallbackUrl();
 
         return $client->getAuthorizationUrl(
             [
@@ -54,18 +53,17 @@ class AuthManager
     }
 
     /**
-     * @param string $redirectUrl
-     * @param array  $params
+     * @param array $params
      * @return string
-     * @throws JsonException
-     * @throws IdentityProviderException
      * @throws GuzzleException
+     * @throws IdentityProviderException
+     * @throws JsonException
      */
-    public function verifyCodeAndGenerateToken(string $redirectUrl, array $params): string
+    public function verifyCodeAndGenerateToken(array $params): string
     {
         $this->stateIsValid($params);
 
-        $forestProvider = $this->oidc->getClientForCallbackUrl($redirectUrl);
+        $forestProvider = $this->oidc->getClientForCallbackUrl();
         $forestProvider->setRenderingId($this->getRenderingIdFromState($params['state']));
         if (config('app.debug')) {
             // @codeCoverageIgnoreStart
