@@ -22,7 +22,7 @@ class OidcClientManager
 {
     use FormatGuzzle;
 
-    public const TTL = 3;// 60 * 60 * 24;
+    public const TTL = 60 * 60 * 24;
 
     /**
      * @var ForestApiRequester
