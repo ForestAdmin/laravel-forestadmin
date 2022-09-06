@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.2...v1.1.3) (2022-09-06)
+
+
+### Bug Fixes
+
+* **charts:** user with permissions level that allows charts creation or edition should always be allow to perform charts requests ([#60](https://github.com/ForestAdmin/laravel-forestadmin/issues/60)) ([b467b35](https://github.com/ForestAdmin/laravel-forestadmin/commit/b467b35d191ffe500aad029d8144f82a16a81567))
+
 ## [1.1.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.1...v1.1.2) (2022-07-22)
 
 

@@ -31,7 +31,7 @@ class Schema
 
     public const LIANA_NAME = 'laravel-forestadmin';
 
-    public const LIANA_VERSION = '1.1.2';
+    public const LIANA_VERSION = '1.1.3';
 
     /**
      * @var array
