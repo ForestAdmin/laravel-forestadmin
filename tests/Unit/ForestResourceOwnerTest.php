@@ -46,6 +46,7 @@ class ForestResourceOwnerTest extends TestCase
                 ],
                 'two_factor_authentication_enabled' => false,
                 'two_factor_authentication_active'  => false,
+                'permission_level'                  => 'admin',
             ],
             1234
         );
