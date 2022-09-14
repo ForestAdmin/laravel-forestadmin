@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.3...v1.2.0) (2022-09-14)
+
+
+### Features
+
+* **auth:** remove callbackUrl parameter on authentication ([#59](https://github.com/ForestAdmin/laravel-forestadmin/issues/59)) ([e097ff9](https://github.com/ForestAdmin/laravel-forestadmin/commit/e097ff9132c985122f7742b3e974c4f7aa4940fd))
+
 ## [1.1.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.2...v1.1.3) (2022-09-06)
 
 
