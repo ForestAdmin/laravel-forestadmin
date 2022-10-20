@@ -139,4 +139,16 @@ class ForestSchemaInstrospection
 
         return $data ?: [];
     }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getSingleRelationships(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.relationship == 'HasOne' or @.relationship == 'BelongsTo')].field");
+
+        return $data ?: [];
+    }
 }

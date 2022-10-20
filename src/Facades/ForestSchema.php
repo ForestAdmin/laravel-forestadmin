@@ -21,6 +21,7 @@ use JsonPath\JsonObject;
  * @method static array getSmartRelationships(string $collection)
  * @method static null|string getTypeByField(string $collection, string $field)
  * @method static array getRelatedData(string $collection)
+ * @method static array getSingleRelationships(string $collection)
  *
  * @see ForestSchemaInstrospection
  */
