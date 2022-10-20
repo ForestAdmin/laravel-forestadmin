@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.0...v1.2.1) (2022-10-20)
+
+
+### Bug Fixes
+
+* render jsonapi when a model uses eager load relation ([#61](https://github.com/ForestAdmin/laravel-forestadmin/issues/61)) ([fdbe907](https://github.com/ForestAdmin/laravel-forestadmin/commit/fdbe907b8bea94563bd34f4a39153a14bb59eee7))
+
 # [1.2.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.3...v1.2.0) (2022-09-14)
 
 
