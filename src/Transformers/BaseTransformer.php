@@ -3,7 +3,6 @@
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
-use ForestAdmin\LaravelForestAdmin\Services\ForestSchemaInstrospection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
