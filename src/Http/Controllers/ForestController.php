@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
+use ForestAdmin\LaravelForestAdmin\Permissions\Permission;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controller;
@@ -21,17 +22,15 @@ class ForestController extends Controller
     }
 
     /**
-     * @param $ability
-     * @param $arguments
-     * @return void
+     * @param string $ability
+     * @param        $arguments
+     * @return mixed
      * @throws AuthorizationException
      */
-    public function authorize($ability, $arguments = [])
+    public function can(string $ability, $arguments)
     {
-        if (Auth::guard('forest')->check()) {
-            Auth::shouldUse('forest');
+        if (! Permission::$ability(Auth::guard('forest')->user(), $arguments)) {
+            throw new AuthorizationException();
         }
-
-        $this->baseAuthorize($ability, $arguments);
     }
 }
