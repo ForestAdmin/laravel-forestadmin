@@ -87,6 +87,26 @@ class Permission
     }
 
     /**
+     * @param ForestUser $forestUser
+     * @param            $query
+     * @return bool
+     */
+    public static function liveQuery(ForestUser $forestUser, $query)
+    {
+        return $forestUser->hasLiveQueryPermission($query);
+    }
+
+    /**
+     * @param ForestUser $forestUser
+     * @param            $query
+     * @return bool
+     */
+    public static function simpleCharts(ForestUser $forestUser, $query)
+    {
+        return $forestUser->hasSimpleChartPermission($query);
+    }
+
+    /**
      * @param mixed $collection
      * @return string
      */

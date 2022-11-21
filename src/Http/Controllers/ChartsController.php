@@ -42,7 +42,7 @@ class ChartsController extends ForestController
      */
     public function index(): JsonResponse
     {
-        $this->authorize('simple-charts', [request()->except('timezone')]);
+        $this->can('simpleCharts', request()->except('timezone'));
 
         $name = request()->route()->parameter('collection');
         $model = $this->getModel(ucfirst($name));
@@ -66,7 +66,7 @@ class ChartsController extends ForestController
      */
     public function liveQuery(): JsonResponse
     {
-        $this->authorize('liveQuery', [request()->input('query')]);
+        $this->can('liveQuery', request()->input('query'));
         $repository = App::make('\ForestAdmin\LaravelForestAdmin\Repositories\Charts\LiveQuery\\' . $this->type);
 
         return response()->json(

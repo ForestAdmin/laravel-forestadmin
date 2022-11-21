@@ -36,19 +36,5 @@ class AuthorizationProvider extends AuthServiceProvider
                 }
             }
         );
-
-        Gate::define(
-            'liveQuery',
-            static function (ForestUser $user, string $query) {
-                return $user->hasLiveQueryPermission($query);
-            }
-        );
-
-        Gate::define(
-            'simple-charts',
-            static function (ForestUser $user, array $payload) {
-                return $user->hasSimpleChartPermission($payload);
-            }
-        );
     }
 }
