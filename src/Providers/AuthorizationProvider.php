@@ -5,7 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
-use ForestAdmin\LaravelForestAdmin\Policies\PermissionPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,22 +34,6 @@ class AuthorizationProvider extends AuthServiceProvider
 
                     return new ForestUser((array) $tokenData);
                 }
-            }
-        );
-
-        Gate::guessPolicyNamesUsing(static fn() => PermissionPolicy::class);
-
-        Gate::define(
-            'liveQuery',
-            static function (ForestUser $user, string $query) {
-                return $user->hasLiveQueryPermission($query);
-            }
-        );
-
-        Gate::define(
-            'simple-charts',
-            static function (ForestUser $user, array $payload) {
-                return $user->hasSimpleChartPermission($payload);
             }
         );
     }
