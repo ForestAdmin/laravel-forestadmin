@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.1...v1.2.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* permission to avoid any conflict with laravel policy ([#62](https://github.com/ForestAdmin/laravel-forestadmin/issues/62)) ([03d5856](https://github.com/ForestAdmin/laravel-forestadmin/commit/03d5856f2369905fce34fe1f01d4b94de9948ed7))
+
 ## [1.2.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.0...v1.2.1) (2022-10-20)
 
 
