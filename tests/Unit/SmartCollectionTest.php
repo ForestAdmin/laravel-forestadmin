@@ -6,6 +6,7 @@ use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\SmartCollections\Comic;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -64,31 +65,38 @@ class SmartCollectionTest extends TestCase
      */
     public function testSerialize(): void
     {
-        $smartCollection = $this->buildSmartCollection();
-        $this->invokeProperty($smartCollection, 'name', 'MyCustomSmartCollection');
+        $smartCollection = new Comic();
 
         $this->assertIsArray($smartCollection->serialize());
         $this->assertEquals(
             [
-                "name"                   => "MyCustomSmartCollection",
-                "name_old"               => "MyCustomSmartCollection",
+                "name"                   => "comic",
+                "name_old"               => "comic",
+                "class"                  => Comic::class,
                 "icon"                   => null,
-                "is_read_only"           => false,
+                "is_read_only"           => true,
                 "is_virtual"             => true,
-                "is_searchable"          => false,
+                "is_searchable"          => true,
                 "only_for_relationships" => false,
                 "pagination_type"        => "page",
                 "fields"                 => [
                     (new SmartField(
                         [
-                            'field' => 'id',
-                            'type'  => 'Number',
+                            'field'       => 'id',
+                            'type'        => 'Number',
+                            'is_sortable' => true,
                         ]
                     ))->serialize(),
                     (new SmartField(
                         [
-                            'field' => 'foo',
+                            'field' => 'label',
                             'type'  => 'String',
+                        ]
+                    ))->serialize(),
+                    (new SmartField(
+                        [
+                            'field' => 'created_at',
+                            'type'  => 'DateTime',
                         ]
                     ))->serialize(),
                 ],
@@ -136,7 +144,7 @@ class SmartCollectionTest extends TestCase
      */
     public function buildSmartCollection()
     {
-        $smartCollection = m::mock(SmartCollection::class)->makePartial();
+        $smartCollection = m::mock(Comic::class)->makePartial();
         $smartCollection->shouldReceive('fields')
             ->andReturn(
                 collect(
@@ -156,6 +164,7 @@ class SmartCollectionTest extends TestCase
                     ]
                 )
             )
+            ->shouldReceive()
             ->getMock();
 
         return $smartCollection;
