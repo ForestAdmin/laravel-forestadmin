@@ -60,6 +60,7 @@ class JsonApiResponse
         if (is_array($class) || $this->isCollection($class)) {
             $resource = new Collection($data, $transformer, $name);
         } elseif ($this->isPaginator($class)) {
+            $data = $this->isPaginator($data) ? $data->getCollection() : $data;
             $resource = new Collection($data, $transformer, $name);
             if (request()->has('search')) {
                 $resource->setMeta($this->searchDecorator($resource->getData(), request()->get('search')));
