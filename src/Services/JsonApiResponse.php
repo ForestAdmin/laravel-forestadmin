@@ -140,7 +140,7 @@ class JsonApiResponse
         return $decorator;
     }
 
-    protected function hydrateData($class, $className): array
+    protected function hydrateData($class, $className)
     {
         if (is_array($class) || $this->isCollection($class) || $this->isPaginator($class)) {
             $records = [];

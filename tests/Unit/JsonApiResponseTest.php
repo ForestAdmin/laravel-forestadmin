@@ -200,6 +200,56 @@ class JsonApiResponseTest extends TestCase
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function testRenderWithSmartCollection(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema());
+        $book = Book::limit(3)->get();
+        $render = $jsonApi->render($book, 'comic');
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('type', $render['data'][0]);
+        $this->assertArrayHasKey('id', $render['data'][0]);
+        $this->assertArrayHasKey('attributes', $render['data'][0]);
+        $this->assertArrayHasKey('label', $render['data'][0]['attributes']);
+        $this->assertArrayHasKey('created_at', $render['data'][0]['attributes']);
+    }
+
+    /**
+     * @return void
+     * @throws BindingResolutionException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testRenderWithSingleSmartCollection(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema());
+        $book = Book::first();
+        $render = $jsonApi->render($book, 'comic');
+
+        // todo test with smartRelationship
+        
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('type', $render['data']);
+        $this->assertArrayHasKey('id', $render['data']);
+        $this->assertArrayHasKey('attributes', $render['data']);
+        $this->assertArrayHasKey('label', $render['data']['attributes']);
+        $this->assertArrayHasKey('created_at', $render['data']['attributes']);
+    }
+
+    /**
+     * @return void
+     * @throws BindingResolutionException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testRenderWithMeta(): void
     {
         $jsonApi = new JsonApiResponse();
