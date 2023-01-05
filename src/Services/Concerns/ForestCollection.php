@@ -6,6 +6,7 @@ use Closure;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartSegment;
@@ -136,22 +137,24 @@ trait ForestCollection
     }
 
     /**
-     * @return Model
+     * @return Model|SmartCollection
      */
-    public function handleSmartFields(): Model
+    public function handleSmartFields()
     {
         $smartFields = ForestSchema::getSmartFields(strtolower(class_basename($this)));
         foreach ($smartFields as $smartField) {
-            $this->{$smartField['field']} = call_user_func($this->{$smartField['field']}()->get);
+            if (method_exists($this, $smartField['field'])) {
+                $this->{$smartField['field']} = call_user_func($this->{$smartField['field']}()->get);
+            }
         }
 
         return $this;
     }
 
     /**
-     * @return Model
+     * @return Model|SmartCollection
      */
-    public function handleSmartRelationships(): Model
+    public function handleSmartRelationships()
     {
         $smartRelationships = ForestSchema::getSmartRelationships(strtolower(class_basename($this)));
         foreach ($smartRelationships as $smartRelationship) {
