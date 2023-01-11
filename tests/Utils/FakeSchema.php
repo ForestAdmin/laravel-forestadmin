@@ -774,6 +774,24 @@ trait FakeSchema
                             "validations"   => [
                             ],
                         ],
+                        [
+                            "field"         => "bookStores",
+                            "type"          => [
+                                "String",
+                            ],
+                            "default_value" => null,
+                            "enums"         => null,
+                            "integration"   => null,
+                            "is_filterable" => false,
+                            "is_read_only"  => false,
+                            "is_required"   => false,
+                            "is_sortable"   => false,
+                            "is_virtual"    => true,
+                            "reference"     => "bookStore.id",
+                            "inverse_of"    => null,
+                            "validations"   => [
+                            ],
+                        ],
                     ],
                     "actions"                => [
                     ],

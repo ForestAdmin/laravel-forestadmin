@@ -224,7 +224,7 @@ class JsonApiResponseTest extends TestCase
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function testRenderWithSingleSmartCollection(): void
+    public function testRenderSmartCollectionWithSmartRelation(): void
     {
         $jsonApi = new JsonApiResponse();
         App::shouldReceive('basePath')->andReturn(null);
@@ -232,8 +232,6 @@ class JsonApiResponseTest extends TestCase
         $book = Book::first();
         $render = $jsonApi->render($book, 'comic');
 
-        // todo test with smartRelationship
-        
         $this->assertIsArray($render);
         $this->assertArrayHasKey('data', $render);
         $this->assertArrayHasKey('type', $render['data']);
@@ -241,6 +239,17 @@ class JsonApiResponseTest extends TestCase
         $this->assertArrayHasKey('attributes', $render['data']);
         $this->assertArrayHasKey('label', $render['data']['attributes']);
         $this->assertArrayHasKey('created_at', $render['data']['attributes']);
+        $this->assertArrayHasKey('relationships', $render['data']);
+        // BelongsTo relation
+        $this->assertArrayHasKey('category', $render['data']['relationships']);
+        $this->assertArrayHasKey('data', $render['data']['relationships']['category']);
+        $this->assertArrayHasKey('type', $render['data']['relationships']['category']['data']);
+        $this->assertArrayHasKey('id', $render['data']['relationships']['category']['data']);
+        // HasMany relation
+        $this->assertArrayHasKey('bookStores', $render['data']['relationships']);
+        $this->assertArrayHasKey('links', $render['data']['relationships']['bookStores']);
+        $this->assertArrayHasKey('related', $render['data']['relationships']['bookStores']['links']);
+        $this->assertArrayHasKey('href', $render['data']['relationships']['bookStores']['links']['related']);
     }
 
     /**
