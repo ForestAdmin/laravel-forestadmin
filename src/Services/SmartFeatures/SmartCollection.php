@@ -2,12 +2,9 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services\SmartFeatures;
 
-use Closure;
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Str;
-use phpDocumentor\Reflection\DocBlock\Tags\Param;
 
 /**
  * Class SmartCollection
@@ -34,6 +31,11 @@ class SmartCollection
     protected bool $is_searchable = false;
 
     /**
+     * @var array
+     */
+    protected array $relations = [];
+
+    /**
      * @return Collection
      */
     public function fields(): Collection
@@ -48,7 +50,19 @@ class SmartCollection
     {
         $this->isValid();
 
-        return $this->fields()->map(fn($item) => $item->serialize())->all();
+        $methods = (new \ReflectionClass($this))->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $smartRelationships = new Collection();
+
+        foreach ($methods as $method) {
+            if (($returnType = $method->getReturnType()) && $returnType->getName() === SmartRelationship::class && $method->getName() !== lcfirst(class_basename(SmartRelationship::class))) {
+                $smartRelationships->push($this->{$method->getName()}()->serialize());
+            }
+        }
+
+        return $this->fields()
+            ->map(fn($item) => $item->serialize())
+            ->merge($smartRelationships)
+            ->all();
     }
 
     /**
@@ -59,6 +73,7 @@ class SmartCollection
         return [
             'name'                   => $this->name,
             'name_old'               => $this->name,
+            'class'                  => static::class,
             'icon'                   => null,
             'is_read_only'           => $this->is_read_only,
             'is_virtual'             => true,
@@ -83,5 +98,75 @@ class SmartCollection
         }
 
         return true;
+    }
+
+    /**
+     * @param $record
+     * @return static
+     */
+    public static function hydrate($record): self
+    {
+        if ($record instanceof Model) {
+            $record = $record->toArray();
+        } else {
+            $record = (array) $record;
+        }
+        $object = new static();
+        foreach ($object->getAttributes() as $attribute) {
+            if (isset($record[$attribute])) {
+                $object->$attribute = $record[$attribute];
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->fields()->map(fn(SmartField $field) => $field->getField())->toArray();
+    }
+
+    /**
+     * @param $relation
+     * @param $value
+     * @return $this
+     */
+    public function setRelation($relation, $value): SmartCollection
+    {
+        $this->relations[$relation] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+
+    /**
+     * @return array
+     */
+    public function attributesToArray(): array
+    {
+        $record = [];
+        foreach ($this->getAttributes() as $attribute) {
+            $record[$attribute] = $this->$attribute ?? null;
+        }
+
+        return $record;
     }
 }
