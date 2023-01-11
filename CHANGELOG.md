@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.2...v1.2.3) (2023-01-11)
+
+
+### Bug Fixes
+
+* **smart-collection:** add support of smart-relationship ([#63](https://github.com/ForestAdmin/laravel-forestadmin/issues/63)) ([9e680f5](https://github.com/ForestAdmin/laravel-forestadmin/commit/9e680f5c0067506ab2b7ef058a5b39c1addad37e))
+
 ## [1.2.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.1...v1.2.2) (2022-11-22)
 
 

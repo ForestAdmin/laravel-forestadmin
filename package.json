@@ -1,6 +1,6 @@
 {
   "name": "laravel-forestadmin",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "The official Laravel liana for Forest.",
   "scripts": {
     "prepare": "husky install",

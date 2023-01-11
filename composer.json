@@ -1,6 +1,6 @@
 {
   "name": "forestadmin/laravel-forestadmin",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Forest Admin provides an off-the-shelf administration panel based on a highly-extensible API plugged into your application.",
   "type": "library",
   "require": {
