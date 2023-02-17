@@ -54,6 +54,11 @@ class SmartAction
     protected ?Closure $execute;
 
     /**
+     * @var string
+     */
+    private string $endpoint;
+
+    /**
      * @var Closure|null
      */
     protected ?Closure $load = null;
@@ -74,8 +79,9 @@ class SmartAction
      * @param string       $type
      * @param string       $methodName
      * @param Closure|null $execute
+     * @param string|null  $endpoint
      */
-    public function __construct(string $model, string $name, string $type, string $methodName, ?Closure $execute = null)
+    public function __construct(string $model, string $name, string $type, string $methodName, ?Closure $execute = null, ?string $endpoint = null)
     {
         $this->model = $model;
         $this->name = $name;
@@ -83,6 +89,7 @@ class SmartAction
         $this->execute = $execute;
         $this->fields = collect();
         $this->methodName = $methodName;
+        $this->endpoint = $endpoint ?: '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey();
     }
 
     /**
@@ -234,7 +241,7 @@ class SmartAction
             'name'       => $this->name,
             'methodName' => $this->methodName,
             'fields'     => $this->fields->map(fn($item) => $item->serialize())->all(),
-            'endpoint'   => '/forest/smart-actions/' . strtolower($this->model) . '_' . $this->getKey(),
+            'endpoint'   => $this->endpoint,
             'type'       => $this->type,
             'download'   => $this->download,
             'hooks'      => $this->hooks(),
