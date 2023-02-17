@@ -84,7 +84,7 @@ trait ForestCollection
     {
         $smartActions = ForestSchema::getSmartActions(strtolower(class_basename($this)));
         foreach ($smartActions as $smartAction) {
-            if (Str::slug($smartAction['name']) === $name && method_exists($this, $smartAction['methodName'])) {
+            if ($smartAction['name'] === $name && method_exists($this, $smartAction['methodName'])) {
                 return $smartAction;
             }
         }

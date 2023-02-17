@@ -4,11 +4,9 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartAction;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Route;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Class SmartActionController
@@ -20,52 +18,17 @@ use Illuminate\Support\Str;
 class SmartActionController extends ForestController
 {
     /**
-     * @var Model $collection
-     */
-    protected Model $collection;
-
-    /**
      * @var SmartAction
      */
     protected SmartAction $smartAction;
 
     /**
-     * @param Route $route
-     * @return JsonResponse
-     * @throws \Exception
-     */
-    public function __invoke(Route $route)
-    {
-        [$collection, $name] = explode('_', $route->parameter('action'));
-        $this->collection = Schema::getModel($collection);
-        $smartActionName = $this->collection->getSmartAction($name)['methodName'];
-        $this->smartAction = $this->collection->{$smartActionName}();
-
-        if ($type = $route->parameter('hook')) {
-            return $type === 'load' ? $this->executeLoadHook() : $this->executeChangeHook();
-        } else {
-            return $this->executeAction();
-        }
-    }
-
-    /**
-     * @return JsonResponse
-     * @throws AuthorizationException
-     */
-    public function executeAction(): JsonResponse
-    {
-        $this->can('smartAction', [$this->collection, Str::slug($this->smartAction->getKey())]);
-
-        return response()->json(
-            call_user_func($this->smartAction->getExecute())
-        );
-    }
-
-    /**
      * @return JsonResponse
      */
-    public function executeLoadHook(): JsonResponse
+    public function load(): JsonResponse
     {
+        $this->setSmartAction();
+
         return response()->json(
             [
                 'fields' => array_values(
@@ -81,8 +44,10 @@ class SmartActionController extends ForestController
      * @return JsonResponse
      * @throws \Exception
      */
-    public function executeChangeHook(): JsonResponse
+    public function change(): JsonResponse
     {
+        $this->setSmartAction();
+
         return response()->json(
             [
                 'fields' => array_values(
@@ -92,5 +57,14 @@ class SmartActionController extends ForestController
                 )
             ]
         );
+    }
+
+    private function setSmartAction()
+    {
+        [$collection, $name] = explode('.', Route::getCurrentRoute()->wheres['id']);
+        /** @var Model $collection */
+        $collection = Schema::getModel($collection);
+        $smartActionName = $collection->getSmartAction($name)['methodName'];
+        $this->smartAction = $collection->{$smartActionName}();
     }
 }

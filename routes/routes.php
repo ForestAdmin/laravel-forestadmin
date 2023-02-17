@@ -1,12 +1,16 @@
 <?php
 
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ApiMapsController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\AuthController;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\DispatchGateway;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\SmartActionController;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestAuthorization;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\IpWhitelistAuthorization;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 Route::get('forest/', [ApiMapsController::class, 'index']);
 Route::post('forest/authentication/logout', [AuthController::class, 'logout']);
@@ -48,8 +52,16 @@ Route::group(
                 Route::get('/{collection}/{id}/relationships/{association_name}/count', DispatchGateway::class)->name('forest.relationships.count');
 
                 // SMART ACTIONS
-                Route::post('/smart-actions/{action}', SmartActionController::class);
-                Route::post('/smart-actions/{action}/hooks/{hook}', SmartActionController::class);
+                if (File::exists(App::basePath(config('forest.json_file_path')))) {
+                    foreach (ForestSchema::getAllSmartActions() as $action) {
+                        if ($action['hooks']['load']) {
+                            Route::post(Str::after($action['endpoint'], '/forest') . '/hooks/load', [SmartActionController::class, 'load'])->where(['id' => $action['id']]);
+                        }
+                        if (!empty($action['hooks']['change'])) {
+                            Route::post(Str::after($action['endpoint'], '/forest') . '/hooks/change', [SmartActionController::class, 'change'])->where(['id' => $action['id']]);
+                        }
+                    }
+                }
             }
         );
     }
