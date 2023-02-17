@@ -157,4 +157,14 @@ class ForestSchemaInstrospection
 
         return $data ?: [];
     }
+
+    /**
+     * @return array
+     */
+    public function getAllSmartActions(): array
+    {
+        $data = $this->getSchema()->get("$..collections[*].actions[*]");
+
+        return $data ?: [];
+    }
 }
