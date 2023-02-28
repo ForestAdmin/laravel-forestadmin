@@ -4,11 +4,10 @@ module.exports = {
     [
       "@semantic-release/commit-analyzer",
       {
+        preset: "angular",
         releaseRules: [
-          // This rule allow to force a release by adding "force-release" in scope.
-          // Example: `chore(force-release): support new feature`
-          // Source: https://github.com/semantic-release/commit-analyzer#releaserules
-          { scope: "force-release", release: "patch" },
+          // Example: `type(scope): subject [force release]`
+          { subject: "*[force release]*", release: "patch" },
         ],
       },
     ],
