@@ -1,3 +1,5 @@
+## [1.2.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.3...v1.2.4) (2023-02-28)
+
 ## [1.2.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.2...v1.2.3) (2023-01-11)
 
 
