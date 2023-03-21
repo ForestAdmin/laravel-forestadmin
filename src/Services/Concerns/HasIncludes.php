@@ -3,6 +3,10 @@
 namespace ForestAdmin\LaravelForestAdmin\Services\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
+use ReflectionFunction;
 
 /**
  * Class HasIncludes
@@ -30,13 +34,27 @@ trait HasIncludes
      * @param Builder $query
      * @param array   $includes
      * @return Builder
+     * @throws \ReflectionException
      */
     protected function appendRelations(Builder $query, array $includes): Builder
     {
+        /** @var \Closure $closure */
+        $closure = $query->getEagerLoads()['user'];
+        $eagerLoads = $query->getEagerLoads();
         foreach ($includes as $key => $value) {
             if ($value['foreign_key']) {
                 $query->addSelect($value['foreign_key']);
             }
+
+            if (isset($eagerLoads[$key])) {
+                $with = (new ReflectionFunction($closure))->getStaticVariables();
+                $relation = $query->getModel()->$key();
+                $relationTable = $relation->getRelated()->getTable();
+                $fields = explode(',', Str::after($with['name'], "$key:"));
+                $includeFields = explode(',', Str::replace("$relationTable.", '', $value['fields']));
+                $value['fields'] = collect($fields)->merge($includeFields)->map(fn ($field) => "$relationTable.$field")->implode(',');
+            }
+
             $query->with($key . ':' . $value['fields']);
         }
 
