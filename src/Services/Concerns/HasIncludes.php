@@ -39,7 +39,6 @@ trait HasIncludes
     protected function appendRelations(Builder $query, array $includes): Builder
     {
         /** @var \Closure $closure */
-        $closure = $query->getEagerLoads()['user'];
         $eagerLoads = $query->getEagerLoads();
         foreach ($includes as $key => $value) {
             if ($value['foreign_key']) {
