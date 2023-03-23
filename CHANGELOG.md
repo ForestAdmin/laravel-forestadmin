@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.4...v1.2.5) (2023-03-23)
+
+
+### Bug Fixes
+
+* **query-builder:** patch eagerload relationships on collection ([#66](https://github.com/ForestAdmin/laravel-forestadmin/issues/66)) ([a06657a](https://github.com/ForestAdmin/laravel-forestadmin/commit/a06657a9c520cfc9b544f5448ca6c3dbb8b25329))
+
 ## [1.2.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.3...v1.2.4) (2023-02-28)
 
 ## [1.2.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.2...v1.2.3) (2023-01-11)
