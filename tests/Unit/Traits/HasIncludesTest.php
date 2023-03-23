@@ -72,27 +72,4 @@ class HasIncludesTest extends TestCase
 
         $this->assertEquals('category:categories.label,categories.id', $result['name']);
     }
-    //    protected function appendRelations(Builder $query, array $includes): Builder
-    //    {
-    //        /** @var \Closure $closure */
-    //        $eagerLoads = $query->getEagerLoads();
-    //        foreach ($includes as $key => $value) {
-    //            if ($value['foreign_key']) {
-    //                $query->addSelect($value['foreign_key']);
-    //            }
-    //
-    //            if (isset($eagerLoads[$key])) {
-    //                $with = (new ReflectionFunction($closure))->getStaticVariables();
-    //                $relation = $query->getModel()->$key();
-    //                $relationTable = $relation->getRelated()->getTable();
-    //                $fieldsRelationEagerLoad = explode(',', Str::after($with['name'], "$key:"));
-    //                $includeFields = explode(',', Str::replace("$relationTable.", '', $value['fields']));
-    //                $value['fields'] = $fieldsRelationEagerLoad !== '' ? collect($fieldsRelationEagerLoad)->merge($includeFields)->map(fn ($field) => "$relationTable.$field")->implode(',') : '*';
-    //            }
-    //
-    //            $query->with($key . ':' . $value['fields']);
-    //        }
-    //
-    //        return $query;
-    //    }
 }
