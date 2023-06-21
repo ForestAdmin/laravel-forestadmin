@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Tests\Feature;
 
 use ForestAdmin\LaravelForestAdmin\Auth\Guard\Model\ForestUser;
 use ForestAdmin\LaravelForestAdmin\Auth\OAuth2\ForestResourceOwner;
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\MockForestUserFactory;
@@ -49,11 +50,7 @@ class ChartsControllerTest extends TestCase
         //--- Override type for testing throw exception ---//
         $data['payloadQuery']['type'] = 'Foo';
         DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        $call = $this->postJson('/forest/stats', $data['payloadQuery']);
-        $response = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
-        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $call->baseResponse->getStatusCode());
-        $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
+        $this->assertThrows(fn () => $this->postJson('/forest/stats', $data['payloadQuery']), ForestException::class, '🌳🌳🌳 The chart\'s type is not recognized.');
     }
 
     /**
