@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.5...v1.2.6) (2023-06-21)
+
+
+### Bug Fixes
+
+* **relationship:** ignore methods with parameters that return relationships  ([#68](https://github.com/ForestAdmin/laravel-forestadmin/issues/68)) ([372ff24](https://github.com/ForestAdmin/laravel-forestadmin/commit/372ff24b6c7b05c60038c766e4861ad2d07b58b7))
+
 ## [1.2.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.4...v1.2.5) (2023-03-23)
 
 
