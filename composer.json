@@ -20,7 +20,7 @@
     "ext-json": "*",
     "firebase/php-jwt": "^6.0",
     "galbar/jsonpath": "^2.0",
-    "guzzlehttp/guzzle": "^7.4",
+    "guzzlehttp/guzzle": "^7.7",
     "league/fractal": "^0.20.1",
     "league/oauth2-client": "^2.6",
     "mlocati/ip-lib": "^1.18",
