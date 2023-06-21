@@ -48,6 +48,7 @@ trait Relationships
             (new \ReflectionClass($model))->getMethods(\ReflectionMethod::IS_PUBLIC),
             function ($result, \ReflectionMethod $method) {
                 ($returnType = $method->getReturnType()) &&
+                empty($method->getParameters()) &&
                 in_array($returnType->getName(), array_keys($this->doctrineTypes), true) &&
                 ($result = array_merge($result, [$method->getName() => $returnType->getName()]));
 
