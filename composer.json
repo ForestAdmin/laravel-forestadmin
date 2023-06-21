@@ -28,9 +28,9 @@
     "usmanhalalit/laracsv": "^2.1"
   },
   "require-dev": {
-    "orchestra/testbench": "^8.5",
+    "orchestra/testbench": "^7.10",
     "phpspec/prophecy-phpunit": "^2.0",
-    "phpunit/phpunit": "^10.0",
+    "phpunit/phpunit": "^9.6",
     "squizlabs/php_codesniffer": "^3.6"
   },
   "autoload": {

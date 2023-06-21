@@ -56,7 +56,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapNotSendWithOutFile(): void
     {
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -69,7 +69,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapRouteNotMatchPattern(): void
     {
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -83,7 +83,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSend(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema(config(), $this->forestApiPost(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), $this->forestApiPost(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 
@@ -100,7 +100,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSendOnce(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 
