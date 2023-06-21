@@ -7,8 +7,10 @@ node_modules
 
 # composer
 vendor
+composer.lock
 
 # phpunit
 .phpunit.result.cache
 coverage
 coverage.xml
+
