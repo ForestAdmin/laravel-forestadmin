@@ -71,7 +71,7 @@ class AuthControllerTest extends TestCase
 
         $auth = $this->prophesize(AuthManager::class);
         $auth
-            ->start(route('forest.auth.callback'), 1)
+            ->start(1)
             ->shouldBeCalled()
             ->willReturn($return);
 
@@ -109,7 +109,7 @@ class AuthControllerTest extends TestCase
 
         $auth = $this->prophesize(AuthManager::class);
         $auth
-            ->verifyCodeAndGenerateToken(route('forest.auth.callback'), Argument::any())
+            ->verifyCodeAndGenerateToken(Argument::any())
             ->shouldBeCalled()
             ->willReturn($jwt);
 

@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
@@ -15,10 +16,10 @@ use League\Fractal\TransformerAbstract;
 class ChildTransformer extends TransformerAbstract
 {
     /**
-     * @param Model $model
+     * @param Model|SmartCollection $model
      * @return array
      */
-    public function transform(Model $model)
+    public function transform($model)
     {
         if (method_exists($model, 'handleSmartFields')) {
             $model->handleSmartFields()->handleSmartRelationships();

@@ -49,14 +49,15 @@ class ResourcesControllerTest extends TestCase
 
         $this->forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => 'admin',
             ]
         );
 
@@ -75,6 +76,9 @@ class ResourcesControllerTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $forestResourceOwner->makeJwt());
         $this->mockForestUserFactory();
         $this->mockIpWhitelist();
+
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
     }
 
     /**
@@ -85,8 +89,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
@@ -109,8 +111,6 @@ class ResourcesControllerTest extends TestCase
         $book->difficulty = 'hard';
         $book->save();
         $params = ['fields' => ['book' => 'id,label,difficulty']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expectedCount = Book::where(['difficulty' => 'hard', 'label' => 'foo'])->count();
@@ -134,8 +134,6 @@ class ResourcesControllerTest extends TestCase
             Category::create(['label' => 'Foo' . $i]);
         }
         $params = ['fields' => ['category' => 'id,label'], 'segment' => 'bestName'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/category?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -156,8 +154,6 @@ class ResourcesControllerTest extends TestCase
         $this->withoutExceptionHandling();
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['category' => 'id,label'], 'segment' => 'foo'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $this->expectException(ForestException::class);
         $this->expectExceptionMessage("🌳🌳🌳 There is no smart-segment foo");
@@ -173,8 +169,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $params = ['fields' => ['book' => 'id,label']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -191,8 +185,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->withHeader('Authorization', '');
         $params = ['fields' => ['book' => 'id,label']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -213,8 +205,6 @@ class ResourcesControllerTest extends TestCase
             'filename' => 'books',
             'header'   => 'id,label',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
 
         $call = $this->get('/forest/book.csv?' . http_build_query($params));
         $data = str_getcsv($call->getContent(), "\n");
@@ -238,8 +228,6 @@ class ResourcesControllerTest extends TestCase
             'filename' => 'books',
             'header'   => 'id,label',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book.csv?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -256,8 +244,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book/1?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
@@ -277,8 +263,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $params = ['fields' => ['book' => 'id,label']];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->getJson('/forest/book/1?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -332,8 +316,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->post('/forest/book', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::all()->last();
@@ -383,8 +365,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->postJson('/forest/book', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -408,8 +388,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->post('/forest/book', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -449,8 +427,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->put('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $attributes = $data['data']['attributes'];
@@ -479,15 +455,13 @@ class ResourcesControllerTest extends TestCase
         $book = Book::first();
         $params = [
             'data' => [
-                'id'            => $book->id,
-                'attributes'    => [
-                    'reference'  => 'new label-hard',
+                'id'         => $book->id,
+                'attributes' => [
+                    'reference' => 'new label-hard',
                 ],
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->put('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $attributes = $data['data']['attributes'];
@@ -528,8 +502,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->putJson('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -555,8 +527,6 @@ class ResourcesControllerTest extends TestCase
             ],
             'type' => 'books',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->put('/forest/book/' . $book->id, $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -574,8 +544,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $book = Book::first();
 
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->delete('/forest/book/' . $book->id);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -592,8 +560,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $this->mockForestUserFactory(false);
         $book = Book::first();
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->deleteJson('/forest/book/' . $book->id);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -609,8 +575,6 @@ class ResourcesControllerTest extends TestCase
     public function testDestroyException(): void
     {
         $this->makeScopeManager($this->forestUser);
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->delete('/forest/book/9999');
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -684,8 +648,6 @@ class ResourcesControllerTest extends TestCase
                 'type'       => 'action-requests',
             ],
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->delete('/forest/book/', $params);
 
         $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
@@ -728,8 +690,6 @@ class ResourcesControllerTest extends TestCase
                 'type'       => 'action-requests',
             ],
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->deleteJson('/forest/book/', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -745,7 +705,7 @@ class ResourcesControllerTest extends TestCase
     public function testDestroyBulkException(): void
     {
         $this->makeScopeManager($this->forestUser);
-        Book::destroy([1,2,3,4,5]);
+        Book::destroy([1, 2, 3, 4, 5]);
         $params = [
             'data' => [
                 'attributes' => [
@@ -773,8 +733,6 @@ class ResourcesControllerTest extends TestCase
                 'type'       => 'action-requests',
             ],
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->delete('/forest/book/', $params);
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -791,8 +749,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label'], 'search' => '1'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::first();
@@ -812,8 +768,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $category = Category::whereHas('books')->first();
         $params = ['fields' => ['book' => 'id,label'], 'search' => $category->label, 'searchExtended' => 1];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $book = Book::where('category_id', $category->id)->first();
@@ -832,8 +786,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label'], 'search' => '9999'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -849,8 +801,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label'], 'sort' => 'id'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $books = Book::orderBy('id', 'ASC')->get();
@@ -869,8 +819,6 @@ class ResourcesControllerTest extends TestCase
     {
         $this->makeScopeManager($this->forestUser);
         $params = ['fields' => ['book' => 'id,label'], 'sort' => '-id'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $books = Book::orderBy('id', 'DESC')->get();
@@ -890,8 +838,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $books = Book::orderBy('label', 'ASC')->limit(3)->get();
         $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => 'reference'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -910,8 +856,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $books = Book::orderBy('label', 'DESC')->limit(3)->get();
         $params = ['fields' => ['book' => 'id,label,reference'], 'sort' => '-reference'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -930,8 +874,6 @@ class ResourcesControllerTest extends TestCase
         $this->makeScopeManager($this->forestUser);
         $book = Book::first();
         $params = ['fields' => ['book' => 'id,label'], 'filters' => '{"field":"label","operator":"equal","value":"' . $book->label . '"}'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -953,8 +895,6 @@ class ResourcesControllerTest extends TestCase
             'fields'  => ['book' => 'id,label,difficulty'],
             'filters' => '{"aggregator":"and","conditions":[{"field":"label","operator":"equal","value":"' . $book->label . '"},{"field":"difficulty","operator":"equal","value":"' . $book->difficulty . '"}]}',
         ];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expectedCount = Book::where(['label' => $book->label, 'difficulty' => $book->difficulty])->count();
@@ -979,8 +919,6 @@ class ResourcesControllerTest extends TestCase
         $book->save();
 
         $params = ['fields' => ['book' => 'id,label,reference'], 'filters' => '{"field":"reference","operator":"equal","value":"my favorite book-easy"}'];
-        App::shouldReceive('basePath')->andReturn(null);
-        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $call = $this->get('/forest/book?' . http_build_query($params));
         $data = json_decode($call->baseResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -998,7 +936,7 @@ class ResourcesControllerTest extends TestCase
         return [
             'book' => [
                 'scope' => [
-                    'filter'             => [
+                    'filter'              => [
                         'aggregator' => 'and',
                         'conditions' => [
                             [

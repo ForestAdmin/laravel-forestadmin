@@ -38,6 +38,20 @@ class ForestSchemaIntrospectionTest extends TestCase
      * @return void
      * @throws \JsonException
      */
+    public function testGetClass(): void
+    {
+        $forestSchema = $this->makeForestSchema();
+        $data = $forestSchema->getClass('book');
+        $schemaCollection = $this->fakeSchema(false)['collections'];
+        $expected = $schemaCollection[array_search('book', array_column($schemaCollection, 'name'))]['class'];
+
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @return void
+     * @throws \JsonException
+     */
     public function testGetFields(): void
     {
         $forestSchema = $this->makeForestSchema();

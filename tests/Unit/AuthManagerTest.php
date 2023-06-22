@@ -36,11 +36,10 @@ class AuthManagerTest extends TestCase
         $return = '123ABC';
         $oidc = $this->makeOidc($return, true);
 
-        /** @var AuthManager auth */
         $this->auth = app()->make(AuthManager::class);
         $this->auth->oidc = $oidc->reveal();
 
-        $start = $this->auth->start('localhost/foo', 1);
+        $start = $this->auth->start(1);
         parse_str(parse_url($start, PHP_URL_QUERY), $output);
 
         $this->assertSame($output['state'], '{"renderingId":1}');
@@ -61,7 +60,7 @@ class AuthManagerTest extends TestCase
         $this->auth->oidc = $oidc->reveal();
 
         $data = ['code' => 'test', 'state' => '{"renderingId":1}'];
-        $token = $this->auth->verifyCodeAndGenerateToken('mock_host/foo', $data);
+        $token = $this->auth->verifyCodeAndGenerateToken($data);
 
         $this->assertSame($return, $token);
     }
@@ -185,7 +184,7 @@ class AuthManagerTest extends TestCase
 
         $oidc = $this->prophesize(OidcClientManager::class);
         $oidc
-            ->getClientForCallbackUrl(Argument::type('string'))
+            ->makeForestProvider()
             ->shouldBeCalled()
             ->willReturn(
                 $provider->reveal()

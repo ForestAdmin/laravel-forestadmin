@@ -43,14 +43,15 @@ class ScopesControllerTest extends TestCase
 
         $forestUser = new ForestUser(
             [
-                'id'           => 1,
-                'email'        => 'john.doe@forestadmin.com',
-                'first_name'   => 'John',
-                'last_name'    => 'Doe',
-                'rendering_id' => 1,
-                'tags'         => [],
-                'teams'        => 'Operations',
-                'exp'          => 1643825269,
+                'id'               => 1,
+                'email'            => 'john.doe@forestadmin.com',
+                'first_name'       => 'John',
+                'last_name'        => 'Doe',
+                'rendering_id'     => 1,
+                'tags'             => [],
+                'teams'            => 'Operations',
+                'exp'              => 1643825269,
+                'permission_level' => 'admin',
             ]
         );
 
@@ -72,7 +73,7 @@ class ScopesControllerTest extends TestCase
         Auth::shouldReceive(
             [
                 'guard->check' => true,
-                'guard->user'  => $forestUser
+                'guard->user'  => $forestUser,
             ]
         );
 
@@ -133,7 +134,7 @@ class ScopesControllerTest extends TestCase
         return [
             'book' => [
                 'scope' => [
-                    'filter'             => [
+                    'filter'              => [
                         'aggregator' => 'and',
                         'conditions' => [
                             [

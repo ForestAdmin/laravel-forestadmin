@@ -2,8 +2,11 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\SmartCollections;
 
+use ForestAdmin\LaravelForestAdmin\Services\Concerns\ForestCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartField;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartRelationship;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Category;
 use Illuminate\Support\Collection;
 
 /**
@@ -15,6 +18,8 @@ use Illuminate\Support\Collection;
  */
 class Comic extends SmartCollection
 {
+    use ForestCollection;
+
     protected string $name = 'comic';
 
     protected bool $is_searchable = true;
@@ -49,5 +54,44 @@ class Comic extends SmartCollection
                 ),
             ]
         );
+    }
+
+    /**
+     * @return SmartRelationship
+     */
+    public function category(): SmartRelationship
+    {
+        return $this->smartRelationship(
+            [
+                'type' => 'String',
+                'reference' => 'category.id'
+            ]
+        )
+            ->get(
+                function () {
+                    return Category::select('categories.*')
+                        ->join('books', 'books.category_id', '=', 'categories.id')
+                        ->where('books.id', $this->id)
+                        ->first();
+                }
+            );
+    }
+
+    /**
+     * @return SmartRelationship
+     */
+    public function bookStores(): SmartRelationship
+    {
+        return $this->smartRelationship(
+            [
+                'type' => ['String'],
+                'reference' => 'bookStore.id'
+            ]
+        )
+            ->get(
+                function () {
+                    return [];
+                }
+            );
     }
 }

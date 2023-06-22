@@ -97,7 +97,7 @@ class ForestModel
             [$this->database, $this->table] = explode('.', $this->table);
         }
 
-        $this->name = class_basename($this->model);
+        $this->name = $this->initName($laravelModel);
         $this->oldName = class_basename($this->model);
     }
 
@@ -109,6 +109,7 @@ class ForestModel
     {
         return [
             'name'                   => Str::camel($this->getName()),
+            'class'                  => get_class($this->model),
             'old_name'               => Str::camel($this->getOldName()),
             'icon'                   => $this->getIcon(),
             'is_read_only'           => $this->isReadOnly(),
@@ -356,7 +357,7 @@ class ForestModel
             }
         }
 
-        $fields = $fields->reject(fn($item) => $item['type'] === 'unknown');
+        $fields = $fields->reject(fn ($item) => $item['type'] === 'unknown');
 
         return $this->mergeFieldsWithRelations($fields, $this->getRelations($this->model));
     }
@@ -453,5 +454,14 @@ class ForestModel
             'widget'        => null,
             'validations'   => [],
         ];
+    }
+
+    /**
+     * @param LaravelModel $model
+     * @return string
+     */
+    protected function initName(LaravelModel $model): string
+    {
+        return method_exists($model, 'forestName') && null !== $model->forestName() ? $model->forestName() : class_basename($model);
     }
 }

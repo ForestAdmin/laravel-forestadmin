@@ -4,7 +4,9 @@ namespace ForestAdmin\LaravelForestAdmin\Services;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use ForestAdmin\LaravelForestAdmin\Serializer\JsonApiSerializer;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use ForestAdmin\LaravelForestAdmin\Transformers\BaseTransformer;
+use ForestAdmin\LaravelForestAdmin\Transformers\SmartCollectionTransformer;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -46,19 +48,25 @@ class JsonApiResponse
      */
     public function render($class, string $name, array $meta = [])
     {
+        $reflectionClass = new \ReflectionClass(ForestSchema::getClass($name));
+        $data = $reflectionClass->isSubclassOf(SmartCollection::class)
+            ? $this->hydrateData($class, $reflectionClass->getName())
+            : $class;
+
         $this->fractal->setSerializer(new JsonApiSerializer(config('app.url')));
         $transformer = app()->make(BaseTransformer::class);
         $transformer->setAvailableIncludes(ForestSchema::getRelatedData($name));
 
         if (is_array($class) || $this->isCollection($class)) {
-            $resource = new Collection($class, $transformer, $name);
+            $resource = new Collection($data, $transformer, $name);
         } elseif ($this->isPaginator($class)) {
-            $resource = new Collection($class->getCollection(), $transformer, $name);
+            $data = $this->isPaginator($data) ? $data->getCollection() : $data;
+            $resource = new Collection($data, $transformer, $name);
             if (request()->has('search')) {
                 $resource->setMeta($this->searchDecorator($resource->getData(), request()->get('search')));
             }
         } else {
-            $resource = new Item($class, $transformer, $name);
+            $resource = new Item($data, $transformer, $name);
         }
 
         if ($meta) {
@@ -130,5 +138,20 @@ class JsonApiResponse
         }
 
         return $decorator;
+    }
+
+    protected function hydrateData($class, $className)
+    {
+        if (is_array($class) || $this->isCollection($class) || $this->isPaginator($class)) {
+            $records = [];
+            $collections = $this->isPaginator($class) ? $class->getCollection() : $class;
+            foreach ($collections as $value) {
+                $records[] = $className::hydrate($value);
+            }
+
+            return $records;
+        } else {
+            return $className::hydrate($class);
+        }
     }
 }

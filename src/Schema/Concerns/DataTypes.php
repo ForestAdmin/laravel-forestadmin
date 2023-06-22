@@ -42,6 +42,7 @@ trait DataTypes
         Types::TEXT                 => 'String',
         Types::TIME_MUTABLE         => 'Time',
         Types::TIME_IMMUTABLE       => 'Time',
+        'timestamp'                 => 'Date',
     ];
 
     /**

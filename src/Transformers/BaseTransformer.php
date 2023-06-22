@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Transformers;
 
 use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
+use ForestAdmin\LaravelForestAdmin\Services\SmartFeatures\SmartCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
@@ -37,16 +38,19 @@ class BaseTransformer extends TransformerAbstract
     }
 
     /**
-     * @param Model $model
+     * @param Model|SmartCollection $model
      * @return mixed
      */
-    public function transform(Model $model)
+    public function transform($model)
     {
         if (method_exists($model, 'handleSmartFields')) {
             $model->handleSmartFields()->handleSmartRelationships();
         }
+        $availableRelations = ForestSchema::getSingleRelationships(strtolower(class_basename($model)));
+        $relations = collect($model->getRelations())
+            ->filter(fn ($item, $key) => in_array($key, $availableRelations) && ! is_null($item))
+            ->all();
 
-        $relations = collect($model->getRelations())->filter()->all();
         $this->setDefaultIncludes(array_keys($relations));
 
         foreach ($relations as $key => $value) {
