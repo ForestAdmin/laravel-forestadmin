@@ -50,7 +50,7 @@ class ChartsControllerTest extends TestCase
         //--- Override type for testing throw exception ---//
         $data['payloadQuery']['type'] = 'Foo';
         DB::shouldReceive('select')->set('query', $data['payloadQuery'])->andReturn($data['queryResult']);
-        if(method_exists($this, 'assertThrows')) {
+        if (method_exists($this, 'assertThrows')) {
             $this->assertThrows(fn () => $this->postJson('/forest/stats', $data['payloadQuery']), ForestException::class, '🌳🌳🌳 The chart\'s type is not recognized.');
         } else {
             $call = $this->postJson('/forest/stats', $data['payloadQuery']);
@@ -58,7 +58,6 @@ class ChartsControllerTest extends TestCase
             $this->assertInstanceOf(JsonResponse::class, $call->baseResponse);
             $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $call->baseResponse->getStatusCode());
             $this->assertEquals('🌳🌳🌳 The chart\'s type is not recognized.', $response['message']);
-
         }
     }
 
