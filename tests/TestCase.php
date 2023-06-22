@@ -74,9 +74,12 @@ class TestCase extends OrchestraTestCase
     {
         parent::setUp();
 
-        $maintenanceMode = $this->app->get(MaintenanceModeManager::class);
-        App::partialMock()->shouldReceive('maintenanceMode')
-            ->andReturn($maintenanceMode);
+        // MaintenanceModeManager only exists for laravel 9 or higher
+        if (class_exists(MaintenanceModeManager::class)) {
+            $maintenanceMode = $this->app->get(MaintenanceModeManager::class);
+            App::partialMock()->shouldReceive('maintenanceMode')
+                ->andReturn($maintenanceMode);
+        }
 
         $db = new DB();
         $db->addConnection(
