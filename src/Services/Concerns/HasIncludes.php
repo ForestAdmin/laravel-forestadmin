@@ -47,6 +47,12 @@ trait HasIncludes
         return $this;
     }
 
+    /**
+     * @param Builder $query
+     * @param array   $includes
+     * @return Builder
+     * @throws \ReflectionException
+     */
     protected function appendRelations(Builder $query, array $includes): Builder
     {
         /** @var \Closure $closure */
@@ -85,6 +91,13 @@ trait HasIncludes
         return $query;
     }
 
+    /**
+     * @param array  $with
+     * @param array  $include
+     * @param string $key
+     * @param string $relationTable
+     * @return array
+     */
     private function mergerIncludeFields(array $with, array $include, string $key, string $relationTable): array
     {
         $fieldsRelationEagerLoad = explode(',', Str::after($with['name'], "$key:"));
