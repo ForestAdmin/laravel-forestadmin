@@ -47,31 +47,6 @@ trait HasIncludes
         return $this;
     }
 
-    /**
-     * @param Builder $query
-     * @param array   $includes
-     * @return Builder
-     * @throws \ReflectionException
-     */
-//    protected function appendRelations(Builder $query, array $includes): Builder
-//    {
-//        /** @var \Closure $closure */
-//        $eagerLoads = $query->getEagerLoads();
-//        foreach ($includes as $key => $include) {
-//            if ($include['foreign_key']) {
-//                $query->addSelect($include['foreign_key']);
-//            }
-//
-//            if (isset($eagerLoads[$key])) {
-//                $this->setIncludeEagerLoad($query, $eagerLoads[$key], $key, $include);
-//            }
-//
-//            $query->with($key . ':' . $include['fields']);
-//        }
-//
-//        return $query;
-//    }
-
     protected function appendRelations(Builder $query, array $includes): Builder
     {
         /** @var \Closure $closure */
@@ -121,5 +96,4 @@ trait HasIncludes
 
         return $include;
     }
-
 }
