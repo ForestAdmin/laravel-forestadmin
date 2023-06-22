@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
  */
 class ForestUser
 {
+    public const ALLOWED_PERMISSION_LEVELS = ['admin', 'editor', 'developer'];
     /**
      * @var array
      */
@@ -168,6 +169,10 @@ class ForestUser
      */
     public function hasLiveQueryPermission(string $query): bool
     {
+        if (in_array($this->getAttribute('permission_level'), self::ALLOWED_PERMISSION_LEVELS, true)) {
+            return true;
+        }
+
         if (!$this->hasQuery($query)) {
             app(ForestUserFactory::class)->makePermissionToUser($this, $this->getAttribute('rendering_id'), true);
 
@@ -198,6 +203,10 @@ class ForestUser
      */
     public function hasSimpleChartPermission(array $chart): bool
     {
+        if (in_array($this->getAttribute('permission_level'), self::ALLOWED_PERMISSION_LEVELS, true)) {
+            return true;
+        }
+
         $type = strtolower(Str::plural($chart['type']));
         $chart = $this->formatChartPayload($chart);
 

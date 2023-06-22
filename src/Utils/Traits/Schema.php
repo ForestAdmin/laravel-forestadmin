@@ -3,6 +3,7 @@
 namespace ForestAdmin\LaravelForestAdmin\Utils\Traits;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Facades\ForestSchema;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,12 +18,11 @@ trait Schema
     /**
      * @param string $collection
      * @return Model
-     * @throws \Exception
      */
     public static function getModel(string $collection): Model
     {
         try {
-            $model = app()->make(config('forest.models_namespace') . $collection);
+            $model = app()->make(ForestSchema::getClass($collection));
         } catch (\Exception $e) {
             throw new ForestException("No model found for collection $collection");
         }

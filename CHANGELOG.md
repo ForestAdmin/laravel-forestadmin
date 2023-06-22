@@ -1,3 +1,82 @@
+# [1.3.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.6...v1.3.0) (2023-06-22)
+
+
+### Features
+
+* allow to use agent with laravel 10 ([#69](https://github.com/ForestAdmin/laravel-forestadmin/issues/69)) ([80a4e36](https://github.com/ForestAdmin/laravel-forestadmin/commit/80a4e36b8780c37e2ec846ef1288e37accee0c6b))
+
+## [1.2.6](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.5...v1.2.6) (2023-06-21)
+
+
+### Bug Fixes
+
+* **relationship:** ignore methods with parameters that return relationships  ([#68](https://github.com/ForestAdmin/laravel-forestadmin/issues/68)) ([372ff24](https://github.com/ForestAdmin/laravel-forestadmin/commit/372ff24b6c7b05c60038c766e4861ad2d07b58b7))
+
+## [1.2.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.4...v1.2.5) (2023-03-23)
+
+
+### Bug Fixes
+
+* **query-builder:** patch eagerload relationships on collection ([#66](https://github.com/ForestAdmin/laravel-forestadmin/issues/66)) ([a06657a](https://github.com/ForestAdmin/laravel-forestadmin/commit/a06657a9c520cfc9b544f5448ca6c3dbb8b25329))
+
+## [1.2.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.3...v1.2.4) (2023-02-28)
+
+## [1.2.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.2...v1.2.3) (2023-01-11)
+
+
+### Bug Fixes
+
+* **smart-collection:** add support of smart-relationship ([#63](https://github.com/ForestAdmin/laravel-forestadmin/issues/63)) ([9e680f5](https://github.com/ForestAdmin/laravel-forestadmin/commit/9e680f5c0067506ab2b7ef058a5b39c1addad37e))
+
+## [1.2.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.1...v1.2.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* permission to avoid any conflict with laravel policy ([#62](https://github.com/ForestAdmin/laravel-forestadmin/issues/62)) ([03d5856](https://github.com/ForestAdmin/laravel-forestadmin/commit/03d5856f2369905fce34fe1f01d4b94de9948ed7))
+
+## [1.2.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.0...v1.2.1) (2022-10-20)
+
+
+### Bug Fixes
+
+* render jsonapi when a model uses eager load relation ([#61](https://github.com/ForestAdmin/laravel-forestadmin/issues/61)) ([fdbe907](https://github.com/ForestAdmin/laravel-forestadmin/commit/fdbe907b8bea94563bd34f4a39153a14bb59eee7))
+
+# [1.2.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.3...v1.2.0) (2022-09-14)
+
+
+### Features
+
+* **auth:** remove callbackUrl parameter on authentication ([#59](https://github.com/ForestAdmin/laravel-forestadmin/issues/59)) ([e097ff9](https://github.com/ForestAdmin/laravel-forestadmin/commit/e097ff9132c985122f7742b3e974c4f7aa4940fd))
+
+## [1.1.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.2...v1.1.3) (2022-09-06)
+
+
+### Bug Fixes
+
+* **charts:** user with permissions level that allows charts creation or edition should always be allow to perform charts requests ([#60](https://github.com/ForestAdmin/laravel-forestadmin/issues/60)) ([b467b35](https://github.com/ForestAdmin/laravel-forestadmin/commit/b467b35d191ffe500aad029d8144f82a16a81567))
+
+## [1.1.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.1...v1.1.2) (2022-07-22)
+
+
+### Bug Fixes
+
+* **security:** update guzzle version (with dependency) to 7.4.5 ([#58](https://github.com/ForestAdmin/laravel-forestadmin/issues/58)) ([5128787](https://github.com/ForestAdmin/laravel-forestadmin/commit/51287875c6efdc5faf1921bedb1aaab4b76c3118))
+
+## [1.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.1.0...v1.1.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* add database type timestamp for schema generation ([#57](https://github.com/ForestAdmin/laravel-forestadmin/issues/57)) ([f645277](https://github.com/ForestAdmin/laravel-forestadmin/commit/f645277d77abab1a6a78fc5acf45167d9ece2bb6))
+
+# [1.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.1...v1.1.0) (2022-06-27)
+
+
+### Features
+
+* add support for multiple models directories ([#56](https://github.com/ForestAdmin/laravel-forestadmin/issues/56)) ([5947782](https://github.com/ForestAdmin/laravel-forestadmin/commit/59477821a4ab26a3f9c26ae1e9e82a7d6dc69269))
+
 ## [1.0.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.0.0...v1.0.1) (2022-06-07)
 
 

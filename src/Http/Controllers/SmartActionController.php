@@ -54,7 +54,7 @@ class SmartActionController extends ForestController
      */
     public function executeAction(): JsonResponse
     {
-        $this->authorize('smartAction', [$this->collection, Str::slug($this->smartAction->getKey())]);
+        $this->can('smartAction', [$this->collection, Str::slug($this->smartAction->getKey())]);
 
         return response()->json(
             call_user_func($this->smartAction->getExecute())

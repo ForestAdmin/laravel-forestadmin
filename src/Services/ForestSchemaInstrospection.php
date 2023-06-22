@@ -39,6 +39,18 @@ class ForestSchemaInstrospection
 
     /**
      * @param string $collection
+     * @return string
+     */
+    public function getClass(string $collection): string
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].class");
+
+        return $data ? $data[0] : '';
+    }
+
+    /**
+     * @param string $collection
      * @return array
      */
     public function getFields(string $collection): array
@@ -121,6 +133,24 @@ class ForestSchemaInstrospection
         $smartRelationships = $this->getSmartRelationships($collection);
         foreach ($smartRelationships as $relationship) {
             if (is_array($relationship['type'])) {
+                $data[] = $relationship['field'];
+            }
+        }
+
+        return $data ?: [];
+    }
+
+    /**
+     * @param string $collection
+     * @return array
+     */
+    public function getSingleRelationships(string $collection): array
+    {
+        $collection = Str::camel($collection);
+        $data = $this->getSchema()->get("$..collections[?(@.name == '$collection')].fields[?(@.relationship == 'HasOne' or @.relationship == 'BelongsTo')].field");
+        $smartRelationships = $this->getSmartRelationships($collection);
+        foreach ($smartRelationships as $relationship) {
+            if (! is_array($relationship['type'])) {
                 $data[] = $relationship['field'];
             }
         }

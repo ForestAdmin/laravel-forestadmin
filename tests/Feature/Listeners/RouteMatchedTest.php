@@ -24,7 +24,7 @@ use Prophecy\Argument;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * Class ResourcesControllerTest
+ * Class RouteMatchedTest
  *
  * @package Laravel-forestadmin
  * @license GNU https://www.gnu.org/licenses/licenses.html
@@ -48,7 +48,6 @@ class RouteMatchedTest extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
-        $app['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Feature\Models\\');
         $app['config']->set('forest.send_apimap_automatic', true);
     }
 
@@ -57,7 +56,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapNotSendWithOutFile(): void
     {
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -70,7 +69,7 @@ class RouteMatchedTest extends TestCase
      */
     public function testApiMapRouteNotMatchPattern(): void
     {
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
 
         $this->assertNull(Cache::get(RouteMatched::APIMAP_DATE));
@@ -84,7 +83,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSend(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema(config(), $this->forestApiPost(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), $this->forestApiPost(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 
@@ -101,7 +100,7 @@ class RouteMatchedTest extends TestCase
     public function testApiMapSendOnce(): void
     {
         App::partialMock()->shouldReceive('basePath')->andReturn(config('forest.json_file_path'));
-        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole('<info>Apimap Received<info>'));
+        $schema = new Schema(config(), new ForestApiRequester(), $this->getConsole());
         App::shouldReceive('make')->andReturn($schema);
         file_put_contents(App::basePath(config('forest.json_file_path')), '{}');
 

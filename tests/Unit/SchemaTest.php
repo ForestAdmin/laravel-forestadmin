@@ -31,10 +31,9 @@ class SchemaTest extends TestCase
     public function testFetchFiles(): void
     {
         $schema = new Schema(config(), $this->getForestApi(), $this->getConsole());
-        $this->invokeProperty($schema, 'directory', __DIR__ . '/../Feature/Models');
-        $files = $this->invokeMethod($schema, 'fetchFiles');
+        $files = $this->invokeMethod($schema, 'fetchFiles', [__DIR__ . '/../Utils/Models']);
 
-        $directory = glob(__DIR__ . '/../Feature/Models', GLOB_ONLYDIR);
+        $directory = glob(__DIR__ . '/../Utils/Models', GLOB_ONLYDIR);
         $directoryFiles = new Collection();
         foreach ($directory as $dir) {
             if (file_exists($dir)) {

@@ -200,6 +200,65 @@ class JsonApiResponseTest extends TestCase
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function testRenderWithSmartCollection(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema());
+        $book = Book::limit(3)->get();
+        $render = $jsonApi->render($book, 'comic');
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('type', $render['data'][0]);
+        $this->assertArrayHasKey('id', $render['data'][0]);
+        $this->assertArrayHasKey('attributes', $render['data'][0]);
+        $this->assertArrayHasKey('label', $render['data'][0]['attributes']);
+        $this->assertArrayHasKey('created_at', $render['data'][0]['attributes']);
+    }
+
+    /**
+     * @return void
+     * @throws BindingResolutionException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testRenderSmartCollectionWithSmartRelation(): void
+    {
+        $jsonApi = new JsonApiResponse();
+        App::shouldReceive('basePath')->andReturn(null);
+        File::shouldReceive('get')->andReturn($this->fakeSchema());
+        $book = Book::first();
+        $render = $jsonApi->render($book, 'comic');
+
+        $this->assertIsArray($render);
+        $this->assertArrayHasKey('data', $render);
+        $this->assertArrayHasKey('type', $render['data']);
+        $this->assertArrayHasKey('id', $render['data']);
+        $this->assertArrayHasKey('attributes', $render['data']);
+        $this->assertArrayHasKey('label', $render['data']['attributes']);
+        $this->assertArrayHasKey('created_at', $render['data']['attributes']);
+        $this->assertArrayHasKey('relationships', $render['data']);
+        // BelongsTo relation
+        $this->assertArrayHasKey('category', $render['data']['relationships']);
+        $this->assertArrayHasKey('data', $render['data']['relationships']['category']);
+        $this->assertArrayHasKey('type', $render['data']['relationships']['category']['data']);
+        $this->assertArrayHasKey('id', $render['data']['relationships']['category']['data']);
+        // HasMany relation
+        $this->assertArrayHasKey('bookStores', $render['data']['relationships']);
+        $this->assertArrayHasKey('links', $render['data']['relationships']['bookStores']);
+        $this->assertArrayHasKey('related', $render['data']['relationships']['bookStores']['links']);
+        $this->assertArrayHasKey('href', $render['data']['relationships']['bookStores']['links']['related']);
+    }
+
+    /**
+     * @return void
+     * @throws BindingResolutionException
+     * @throws \JsonException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testRenderWithMeta(): void
     {
         $jsonApi = new JsonApiResponse();

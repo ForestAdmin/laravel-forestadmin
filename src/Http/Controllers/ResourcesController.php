@@ -74,7 +74,7 @@ class ResourcesController extends ForestController
     public function index()
     {
         $authorizeAction = $this->requestFormat === 'csv' ? 'export' : 'viewAny';
-        $this->authorize($authorizeAction,  $this->model);
+        $this->can($authorizeAction, $this->model);
 
         $repository = new ResourceGetter($this->model);
 
@@ -107,7 +107,7 @@ class ResourcesController extends ForestController
      */
     public function show(): JsonResponse
     {
-        $this->authorize('view', $this->model);
+        $this->can('view', $this->model);
 
         $repository = new ResourceGetter($this->model);
 
@@ -129,7 +129,7 @@ class ResourcesController extends ForestController
      */
     public function store(): JsonResponse
     {
-        $this->authorize('create', $this->model);
+        $this->can('create', $this->model);
 
         try {
             $repository = new ResourceCreator($this->model);
@@ -150,7 +150,7 @@ class ResourcesController extends ForestController
      */
     public function update(): JsonResponse
     {
-        $this->authorize('update', $this->model);
+        $this->can('update', $this->model);
 
         try {
             $repository = new ResourceUpdater($this->model);
@@ -170,7 +170,7 @@ class ResourcesController extends ForestController
      */
     public function destroy(): JsonResponse
     {
-        $this->authorize('delete', $this->model);
+        $this->can('delete', $this->model);
 
         try {
             $id = request()->route()->parameter($this->model->getKeyName());
@@ -188,7 +188,7 @@ class ResourcesController extends ForestController
      */
     public function count(): JsonResponse
     {
-        $this->authorize('viewAny',  $this->model);
+        $this->can('viewAny',  $this->model);
 
         $repository = new ResourceGetter($this->model);
 
@@ -201,7 +201,7 @@ class ResourcesController extends ForestController
      */
     public function destroyBulk(): JsonResponse
     {
-        $this->authorize('delete', $this->model);
+        $this->can('delete', $this->model);
 
         try {
             $repository = new ResourceRemover($this->model);

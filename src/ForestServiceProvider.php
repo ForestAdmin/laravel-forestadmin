@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin;
 
+use ForestAdmin\LaravelForestAdmin\Commands\ForestClear;
 use ForestAdmin\LaravelForestAdmin\Commands\ForestInstall;
 use ForestAdmin\LaravelForestAdmin\Commands\SendApimap;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
@@ -37,6 +38,7 @@ class ForestServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands(
                 [
+                    ForestClear::class,
                     ForestInstall::class,
                     SendApimap::class,
                 ]

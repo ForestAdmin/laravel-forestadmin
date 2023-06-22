@@ -3,9 +3,11 @@
 namespace ForestAdmin\LaravelForestAdmin\Tests\Unit\Traits;
 
 use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
+use ForestAdmin\LaravelForestAdmin\Tests\Utils\FakeSchema;
 use ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\Book;
 use ForestAdmin\LaravelForestAdmin\Tests\TestCase;
 use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class SchemaTest
@@ -16,13 +18,15 @@ use ForestAdmin\LaravelForestAdmin\Utils\Traits\Schema;
  */
 class SchemaTest extends TestCase
 {
+    use FakeSchema;
+
     /**
      * @throws \ReflectionException
      * @return void
      */
     public function testGetModel(): void
     {
-        app()['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $trait = $this->getObjectForTrait(Schema::class);
         $dummyModel = 'Book';
         $getModel = $this->invokeMethod($trait, 'getModel', [$dummyModel]);
@@ -36,7 +40,7 @@ class SchemaTest extends TestCase
      */
     public function testGetModelException(): void
     {
-        app()['config']->set('forest.models_namespace', 'ForestAdmin\LaravelForestAdmin\Tests\Utils\Models\\');
+        File::shouldReceive('get')->andReturn($this->fakeSchema(true));
         $trait = $this->getObjectForTrait(Schema::class);
         $dummyModel = 'Foo';
 

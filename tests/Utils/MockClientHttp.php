@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Tests\Utils;
 
+use GuzzleHttp\Psr7\Utils;
 use Mockery as m;
 
 /**
@@ -23,8 +24,8 @@ trait MockClientHttp
     public function mockClient(int $status = 200, string $body = '{"access_token":"mock_access_token"}', $responseCallLimit = 1, $clientCallLimit = 1)
     {
         $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $response->shouldReceive('getHeader')->times($responseCallLimit)->andReturn('application/json');
-        $response->shouldReceive('getBody')->andReturn($body);
+        $response->shouldReceive('getHeader')->times($responseCallLimit)->andReturn(['application/json']);
+        $response->shouldReceive('getBody')->andReturn(Utils::streamFor($body));
         $response->shouldReceive('getStatusCode')->andReturn($status);
 
         $client = m::mock('GuzzleHttp\ClientInterface');
