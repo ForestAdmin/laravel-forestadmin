@@ -49,6 +49,10 @@ class HasIncludesTest extends TestCase
         $appendQuery = $this->invokeMethod($trait, 'appendRelations', [$query, $includes]);
         $result = (new ReflectionFunction($appendQuery->getEagerLoads()['category']))->getStaticVariables();
 
+        if (isset($result['constraints'])) {
+            $result = (new ReflectionFunction($result['constraints'][0]))->getStaticVariables();
+        }
+
         $this->assertEquals('category:categories.*', $result['name']);
     }
 
@@ -59,8 +63,7 @@ class HasIncludesTest extends TestCase
     public function testAppendRelationEagerMergeFields(): void
     {
         $trait = $this->getObjectForTrait(HasIncludes::class);
-        $query = Book::with('category:label')
-            ->select('books.label,books.comment,books.difficulty');
+        $query = Book::with('category:label');
         $includes = [
             'category' => [
                 'fields' => 'categories.id',
@@ -69,6 +72,10 @@ class HasIncludesTest extends TestCase
         ];
         $appendQuery = $this->invokeMethod($trait, 'appendRelations', [$query, $includes]);
         $result = (new ReflectionFunction($appendQuery->getEagerLoads()['category']))->getStaticVariables();
+
+        if (isset($result['constraints'])) {
+            $result = (new ReflectionFunction($result['constraints'][0]))->getStaticVariables();
+        }
 
         $this->assertEquals('category:categories.label,categories.id', $result['name']);
     }

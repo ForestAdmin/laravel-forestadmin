@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Services;
 
+use ForestAdmin\LaravelForestAdmin\Exceptions\ForestException;
 use ForestAdmin\LaravelForestAdmin\Exceptions\InvalidUrlException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -9,6 +10,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class ForestApiRequester
@@ -173,6 +176,6 @@ class ForestApiRequester
      */
     private function throwException($message): void
     {
-        throw new RuntimeException($message);
+        throw new HttpException(HttpResponse::HTTP_INTERNAL_SERVER_ERROR, $message);
     }
 }

@@ -7,6 +7,9 @@ use ForestAdmin\LaravelForestAdmin\Tests\Utils\Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\MaintenanceModeManager;
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Support\Facades\App;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
@@ -70,6 +73,13 @@ class TestCase extends OrchestraTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // MaintenanceModeManager only exists for laravel 9 or higher
+        if (class_exists(MaintenanceModeManager::class)) {
+            $maintenanceMode = $this->app->get(MaintenanceModeManager::class);
+            App::partialMock()->shouldReceive('maintenanceMode')
+                ->andReturn($maintenanceMode);
+        }
 
         $db = new DB();
         $db->addConnection(
