@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.6...v1.3.0) (2023-06-22)
+
+
+### Features
+
+* allow to use agent with laravel 10 ([#69](https://github.com/ForestAdmin/laravel-forestadmin/issues/69)) ([80a4e36](https://github.com/ForestAdmin/laravel-forestadmin/commit/80a4e36b8780c37e2ec846ef1288e37accee0c6b))
+
 ## [1.2.6](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.2.5...v1.2.6) (2023-06-21)
 
 
