@@ -32,7 +32,7 @@ class ForestServiceProvider extends ServiceProvider
     public function boot(Kernel $kernel): void
     {
         $this->app->register(EventProvider::class);
-        $this->app->register(AuthorizationProvider::class);
+        //$this->app->register(AuthorizationProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
         if ($this->app->runningInConsole()) {
@@ -54,9 +54,9 @@ class ForestServiceProvider extends ServiceProvider
 
         $kernel->pushMiddleware(ForestCors::class);
 
-        $this->app->bind('chart-api', fn() => new ChartApiResponse());
-        $this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection());
-        $this->app->bind('json-api', fn() => new JsonApiResponse());
+        //$this->app->bind('chart-api', fn() => new ChartApiResponse());
+        //$this->app->bind('forest-schema', fn() => new ForestSchemaInstrospection()); -> A EVENTUELLEMENT FAIRE POINTER SUR LE FORESTSCHEMAINTROSPECTION DE L'AGENT
+        //$this->app->bind('json-api', fn() => new JsonApiResponse()); -> IDEM
     }
 
     /**
@@ -66,16 +66,16 @@ class ForestServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->configFile(), 'forest');
 
-        config(
-            [
-                'auth.guards.forest' => array_merge(
-                    [
-                        'driver' => 'forest-token',
-                    ],
-                    config('auth.guards.forest', [])
-                ),
-            ]
-        );
+//        config(
+//            [
+//                'auth.guards.forest' => array_merge(
+//                    [
+//                        'driver' => 'forest-token',
+//                    ],
+//                    config('auth.guards.forest', [])
+//                ),
+//            ]
+//        );
     }
 
     /**

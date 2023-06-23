@@ -32,6 +32,7 @@ class SendApimap extends Command
      */
     public function handle()
     {
-        app()->make(Schema::class)->sendApiMap();
+//        app()->make(Schema::class)->sendApiMap();
+        // A REPRENDRE DEPUIS AGENT FACTORY COMME BUNDLE SF
     }
 }

@@ -20,6 +20,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
+        // VOIR A RECUPERER LES ROUTES DEPUIS L'AGENT
     }
 }
