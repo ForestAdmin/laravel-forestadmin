@@ -2,7 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Listeners;
 
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Container\BindingResolutionException;
 
@@ -24,7 +23,7 @@ class ArtisanStart
     public function handle(CommandStarting $event): void
     {
         if ($event->command === 'serve') {
-            app()->make(Schema::class)->sendApiMap();
+            //app()->make(Schema::class)->sendApiMap();
         }
     }
 }

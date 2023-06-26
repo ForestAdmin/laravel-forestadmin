@@ -2,7 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Listeners;
 
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;

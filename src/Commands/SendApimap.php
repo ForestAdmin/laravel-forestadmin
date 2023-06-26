@@ -2,7 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Commands;
 
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 

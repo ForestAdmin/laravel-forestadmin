@@ -5,8 +5,6 @@ namespace ForestAdmin\LaravelForestAdmin\Http\Middleware;
 use Asm89\Stack\CorsService;
 use Closure;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +23,7 @@ class ForestCors
 
     public function handle($request, Closure $next): Response
     {
-        if (!$this->shouldRun($request)) {
+        if (! $this->shouldRun($request)) {
             return $next($request);
         }
 
@@ -51,7 +49,7 @@ class ForestCors
 
     protected function addHeaders(Request $request, Response $response): Response
     {
-        if (!$response->headers->has('Access-Control-Allow-Origin')) {
+        if (! $response->headers->has('Access-Control-Allow-Origin')) {
             $response = $this->cors->addActualRequestHeaders($response, $request);
         }
 
