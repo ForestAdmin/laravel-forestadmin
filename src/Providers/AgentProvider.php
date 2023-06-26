@@ -29,8 +29,17 @@ class AgentProvider extends ServiceProvider
         $prefix = '/forest';
 
         foreach (AgentRouter::getRoutes() as $agentRoute) {
-            $this->app['router']->addRoute(['GET'], $prefix . $agentRoute['uri'], $agentRoute['closure']);
+            $this->app['router']->addRoute($this->transformMethodsValuesToUpper($agentRoute['methods']), $prefix . $agentRoute['uri'], $agentRoute['closure']);
         }
+    }
+
+    private function transformMethodsValuesToUpper(array|string $methods): array
+    {
+        if (is_string($methods)) {
+            return [strtoupper($methods)];
+        }
+
+        return array_map(fn ($method) => strtoupper($method), $methods);
     }
 
     private function loadConfiguration(): void
