@@ -3,73 +3,50 @@
 namespace ForestAdmin\LaravelForestAdmin\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-/**
- * Class ForestInstall
- *
- * @package Laravel-forestadmin
- * @license GNU https://www.gnu.org/licenses/licenses.html
- * @link    https://github.com/ForestAdmin/laravel-forestadmin
- * @codeCoverageIgnore
- */
 class ForestInstall extends Command
 {
-    /**
-     * @var string
-     */
-    protected $signature = 'forest:setup-keys {secret-key} {url}';
-    // A RENOMMER EN forest:install COMME LE BUNDLE
+    protected $signature = 'forest:install {secretKey} {envFileName=.env}';
 
-    /**
-     * @var string
-     */
-    protected $description = 'Setup de keys on forest config file';
+    protected $description = 'Install the Forest admin : setup environment keys & publish the default Forest Admin configuration to the application';
 
-    /**
-     * @return int
-     */
-    public function handle()
+    public function handle(): void
     {
-        // A REPRENDRE COMME LE BUNDLE SF
+        File::deleteDirectory(storage_path('framework/cache/data/forest'));
 
-//        $url = $this->argument('url');
-//        $appUrl = config('app.url');
-//        $documentationUrl = 'https://docs.forestadmin.com/documentation/how-tos/settings/laravel-specific-settings#onboard-with-laravel-valet';
-//
-//        if (preg_match('/^(http:\/\/.*)(.test)$/', $url)) {
-//            $this->info("⚠️  If you use Valet, please activate SSL with valet secure command. See the <href=$documentationUrl>documentation</> for more information");
-//        }
-//
-//        if ($url !== $appUrl) {
-//            $this->error("🌳🌳🌳 Something went wrong! The URL set on step 1 ($url) and you Laravel APP_URL ($appUrl) do not match. Please update as to make them match. 🌳🌳🌳");
-//            return;
-//        } else {
-//            $this->info('✅ Url properly configured');
-//        }
-//
-//        if (Str::contains(file_get_contents($this->getEnvFilePath()), 'FOREST_AUTH_SECRET') === false) {
-//            $key = Str::random(32);
-//            file_put_contents($this->getEnvFilePath(), PHP_EOL . "FOREST_AUTH_SECRET=$key", FILE_APPEND);
-//            $this->info('✅ The forest auth key has been setup');
-//        } else {
-//            $this->warn('The forest auth key is already setup');
-//        }
-//
-//        if (Str::contains(file_get_contents($this->getEnvFilePath()), 'FOREST_ENV_SECRET') === false) {
-//            $secretKey = $this->argument('secret-key');
-//            file_put_contents($this->getEnvFilePath(), PHP_EOL . "FOREST_ENV_SECRET=$secretKey" . PHP_EOL, FILE_APPEND);
-//            $this->info('✅ The forest secret key has been setup');
-//        } else {
-//            $this->warn('The forest secret key is already setup');
-//        }
+        $keys = [
+            'FOREST_AUTH_SECRET' => Str::random(32),
+            'FOREST_ENV_SECRET'  => $this->argument('secretKey'),
+        ];
+
+        $this->addKeysToEnvFile($keys, $this->argument('envFileName'));
+
+        $this->publishConfig();
     }
 
-    /**
-     * @return string
-     */
-    private function getEnvFilePath(): string
+    private function addKeysToEnvFile(array $keys, string $envFileName): void
     {
-//        return app()->basePath('.env');
+        foreach ($keys as $key => $value) {
+            file_put_contents(base_path() . '/' . $envFileName, PHP_EOL . "$key=$value", FILE_APPEND);
+        }
+        $this->info('<info>✅ Env keys correctly set</info>');
+    }
+
+    private function publishConfig(): void
+    {
+        $defaultConfigFile = __DIR__ . '/../../default.config';
+        $publishFileName = base_path() . '/forest/symfony_forest_admin.php';
+        if (! file_exists($publishFileName)) {
+            $forestDirectory = base_path() . '/forest';
+            if (! mkdir($forestDirectory) && ! is_dir($forestDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $forestDirectory));
+            }
+            copy($defaultConfigFile, $publishFileName);
+            $this->info('<info>✅ Config file set</info>');
+        } else {
+            $this->info('<info>⚠️ Forest Admin config file already setup</info>');
+        }
     }
 }

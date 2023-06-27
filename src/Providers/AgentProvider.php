@@ -4,9 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
 use ForestAdmin\AgentPHP\Agent\Http\Router as AgentRouter;
-use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class AgentProvider extends ServiceProvider
