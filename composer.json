@@ -20,7 +20,7 @@
     },
     {
       "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/DatasourceDummy"
+      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/DatasourceEloquent"
     },
     {
       "type": "path",
@@ -41,7 +41,7 @@
     "forestadmin/php-agent-toolkit": "*",
     "forestadmin/php-base-datasource": "*",
     "forestadmin/php-datasource-customizer": "*",
-    "forestadmin/php-datasource-dummy": "*",
+    "forestadmin/php-datasource-eloquent": "*",
     "forestadmin/php-datasource-toolkit": "*"
   },
   "require-dev": {
