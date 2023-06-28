@@ -4,6 +4,7 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
 use ForestAdmin\AgentPHP\Agent\Http\Router as AgentRouter;
+use ForestAdmin\LaravelForestAdmin\Http\Controllers\ForestController;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,9 +14,9 @@ class AgentProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->app->bind(AgentFactory::class, fn () => new AgentFactory($this->loadOptions()));
+        $this->app->instance(AgentFactory::class, new AgentFactory($this->loadOptions()));
         $this->loadConfiguration();
-        $this->app->get(AgentFactory::class)->build();
+        $this->app->make(AgentFactory::class)->build();
         $this->loadRoutes();
     }
 
@@ -26,8 +27,8 @@ class AgentProvider extends ServiceProvider
     {
         $prefix = '/forest';
 
-        foreach (AgentRouter::getRoutes() as $agentRoute) {
-            $this->app['router']->addRoute($this->transformMethodsValuesToUpper($agentRoute['methods']), $prefix . $agentRoute['uri'], $agentRoute['closure']);
+        foreach (AgentRouter::getRoutes() as $name => $agentRoute) {
+            $this->app['router']->addRoute($this->transformMethodsValuesToUpper($agentRoute['methods']), $prefix . $agentRoute['uri'], [ForestController::class, '__invoke'])->name($name);
         }
     }
 
@@ -51,13 +52,14 @@ class AgentProvider extends ServiceProvider
     private function loadOptions(): array
     {
         return [
+            // TODO  fix symfony
             'debug'                => env('FOREST_DEBUG', true),
             'authSecret'           => env('FOREST_AUTH_SECRET'),
             'envSecret'            => env('FOREST_ENV_SECRET'),
             'forestServerUrl'      => env('FOREST_SERVER_URL', 'https://api.forestadmin.com'),
-            'isProduction'         => env('APP_ENV', 'dev') === 'prod',
+            'isProduction'         => env('FOREST_ENVIRONMENT', 'dev') === 'prod',
             'prefix'               => env('FOREST_PREFIX', 'forest'),
-            'permissionExpiration' => env('FOREST_PERMISSIONS_EXPIRATION_IN_SECONDS', 1),
+            'permissionExpiration' => env('FOREST_PERMISSIONS_EXPIRATION_IN_SECONDS', 300),
             'cacheDir'             => storage_path('framework/cache/data/forest'),
             'schemaPath'           => base_path() . '/.forestadmin-schema.json',
             'projectDir'           => base_path(),
