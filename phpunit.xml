@@ -11,6 +11,7 @@
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>
+            <directory suffix=".php">./src/Http/Middleware</directory>
         </include>
     </coverage>
 </phpunit>
