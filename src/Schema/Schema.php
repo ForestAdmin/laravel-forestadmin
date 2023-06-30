@@ -176,8 +176,8 @@ class Schema
         }
 
         return [
-            'data'     => $data,
-            'included' => array_merge(...$included),
+            'data'     => collect($data)->filter()->toArray(),
+            'included' => collect(array_merge(...$included))->filter()->toArray(),
             'meta'     => $schema['meta'],
         ];
     }
