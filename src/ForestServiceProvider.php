@@ -28,20 +28,12 @@ class ForestServiceProvider extends ServiceProvider
 
         $this->publishes(
             [
-                $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest.php',
+                $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php',
             ],
             'config'
         );
 
         $kernel->pushMiddleware(ForestCors::class);
-    }
-
-    /**
-     * @return void
-     */
-    public function register(): void
-    {
-        $this->mergeConfigFrom($this->configFile(), 'forest');
     }
 
     /**
@@ -51,6 +43,6 @@ class ForestServiceProvider extends ServiceProvider
      */
     protected function configFile(): string
     {
-        return realpath(__DIR__ . '/../config/forest.php');
+        return realpath(__DIR__ . '/../config/forest_admin.php');
     }
 }

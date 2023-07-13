@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class ForestInstall extends Command
 {
-    protected $signature = 'forest:install {secretKey} {envFileName=.env}';
+    protected $signature = 'forest:install {secretKey?} {envFileName=.env}';
 
     protected $description = 'Install the Forest admin : setup environment keys & publish the default Forest Admin configuration to the application';
 
@@ -16,37 +16,21 @@ class ForestInstall extends Command
     {
         File::deleteDirectory(storage_path('framework/cache/data/forest'));
 
+        if (null !== $this->argument('secretKey')) {
+            $this->createNewKeysToEnvFile($this->argument('envFileName'));
+        }
+    }
+
+    private function createNewKeysToEnvFile(string $envFileName): void
+    {
         $keys = [
             'FOREST_AUTH_SECRET' => Str::random(32),
             'FOREST_ENV_SECRET'  => $this->argument('secretKey'),
         ];
 
-        $this->addKeysToEnvFile($keys, $this->argument('envFileName'));
-
-        $this->publishConfig();
-    }
-
-    private function addKeysToEnvFile(array $keys, string $envFileName): void
-    {
         foreach ($keys as $key => $value) {
             file_put_contents(base_path() . '/' . $envFileName, PHP_EOL . "$key=$value", FILE_APPEND);
         }
         $this->info('<info>✅ Env keys correctly set</info>');
-    }
-
-    private function publishConfig(): void
-    {
-        $defaultConfigFile = __DIR__ . '/../../default.config';
-        $publishFileName = base_path() . '/config/forest_admin.php';
-        if (! file_exists($publishFileName)) {
-            $forestDirectory = base_path() . '/config';
-            if (! mkdir($forestDirectory) && ! is_dir($forestDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $forestDirectory));
-            }
-            copy($defaultConfigFile, $publishFileName);
-            $this->info('<info>✅ Config file set</info>');
-        } else {
-            $this->info('<info>⚠️ Forest Admin config file already setup</info>');
-        }
     }
 }

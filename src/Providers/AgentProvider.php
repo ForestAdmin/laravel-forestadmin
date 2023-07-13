@@ -14,10 +14,10 @@ class AgentProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->app->instance(AgentFactory::class, new AgentFactory($this->loadOptions()));
-        $this->loadConfiguration();
-        $this->app->make(AgentFactory::class)->build();
-        $this->loadRoutes();
+        if ($this->forestIsPlanted()) {
+            $this->app->instance(AgentFactory::class, new AgentFactory($this->loadOptions()));
+            $this->loadConfiguration();
+        }
     }
 
     /**
@@ -32,6 +32,11 @@ class AgentProvider extends ServiceProvider
         }
     }
 
+    private function forestIsPlanted(): bool
+    {
+        return env('FOREST_AUTH_SECRET') && env('FOREST_ENV_SECRET');
+    }
+
     private function transformMethodsValuesToUpper(array|string $methods): array
     {
         if (is_string($methods)) {
@@ -43,16 +48,18 @@ class AgentProvider extends ServiceProvider
 
     private function loadConfiguration(): void
     {
-        if (file_exists(base_path() . '/forest/symfony_forest_admin.php')) {
-            $callback = require base_path() . '/forest/symfony_forest_admin.php';
+        if (file_exists($this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php')) {
+            $callback = require $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php';
             $callback($this);
+
+            $this->app->make(AgentFactory::class)->build();
+            $this->loadRoutes();
         }
     }
 
     private function loadOptions(): array
     {
         return [
-            // TODO  fix symfony
             'debug'                => env('FOREST_DEBUG', true),
             'authSecret'           => env('FOREST_AUTH_SECRET'),
             'envSecret'            => env('FOREST_ENV_SECRET'),
