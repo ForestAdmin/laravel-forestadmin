@@ -37,9 +37,9 @@ class ForestInstall extends Command
     private function publishConfig(): void
     {
         $defaultConfigFile = __DIR__ . '/../../default.config';
-        $publishFileName = base_path() . '/forest/symfony_forest_admin.php';
+        $publishFileName = base_path() . '/config/forest_admin.php';
         if (! file_exists($publishFileName)) {
-            $forestDirectory = base_path() . '/forest';
+            $forestDirectory = base_path() . '/config';
             if (! mkdir($forestDirectory) && ! is_dir($forestDirectory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $forestDirectory));
             }
