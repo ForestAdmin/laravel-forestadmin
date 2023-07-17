@@ -2,13 +2,6 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Utils;
 
-/**
- * Class Database
- *
- * @package Laravel-forestadmin
- * @license GNU https://www.gnu.org/licenses/licenses.html
- * @link    https://github.com/ForestAdmin/laravel-forestadmin
- */
 class Database
 {
     /**
@@ -17,16 +10,18 @@ class Database
      */
     public static function getSource(string $name): string
     {
-        if (!in_array($name, ['sqlite', 'mysql', 'pgsql', 'sqlsrv'], true)) {
+        if (! in_array($name, ['sqlite', 'mysql', 'pgsql', 'sqlsrv'], true)) {
             throw new \RuntimeException("The database dialect `$name` is not supported");
         }
 
         switch ($name) {
             case 'pgsql':
                 $name = 'postgres';
+
                 break;
             case 'sqlsrv':
                 $name = 'mssql';
+
                 break;
             default:
                 $name;

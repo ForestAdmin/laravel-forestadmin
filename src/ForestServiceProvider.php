@@ -6,7 +6,6 @@ use ForestAdmin\LaravelForestAdmin\Commands\ForestInstall;
 use ForestAdmin\LaravelForestAdmin\Commands\SendApimap;
 use ForestAdmin\LaravelForestAdmin\Http\Middleware\ForestCors;
 use ForestAdmin\LaravelForestAdmin\Providers\AgentProvider;
-use ForestAdmin\LaravelForestAdmin\Providers\EventProvider;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +14,6 @@ class ForestServiceProvider extends ServiceProvider
     public function boot(Kernel $kernel): void
     {
         $this->app->register(AgentProvider::class);
-        $this->app->register(EventProvider::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands(
