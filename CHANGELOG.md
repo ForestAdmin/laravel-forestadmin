@@ -1,3 +1,10 @@
+# [1.4.0-beta.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.4.0-beta.1...v1.4.0-beta.2) (2023-07-17)
+
+
+### Bug Fixes
+
+* schema to avoid null data ([#71](https://github.com/ForestAdmin/laravel-forestadmin/issues/71)) ([de63a09](https://github.com/ForestAdmin/laravel-forestadmin/commit/de63a09a1090c14ef50b9e10a0630ce46d43af80))
+
 # [1.4.0-beta.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.3.0...v1.4.0-beta.1) (2023-07-17)
 
 
