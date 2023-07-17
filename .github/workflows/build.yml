@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['7.4', '8.0', '8.1']
+        php: ['8.0', '8.1']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -39,14 +39,14 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Detect coding standard violations
-        run: vendor/bin/phpcs -n -q --report=checkstyle | cs2pr --graceful-warnings
+      - name: PHP-CS-Fixer
+        uses: docker://oskarstark/php-cs-fixer-ga
 
-      - name: PHPUnit tests
-        run: vendor/bin/phpunit --coverage-clover /tmp/clover.xml
+      - name: Pest PHP tests
+        run: vendor/bin/pest --coverage-clover /tmp/clover.xml
 
       - name: Send coverage
-        uses: paambaati/codeclimate-action@v2.7.4
+        uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
