@@ -5,28 +5,6 @@
   "type": "library",
   "license": "GPL-3.0-or-later",
   "prefer-stable": true,
-  "repositories": [
-    {
-      "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/Agent"
-    },
-    {
-      "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/BaseDatasource"
-    },
-    {
-      "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/DatasourceCustomizer"
-    },
-    {
-      "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/DatasourceEloquent"
-    },
-    {
-      "type": "path",
-      "url": "/Users/matthieuvideaud/Sites/agents/in-app/agent-php/packages/DatasourceToolkit"
-    }
-  ],
   "require": {
     "php": ">=8.0",
     "asm89/stack-cors": "^2.0",
