@@ -2,36 +2,19 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Commands;
 
-use ForestAdmin\LaravelForestAdmin\Schema\Schema;
+use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Container\BindingResolutionException;
 
-/**
- * Class SendApimap
- *
- * @package Laravel-forestadmin
- * @license GNU https://www.gnu.org/licenses/licenses.html
- * @link    https://github.com/ForestAdmin/laravel-forestadmin
- * @codeCoverageIgnore
- */
 class SendApimap extends Command
 {
-    /**
-     * @var string
-     */
     protected $signature = 'forest:send-apimap';
 
-    /**
-     * @var string
-     */
     protected $description = 'Send the apimap to Forest';
 
-    /**
-     * @return int
-     * @throws BindingResolutionException
-     */
     public function handle()
     {
-        app()->make(Schema::class)->sendApiMap();
+        app()->make(AgentFactory::class)->sendSchema();
+
+        $this->info('✅ Apimap sent');
     }
 }
