@@ -1,3 +1,16 @@
+# [2.0.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.3.1...v2.0.0) (2023-07-18)
+
+
+### Features
+
+* allow user to onboard to the new eloquent datasource from forestadmin/agent-php ([#72](https://github.com/ForestAdmin/laravel-forestadmin/issues/72)) ([f09cf6d](https://github.com/ForestAdmin/laravel-forestadmin/commit/f09cf6d458ee1d5b4bb7e4525781bd391ffae343))
+* allow user to onboard to the new eloquent datasource from forestadmin/agent-php ([#78](https://github.com/ForestAdmin/laravel-forestadmin/issues/78)) ([ee7f1ee](https://github.com/ForestAdmin/laravel-forestadmin/commit/ee7f1ee629999dfb1f3845184b0969662c4fea4e))
+
+
+### BREAKING CHANGES
+
+* allow user to onboard to the new eloquent datasource from forestadmin/agent-php
+
 # [2.0.0-beta.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.3.1...v2.0.0-beta.1) (2023-07-18)
 
 
