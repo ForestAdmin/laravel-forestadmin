@@ -2,35 +2,19 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Http\Controllers;
 
-use ForestAdmin\LaravelForestAdmin\Permissions\Permission;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
+use ForestAdmin\AgentPHP\Agent\Http\ForestController as BaseForestController;
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ForestController
- *
- * @package  Laravel-forestadmin
- * @license  GNU https://www.gnu.org/licences/licences.html
- * @link     https://github.com/ForestAdmin/laravel-forestadmin
- */
-class ForestController extends Controller
+class ForestController extends BaseForestController
 {
-    use AuthorizesRequests {
-        authorize as baseAuthorize;
-    }
-
-    /**
-     * @param string $ability
-     * @param        $arguments
-     * @return mixed
-     * @throws AuthorizationException
-     */
-    public function can(string $ability, $arguments)
+    public function __invoke(Request $request): JsonResponse|Response
     {
-        if (! Permission::$ability(Auth::guard('forest')->user(), $arguments)) {
-            throw new AuthorizationException();
-        }
+        $request->attributes->set('_route', Route::currentRouteName());
+        $request->attributes->set('_route_params', Route::current()->parameters());
+
+        return parent::__invoke($request);
     }
 }
