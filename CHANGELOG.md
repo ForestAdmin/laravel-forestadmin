@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.0.0...v2.1.0) (2023-07-20)
+
+
+### Features
+
+* **command:** add auto publish configuration into forest install command ([#79](https://github.com/ForestAdmin/laravel-forestadmin/issues/79)) ([e227807](https://github.com/ForestAdmin/laravel-forestadmin/commit/e22780768862ca03a849d004ab688c1b9b0c7686))
+
 # [2.0.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v1.3.1...v2.0.0) (2023-07-18)
 
 
