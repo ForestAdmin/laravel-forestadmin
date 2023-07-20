@@ -2,6 +2,7 @@
 
 namespace ForestAdmin\LaravelForestAdmin\Commands;
 
+use ForestAdmin\LaravelForestAdmin\ForestServiceProvider;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -19,6 +20,11 @@ class ForestInstall extends Command
         if (null !== $this->argument('secretKey')) {
             $this->createNewKeysToEnvFile($this->argument('envFileName'));
         }
+
+        $this->call('vendor:publish', [
+            '--provider' => ForestServiceProvider::class,
+            '--tag'      => 'config',
+        ]);
     }
 
     private function createNewKeysToEnvFile(string $envFileName): void
@@ -31,6 +37,7 @@ class ForestInstall extends Command
         foreach ($keys as $key => $value) {
             file_put_contents(base_path() . '/' . $envFileName, PHP_EOL . "$key=$value", FILE_APPEND);
         }
-        $this->info('<info>✅ Env keys correctly set</info>');
+
+        $this->components->info('✅ Env keys correctly set');
     }
 }
