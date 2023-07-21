@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.1...v2.1.2) (2023-07-21)
+
+
+### Bug Fixes
+
+* add doctrine/dbal dependency to allow use of sqlsrv database ([#81](https://github.com/ForestAdmin/laravel-forestadmin/issues/81)) ([39bea62](https://github.com/ForestAdmin/laravel-forestadmin/commit/39bea62179ec4ca1d9de72068190e3e4affb5fb2))
+
 ## [2.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.0...v2.1.1) (2023-07-21)
 
 
