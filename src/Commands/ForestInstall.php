@@ -38,6 +38,6 @@ class ForestInstall extends Command
             file_put_contents(base_path() . '/' . $envFileName, PHP_EOL . "$key=$value", FILE_APPEND);
         }
 
-        $this->components->info('✅ Env keys correctly set');
+        $this->info('✅ Env keys correctly set');
     }
 }
