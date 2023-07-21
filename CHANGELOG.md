@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.0...v2.1.1) (2023-07-21)
+
+
+### Bug Fixes
+
+* output confirmation message on forest:install command ([#80](https://github.com/ForestAdmin/laravel-forestadmin/issues/80)) ([7d7195f](https://github.com/ForestAdmin/laravel-forestadmin/commit/7d7195fcb45224d54c767bb4f64e7f1532417b2c))
+
 # [2.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.0.0...v2.1.0) (2023-07-20)
 
 
