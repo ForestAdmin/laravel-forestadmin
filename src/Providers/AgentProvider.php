@@ -15,7 +15,7 @@ class AgentProvider extends ServiceProvider
     public function boot()
     {
         if ($this->forestIsPlanted()) {
-            $this->app->instance(AgentFactory::class, new AgentFactory($this->loadOptions()));
+            $this->app->instance(AgentFactory::class, new AgentFactory(config('forest')));
             $this->loadConfiguration();
         }
     }
@@ -34,7 +34,7 @@ class AgentProvider extends ServiceProvider
 
     private function forestIsPlanted(): bool
     {
-        return env('FOREST_AUTH_SECRET') && env('FOREST_ENV_SECRET');
+        return config('forest.authSecret') && config('forest.envSecret');
     }
 
     private function transformMethodsValuesToUpper(array|string $methods): array
@@ -48,8 +48,8 @@ class AgentProvider extends ServiceProvider
 
     private function loadConfiguration(): void
     {
-        if (file_exists($this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php')) {
-            $callback = require $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php';
+        if (file_exists($this->appForestConfig())) {
+            $callback = require $this->appForestConfig();
             $callback($this);
 
             $this->app->make(AgentFactory::class)->build();
@@ -57,19 +57,8 @@ class AgentProvider extends ServiceProvider
         }
     }
 
-    private function loadOptions(): array
+    private function appForestConfig(): string
     {
-        return [
-            'debug'                => env('FOREST_DEBUG', true),
-            'authSecret'           => env('FOREST_AUTH_SECRET'),
-            'envSecret'            => env('FOREST_ENV_SECRET'),
-            'forestServerUrl'      => env('FOREST_SERVER_URL', 'https://api.forestadmin.com'),
-            'isProduction'         => env('FOREST_ENVIRONMENT', 'dev') === 'prod',
-            'prefix'               => env('FOREST_PREFIX', 'forest'),
-            'permissionExpiration' => env('FOREST_PERMISSIONS_EXPIRATION_IN_SECONDS', 300),
-            'cacheDir'             => storage_path('framework/cache/data/forest'),
-            'schemaPath'           => base_path() . '/.forestadmin-schema.json',
-            'projectDir'           => base_path(),
-        ];
+        return base_path() . DIRECTORY_SEPARATOR . 'forest' . DIRECTORY_SEPARATOR . 'forest_admin.php';
     }
 }

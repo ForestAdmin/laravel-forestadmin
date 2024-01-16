@@ -23,6 +23,7 @@ class ForestInstall extends Command
 
         $this->call('vendor:publish', [
             '--provider' => ForestServiceProvider::class,
+            '--tag'      => 'forest',
             '--tag'      => 'config',
         ]);
     }

@@ -26,9 +26,16 @@ class ForestServiceProvider extends ServiceProvider
 
         $this->publishes(
             [
-                $this->configFile() => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'forest_admin.php',
+                $this->configFile() => config_path('forest.php'),
             ],
             'config'
+        );
+
+        $this->publishes(
+            [
+                $this->agentTemplateFile() => $this->appForestPath() . DIRECTORY_SEPARATOR . 'forest_admin.php',
+            ],
+            'forest'
         );
 
         $kernel->pushMiddleware(ForestCors::class);
@@ -41,6 +48,16 @@ class ForestServiceProvider extends ServiceProvider
      */
     protected function configFile(): string
     {
-        return realpath(__DIR__ . '/../config/forest_admin.php');
+        return realpath(__DIR__ . '/../config/forest.php');
+    }
+
+    protected function agentTemplateFile(): string
+    {
+        return realpath(__DIR__ . '/../agentTemplate/forest_admin.php');
+    }
+
+    protected function appForestPath(): string
+    {
+        return base_path() . DIRECTORY_SEPARATOR . 'forest';
     }
 }
