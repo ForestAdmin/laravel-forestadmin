@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.2...v3.0.0) (2024-01-16)
+
+
+### Bug Fixes
+
+* allows user to cache the agent's configuration ([#82](https://github.com/ForestAdmin/laravel-forestadmin/issues/82)) ([8d39c44](https://github.com/ForestAdmin/laravel-forestadmin/commit/8d39c44cfc814cbc9438f4511502b21f58f33af0))
+
+
+### BREAKING CHANGES
+
+* add a new configuration file config/forest.php and move the previous configuration to a new template file agentTemplate/forest_admin.php
+
 ## [2.1.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.1...v2.1.2) (2023-07-21)
 
 
