@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.0.0...v3.0.1) (2024-02-15)
+
+
+### Bug Fixes
+
+* **onboarding:** the installation command publishes the agent initialisation file ([#83](https://github.com/ForestAdmin/laravel-forestadmin/issues/83)) ([17fb6dd](https://github.com/ForestAdmin/laravel-forestadmin/commit/17fb6dd6760bb41cc09baf01b01aae8f90bef196))
+
 # [3.0.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v2.1.2...v3.0.0) (2024-01-16)
 
 
