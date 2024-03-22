@@ -5,7 +5,9 @@ use ForestAdmin\AgentPHP\DatasourceEloquent\EloquentDatasource;
 
 return static function () {
     $defaultDB = config('database.default');
-    app()->make(AgentFactory::class)->addDatasource(
+    $forestAgent =  app()->make(AgentFactory::class);
+
+    $forestAgent->addDatasource(
         new EloquentDatasource(
             [
                 'driver'   => config('database.connections.' . $defaultDB . '.driver'),
