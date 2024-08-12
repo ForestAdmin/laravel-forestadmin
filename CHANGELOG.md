@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.0...v3.1.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* update minimum version of agent-php packages ([#88](https://github.com/ForestAdmin/laravel-forestadmin/issues/88)) ([a9337f3](https://github.com/ForestAdmin/laravel-forestadmin/commit/a9337f3186348802a8bfbc8dc6607dbf6a9e3e43))
+
 # [3.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.0.2...v3.1.0) (2024-08-12)
 
 
