@@ -8,17 +8,6 @@ return static function () {
     $forestAgent =  app()->make(AgentFactory::class);
 
     $forestAgent->addDatasource(
-        new EloquentDatasource(
-            [
-                'driver'   => config('database.connections.' . $defaultDB . '.driver'),
-                'host'     => config('database.connections.' . $defaultDB . '.host'),
-                'port'     => config('database.connections.' . $defaultDB . '.port'),
-                'database' => config('database.connections.' . $defaultDB . '.database'),
-                'username' => config('database.connections.' . $defaultDB . '.username'),
-                'password' => config('database.connections.' . $defaultDB . '.password'),
-                // OR
-                // 'url' => config('database.connections.' . $defaultDB . '.url'),
-            ]
-        ),
+        new EloquentDatasource(config('database.connections.' . $defaultDB)),
     );
 };
