@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.0.2...v3.1.0) (2024-08-12)
+
+
+### Features
+
+* **onboard:** laravel 11 compatibily ([#87](https://github.com/ForestAdmin/laravel-forestadmin/issues/87)) ([957aa8b](https://github.com/ForestAdmin/laravel-forestadmin/commit/957aa8b7aef27dca6db079f33154ff9246d0b139)), closes [#86](https://github.com/ForestAdmin/laravel-forestadmin/issues/86)
+
 ## [3.0.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.0.1...v3.0.2) (2024-07-31)
 
 
