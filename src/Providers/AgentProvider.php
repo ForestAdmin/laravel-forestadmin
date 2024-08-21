@@ -24,7 +24,7 @@ class AgentProvider extends ServiceProvider
 
     public static function getAgentInstance()
     {
-        if (Cache::has('forestAgent')) {
+        if (Cache::enabled() && Cache::has('forestAgent')) {
             return Cache::get('forestAgent');
         } else {
             $agent = new AgentFactory(config('forest'));

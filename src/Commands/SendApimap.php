@@ -3,6 +3,8 @@
 namespace ForestAdmin\LaravelForestAdmin\Commands;
 
 use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
+use ForestAdmin\AgentPHP\Agent\Facades\Cache;
+use ForestAdmin\LaravelForestAdmin\Providers\AgentProvider;
 use Illuminate\Console\Command;
 
 class SendApimap extends Command
@@ -13,7 +15,8 @@ class SendApimap extends Command
 
     public function handle()
     {
-        app()->make(AgentFactory::class)->sendSchema();
+        Cache::flush();
+        AgentProvider::getAgentInstance()->sendSchema();
 
         $this->info('✅ Apimap sent');
     }
