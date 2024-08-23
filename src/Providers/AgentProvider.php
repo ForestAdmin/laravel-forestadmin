@@ -64,7 +64,8 @@ class AgentProvider extends ServiceProvider
     {
         if (file_exists($this->appForestConfig())) {
             $hash = sha1(file_get_contents($this->appForestConfig()));
-            if($hash !== Cache::get('forestConfigHash')) {
+            $agent = self::getAgentInstance();
+            if($hash !== Cache::get('forestConfigHash') || AgentFactory::get('datasource') !== null) {
                 $callback = require $this->appForestConfig();
                 $callback();
                 Cache::put('forestConfigHash', $hash, 3600);

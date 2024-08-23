@@ -11,4 +11,6 @@ return static function () {
     $forestAgent->addDatasource(
         new EloquentDatasource(config('database.connections.' . $defaultDB)),
     );
+
+    $forestAgent->build();
 };
