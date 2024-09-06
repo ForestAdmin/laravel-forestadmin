@@ -4,7 +4,9 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
 use ForestAdmin\AgentPHP\Agent\Facades\Cache;
+use ForestAdmin\AgentPHP\Agent\Facades\Logger;
 use ForestAdmin\AgentPHP\Agent\Http\Router as AgentRouter;
+use ForestAdmin\AgentPHP\Agent\Utils\Filesystem;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ForestController;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +18,12 @@ class AgentProvider extends ServiceProvider
     public function boot()
     {
         if ($this->forestIsPlanted() && (request()->getMethod() !== 'OPTIONS')) {
+            // set cache file configuration
+            $filesystem = new Filesystem();
+            $directory = config('forest')['cacheDir'];
+            $disabledApcuCache = config('forest')['disabledApcuCache'];
+            AgentFactory::$fileCacheOptions = compact('filesystem', 'directory', 'disabledApcuCache');
+
             self::getAgentInstance();
 
             $this->loadConfiguration();
@@ -24,11 +32,20 @@ class AgentProvider extends ServiceProvider
 
     public static function getAgentInstance()
     {
-        if (Cache::enabled() && Cache::has('forestAgent')) {
+        if (Cache::enabled() &&
+            Cache::has('forestAgent') &&
+            Cache::get('forestAgentExpireAt') > strtotime('+ 30 seconds')
+        ) {
+            Logger::log('Info', 'get agent in cache');
+
             return Cache::get('forestAgent');
         } else {
             $agent = new AgentFactory(config('forest'));
-            Cache::put('forestAgent', $agent, 3600);
+            $expireAt = strtotime('+ '. AgentFactory::TTL .' seconds');
+            Cache::put('forestAgent', $agent, AgentFactory::TTL);
+            Cache::put('forestAgentExpireAt', $expireAt, AgentFactory::TTL);
+
+            Logger::log('Info', 'create agent');
 
             return $agent;
         }
@@ -65,9 +82,10 @@ class AgentProvider extends ServiceProvider
         if (file_exists($this->appForestConfig())) {
             $hash = sha1(file_get_contents($this->appForestConfig()));
             $agent = self::getAgentInstance();
-            if($hash !== Cache::get('forestConfigHash') || AgentFactory::get('datasource') !== null) {
+            if($hash !== Cache::get('forestConfigHash') || AgentFactory::get('datasource') === null) {
                 $callback = require $this->appForestConfig();
                 $callback();
+
                 Cache::put('forestConfigHash', $hash, 3600);
             }
             $this->loadRoutes();
