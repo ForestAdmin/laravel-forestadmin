@@ -4,12 +4,12 @@ namespace ForestAdmin\LaravelForestAdmin\Providers;
 
 use ForestAdmin\AgentPHP\Agent\Builder\AgentFactory;
 use ForestAdmin\AgentPHP\Agent\Facades\Cache;
-use ForestAdmin\AgentPHP\Agent\Facades\Logger;
 use ForestAdmin\AgentPHP\Agent\Http\Router as AgentRouter;
 use ForestAdmin\AgentPHP\Agent\Utils\Filesystem;
 use ForestAdmin\LaravelForestAdmin\Http\Controllers\ForestController;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\ServiceProvider;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class AgentProvider extends ServiceProvider
 {
@@ -24,31 +24,30 @@ class AgentProvider extends ServiceProvider
             $disabledApcuCache = config('forest')['disabledApcuCache'];
             AgentFactory::$fileCacheOptions = compact('filesystem', 'directory', 'disabledApcuCache');
 
-            self::getAgentInstance();
+            $this->app->instance(AgentFactory::class, self::getAgentInstance());
 
             $this->loadConfiguration();
         }
     }
 
-    public static function getAgentInstance()
+    public static function getAgentInstance(bool $forceReload = false)
     {
-        if (Cache::enabled() &&
+        if (! $forceReload &&
+            Cache::enabled() &&
             Cache::has('forestAgent') &&
             Cache::get('forestAgentExpireAt') > strtotime('+ 30 seconds')
         ) {
-            Logger::log('Info', 'get agent in cache');
+            $forestAgentClosure = Cache::get('forestAgent');
 
-            return Cache::get('forestAgent');
-        } else {
-            $agent = new AgentFactory(config('forest'));
-            $expireAt = strtotime('+ '. AgentFactory::TTL .' seconds');
-            Cache::put('forestAgent', $agent, AgentFactory::TTL);
-            Cache::put('forestAgentExpireAt', $expireAt, AgentFactory::TTL);
-
-            Logger::log('Info', 'create agent');
-
-            return $agent;
+            return $forestAgentClosure();
         }
+
+        $agent = new AgentFactory(config('forest'));
+        $expireAt = strtotime('+ '. AgentFactory::TTL .' seconds');
+        Cache::put('forestAgent', new SerializableClosure(fn () => $agent), AgentFactory::TTL);
+        Cache::put('forestAgentExpireAt', $expireAt, AgentFactory::TTL);
+
+        return $agent;
     }
 
     /**
@@ -83,6 +82,7 @@ class AgentProvider extends ServiceProvider
             $hash = sha1(file_get_contents($this->appForestConfig()));
             $agent = self::getAgentInstance();
             if($hash !== Cache::get('forestConfigHash') || AgentFactory::get('datasource') === null) {
+                $this->app->instance(AgentFactory::class, self::getAgentInstance(true));
                 $callback = require $this->appForestConfig();
                 $callback();
 
