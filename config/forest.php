@@ -10,5 +10,6 @@ return [
     'permissionExpiration' => env('FOREST_PERMISSIONS_EXPIRATION_IN_SECONDS', 300),
     'cacheDir'             => storage_path('framework/cache/data/forest'),
     'schemaPath'           => base_path() . '/.forestadmin-schema.json',
+    'disabledApcuCache'    => true,
     'projectDir'           => base_path(),
 ];
