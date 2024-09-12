@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.1...v3.1.2) (2024-09-12)
+
+
+### Bug Fixes
+
+* store agent in cache to improve performance ([#90](https://github.com/ForestAdmin/laravel-forestadmin/issues/90)) ([952480a](https://github.com/ForestAdmin/laravel-forestadmin/commit/952480a10a0bea1e43566c87323a30f3c0f649d0))
+
 ## [3.1.1](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.0...v3.1.1) (2024-08-12)
 
 
