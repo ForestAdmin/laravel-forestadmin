@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.3...v3.1.4) (2024-09-16)
+
+
+### Bug Fixes
+
+* **composer:** update minimum agent dependencies ([#92](https://github.com/ForestAdmin/laravel-forestadmin/issues/92)) ([6eb0965](https://github.com/ForestAdmin/laravel-forestadmin/commit/6eb096526cc09a3b502ce9e30d2b80309b7b7288))
+
 ## [3.1.3](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.2...v3.1.3) (2024-09-16)
 
 
