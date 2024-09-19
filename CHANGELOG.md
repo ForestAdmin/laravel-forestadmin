@@ -1,3 +1,10 @@
+## [3.1.5](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.4...v3.1.5) (2024-09-19)
+
+
+### Bug Fixes
+
+* **config:** add default value for disabledApcuCache configuration ([#93](https://github.com/ForestAdmin/laravel-forestadmin/issues/93)) ([7f59f84](https://github.com/ForestAdmin/laravel-forestadmin/commit/7f59f8416d7316eb0246388ad8211ef6f2fed478))
+
 ## [3.1.4](https://github.com/ForestAdmin/laravel-forestadmin/compare/v3.1.3...v3.1.4) (2024-09-16)
 
 
