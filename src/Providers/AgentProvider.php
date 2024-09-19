@@ -21,7 +21,7 @@ class AgentProvider extends ServiceProvider
             // set cache file configuration
             $filesystem = new Filesystem();
             $directory = config('forest')['cacheDir'];
-            $disabledApcuCache = config('forest')['disabledApcuCache'];
+            $disabledApcuCache = config('forest')['disabledApcuCache'] ?? true;
             AgentFactory::$fileCacheOptions = compact('filesystem', 'directory', 'disabledApcuCache');
 
             $this->app->instance(AgentFactory::class, self::getAgentInstance());
